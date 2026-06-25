@@ -642,19 +642,20 @@
 
     /* ── Curtain section styling ─────────────────────────────────── */
     /* Sections stack via z-index; solid background creates the cover */
-    #hero    { position:relative; z-index:10; background:var(--bg); }
-    #journey { position:relative; z-index:11; background:var(--bg); }
-    #areas   { position:relative; z-index:12; background:var(--bg); }
-    #people  { position:relative; z-index:13; background:var(--bg); }
-    #vision  { position:relative; z-index:14; background:var(--bg); }
-    #spotlight { position:relative; z-index:15; background:var(--bg); }
-    #insights  { position:relative; z-index:16; background:var(--bg); }
-    #cta       { position:relative; z-index:17; background:var(--bg); }
-    footer     { position:relative; z-index:18; background:var(--bg); }
+    #hero            { position:relative; z-index:10; background:var(--bg); }
+    #journey         { position:relative; z-index:11; background:var(--bg); }
+    #areas           { position:relative; z-index:12; background:var(--bg); }
+    #people          { position:relative; z-index:13; background:var(--bg); }
+    #vision          { position:relative; z-index:14; background:var(--bg); }
+    #reut-spotlight  { position:relative; z-index:15; background:var(--bg); --sa:#5BA8CC; --sa-glow:rgba(91,168,204,0.28); }
+    #spotlight       { position:relative; z-index:16; background:var(--bg); }
+    #insights        { position:relative; z-index:17; background:var(--bg); }
+    #cta             { position:relative; z-index:18; background:var(--bg); }
+    footer           { position:relative; z-index:19; background:var(--bg); }
 
     /* Top accent glow line per section — gives the "new card rising" feel */
     #journey::before, #areas::before, #people::before,
-    #vision::before, #spotlight::before, #insights::before, #cta::before {
+    #vision::before, #reut-spotlight::before, #spotlight::before, #insights::before, #cta::before {
       content: '';
       position: absolute;
       top: 0; left: 10%; right: 10%;
@@ -1123,7 +1124,32 @@
   </section>
 
   <!-- ══════════════════════════════════════════════════════════════════
-       FEATURE SPOTLIGHT
+       REUT SPOTLIGHT — AJ 2026
+  ══════════════════════════════════════════════════════════════════ -->
+  <section id="reut-spotlight" class="curtain-rise">
+    <div class="container">
+      <div class="spotlight-grid">
+        <div class="reveal">
+          <span class="spotlight-kicker">Current Initiative</span>
+          <h2 class="spotlight-h">AJ 2026 — Toward a Decade of Renewal of <em>American Jewry.</em></h2>
+          <p class="spotlight-body">In March 2026, Enrico was invited to the Reut USA American Jewry Un-Conference in Miami as part of AJ 2026, a gathering of national Jewish leadership focused on the decade ahead. He made the case that the future of American Jewry runs through communities like Arkansas, not only the major metros. Small communities are not the margins of the Jewish world. They are where the next chapter gets written.</p>
+          <a href="https://www.linkedin.com/in/enricoravenna" target="_blank" rel="noopener noreferrer" class="btn-primary">
+            Connect on LinkedIn
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><path stroke-linecap="round" stroke-linejoin="round" d="M13.5 4.5 21 12m0 0-7.5 7.5M21 12H3"/></svg>
+          </a>
+        </div>
+        <div class="spotlight-img-panel reveal d2">
+          <img src="photo-reut.jpg" class="spotlight-img"
+               alt="Enrico Omri Ravenna at AJ 2026 — Toward a Decade of Renewal of American Jewry, Miami"
+               width="600" height="450"
+               onerror="this.parentElement.innerHTML='<div class=spotlight-placeholder><span>photo-reut.jpg</span></div>';">
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ══════════════════════════════════════════════════════════════════
+       FEATURE SPOTLIGHT — CAMPUS
   ══════════════════════════════════════════════════════════════════ -->
   <section id="spotlight" class="curtain-rise">
     <div class="container">
@@ -1629,7 +1655,7 @@
 
     /* Outgoing section subtle recede — runs on scroll */
     if (!reduced) {
-      var recedePanels = Array.from(document.querySelectorAll('#areas,#people,#vision,#spotlight,#insights,#cta,footer'));
+      var recedePanels = Array.from(document.querySelectorAll('#areas,#people,#vision,#reut-spotlight,#spotlight,#insights,#cta,footer'));
       var recTick = false;
       window.addEventListener('scroll', function () {
         if (recTick) return; recTick = true;
@@ -1670,7 +1696,7 @@
     }
 
     var accentZones = Array.from(document.querySelectorAll(
-      '#hero,.ch-1,.ch-interlude,.ch-2,.ch-3,#areas,#people,#vision,#spotlight,#insights,#cta'
+      '#hero,.ch-1,.ch-interlude,.ch-2,.ch-3,#areas,#people,#vision,#reut-spotlight,#spotlight,#insights,#cta'
     ));
     /* Force --sa recompute after overriding :root accent */
     document.documentElement.style.setProperty('--sa', '#D4B050');
