@@ -99,12 +99,12 @@
     /* ── Sticky nav ─────────────────────────────────────────────── */
     #sticky-nav { position:fixed; top:0; left:0; right:0; z-index:900; transform:translateY(-100%); transition:transform .38s cubic-bezier(0.16,1,0.3,1); background:rgba(11,17,32,0.93); backdrop-filter:blur(14px); -webkit-backdrop-filter:blur(14px); border-bottom:1px solid var(--border-subtle); }
     #sticky-nav.snav-visible { transform:translateY(0); }
-    .snav-inner { max-width:var(--max-w); margin:0 auto; padding:0 var(--pad); height:68px; display:flex; align-items:center; gap:28px; }
-    .snav-name { font-family:var(--font-serif); font-size:15px; font-weight:700; color:var(--text); white-space:nowrap; flex-shrink:0; }
-    .snav-links { display:flex; gap:26px; flex:1; }
-    .snav-links a { font-family:var(--font-sans); font-size:12px; font-weight:500; letter-spacing:.1em; text-transform:uppercase; color:var(--muted); transition:color .2s ease; white-space:nowrap; }
+    .snav-inner { max-width:var(--max-w); margin:0 auto; padding:0 var(--pad); height:80px; display:flex; align-items:center; gap:32px; }
+    .snav-name { font-family:var(--font-serif); font-size:17px; font-weight:700; color:var(--text); white-space:nowrap; flex-shrink:0; }
+    .snav-links { display:flex; gap:28px; flex:1; }
+    .snav-links a { font-family:var(--font-sans); font-size:13px; font-weight:500; letter-spacing:.1em; text-transform:uppercase; color:var(--muted); transition:color .2s ease; white-space:nowrap; }
     .snav-links a:hover { color:var(--text); }
-    .snav-cta { font-family:var(--font-sans); font-size:12px; font-weight:600; letter-spacing:.1em; text-transform:uppercase; padding:9px 22px; background:var(--accent); color:#0B1120; border-radius:2px; white-space:nowrap; flex-shrink:0; transition:background .2s ease; }
+    .snav-cta { font-family:var(--font-sans); font-size:13px; font-weight:600; letter-spacing:.1em; text-transform:uppercase; padding:11px 26px; background:var(--accent); color:#0B1120; border-radius:2px; white-space:nowrap; flex-shrink:0; transition:background .2s ease; }
     .snav-cta:hover { background:var(--accent-hover); }
 
     /* ═══════════════════════════════════════════════════════════════
@@ -161,15 +161,59 @@
     @media (prefers-reduced-motion: reduce) {
       .avatar-wrap.reveal { opacity: 1; transform: none; transition: none; }
     }
+    /* Floating drift animation */
+    @keyframes avatarFloat { 0%,100%{transform:translateY(0)} 50%{transform:translateY(-7px)} }
+    @keyframes shadowPulse { 0%,100%{transform:translateY(0) scaleX(1);opacity:.55} 50%{transform:translateY(7px) scaleX(.88);opacity:.3} }
+    /* Rotating glow ring */
+    @keyframes ringRotate { from{transform:rotate(0deg)} to{transform:rotate(360deg)} }
+
     .avatar-ring { position:absolute; inset:-6px; border-radius:50%; border:1px solid var(--accent); opacity:0.4; animation:ringPulse 3.5s ease-in-out infinite; }
     @keyframes ringPulse { 0%,100%{transform:scale(1);opacity:.4} 50%{transform:scale(1.05);opacity:.85} }
     .avatar-ring-2 { position:absolute; inset:-14px; border-radius:50%; border:1px solid var(--accent); opacity:0.12; animation:ringPulse 3.5s ease-in-out infinite 1s; }
+    /* Conic gradient rotating ring */
+    .avatar-ring-glow {
+      position: absolute;
+      inset: -4px;
+      border-radius: 50%;
+      background: conic-gradient(from 0deg,
+        transparent 0%,
+        rgba(212,176,80,0.7) 18%,
+        rgba(79,200,220,0.45) 38%,
+        transparent 55%,
+        rgba(98,184,224,0.35) 75%,
+        rgba(212,176,80,0.6) 92%,
+        transparent 100%);
+      -webkit-mask: radial-gradient(circle, transparent calc(100% - 3px), white calc(100% - 1.5px), white 100%);
+      mask: radial-gradient(circle, transparent calc(100% - 3px), white calc(100% - 1.5px), white 100%);
+      animation: ringRotate 9s linear infinite;
+      pointer-events: none;
+    }
+    /* Float shadow — sits below the image */
+    .avatar-float-shadow {
+      position: absolute;
+      bottom: -18px; left: 12%; right: 12%;
+      height: 28px;
+      background: radial-gradient(ellipse at center, rgba(0,0,0,0.55) 0%, transparent 72%);
+      border-radius: 50%;
+      animation: shadowPulse 6s ease-in-out infinite;
+      pointer-events: none;
+      z-index: -1;
+    }
     .avatar-mono { width:100%; height:100%; border-radius:50%; background:linear-gradient(145deg,#192545 0%,#0d1828 100%); border:1px solid var(--border); display:flex; align-items:center; justify-content:center; font-family:var(--font-serif); font-size:clamp(28px,6vw,48px); font-weight:700; color:var(--accent); letter-spacing:.08em; user-select:none; }
-    .avatar-img { width:100%; height:100%; border-radius:50%; object-fit:cover; object-position:center top; border:2px solid var(--border); box-shadow:0 0 0 1px rgba(201,168,76,0.1), 0 24px 80px rgba(0,0,0,0.5); }
+    .avatar-img { width:100%; height:100%; border-radius:50%; object-fit:cover; object-position:center top; border:2px solid var(--border); box-shadow:0 0 0 1px rgba(212,176,80,0.15), 0 20px 60px rgba(0,0,0,0.45); animation:avatarFloat 6s ease-in-out infinite; }
+
+    @media (prefers-reduced-motion: reduce) {
+      .avatar-img { animation:none; }
+      .avatar-ring-glow { animation:none; }
+      .avatar-float-shadow { animation:none; opacity:.4; }
+    }
 
     /* Name / title */
-    .hero-name { font-family:var(--font-serif); font-optical-sizing:auto; font-size:clamp(26px,5.5vw,54px); font-weight:700; line-height:1.1; letter-spacing:-.01em; margin-bottom:12px; }
-    .hero-title { font-family:var(--font-sans); font-size:clamp(10px,1.8vw,12.5px); font-weight:400; letter-spacing:.2em; text-transform:uppercase; color:var(--muted); margin-bottom:44px; }
+    .hero-name { font-family:var(--font-serif); font-optical-sizing:auto; font-size:clamp(26px,5.5vw,54px); font-weight:700; line-height:1.1; letter-spacing:-.01em; margin-bottom:14px; }
+    /* Primary positioning line — larger, serif, accent */
+    .hero-communal { font-family:var(--font-serif); font-optical-sizing:auto; font-size:clamp(17px,2.8vw,26px); font-weight:600; font-style:italic; color:var(--accent); letter-spacing:0.01em; line-height:1.25; margin-bottom:10px; }
+    /* Supporting role line — small caps, muted */
+    .hero-title { font-family:var(--font-sans); font-size:clamp(9px,1.4vw,11.5px); font-weight:500; letter-spacing:.22em; text-transform:uppercase; color:var(--muted); margin-bottom:44px; opacity:.85; }
 
     /* Quote shimmer */
     .hero-quote { max-width:520px; }
@@ -703,6 +747,10 @@
     .arc-thesis.arc-in { opacity: 1; transform: translateY(0) scale(1); }
     .arc-thesis em { font-style: italic; color: var(--sa); -webkit-text-fill-color: var(--sa); }
 
+    /* ── Reut spotlight: full widescreen frame, no crop ─────────── */
+    #reut-spotlight .spotlight-img-panel { aspect-ratio:16/9; background:#060a15; }
+    #reut-spotlight .spotlight-img { object-fit:contain; background:#060a15; }
+
     /* ── Spotlight image Ken Burns + reveal ─────────────────────── */
     .spotlight-img-panel { overflow: hidden; }
     .spotlight-img {
@@ -798,8 +846,10 @@
       <!-- Large headshot — the dominant image on the page -->
       <div class="hero-photo-col">
         <div class="avatar-wrap reveal">
+          <div class="avatar-ring-glow" aria-hidden="true"></div>
           <div class="avatar-ring"></div>
           <div class="avatar-ring-2"></div>
+          <div class="avatar-float-shadow" aria-hidden="true"></div>
           <!-- photo.jpg = studio headshot (Enrico-2025-032.jpg). Falls back to initials. -->
           <img src="photo.jpg" alt="Enrico Omri Ravenna" class="avatar-img" width="360" height="360"
                onerror="this.style.display='none';this.nextElementSibling.style.display='flex';">
@@ -811,18 +861,18 @@
       <div class="hero-text-col">
         <!-- EDIT: name -->
         <h1 class="hero-name reveal d1">Enrico Omri Ravenna</h1>
-        <!-- EDIT: title line -->
-        <p class="hero-title reveal d2">Jewish Communal Leader</p>
+        <p class="hero-communal reveal d2">Jewish Communal Leader</p>
+        <p class="hero-title reveal d3">Executive Director · Jewish Federation of Arkansas</p>
 
         <!-- EDIT: quote — JS splits into word spans. No HTML tags inside blockquote except <br>. -->
-        <div class="hero-quote reveal d3">
+        <div class="hero-quote reveal d4">
           <blockquote>
             "Where there is a possibility,<br>there's a responsibility"
           </blockquote>
           <p class="quote-byline">— Enrico Omri Ravenna</p>
         </div>
 
-        <div class="hero-ctas reveal d4">
+        <div class="hero-ctas reveal d5">
           <!-- EDIT: LinkedIn URL -->
           <a href="https://www.linkedin.com/in/enricoravenna" target="_blank" rel="noopener noreferrer" class="btn-hero-primary">
             <svg width="15" height="15" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M20.447 20.452h-3.554v-5.569c0-1.328-.027-3.037-1.852-3.037-1.853 0-2.136 1.445-2.136 2.939v5.667H9.351V9h3.414v1.561h.046c.477-.9 1.637-1.85 3.37-1.85 3.601 0 4.267 2.37 4.267 5.455v6.286zM5.337 7.433a2.062 2.062 0 01-2.063-2.065 2.064 2.064 0 112.063 2.065zm1.782 13.019H3.555V9h3.564v11.452zM22.225 0H1.771C.792 0 0 .774 0 1.729v20.542C0 23.227.792 24 1.771 24h20.451C23.2 24 24 23.227 24 22.271V1.729C24 .774 23.2 0 22.222 0h.003z"/></svg>
@@ -957,13 +1007,6 @@
                   <div class="ch-body">
                     <p>Today I lead the Jewish Federation of Arkansas. A lean team. An outsized mission. In under two years we tripled programming, rebuilt a dormant donor base, forged security partnerships across law enforcement and government, and put Arkansas on the national Jewish communal map.</p>
                     <p>The community is small. The stakes are not.</p>
-                  </div>
-                  <!-- EDIT: credential pills -->
-                  <div class="ch-credentials">
-                    <span class="cred">IDF · First Sergeant</span>
-                    <span class="cred">B.A. Political Science · Cum Laude · GSU</span>
-                    <span class="cred">Hebrew · English · Italian · Arabic</span>
-                    <span class="cred">U.S. · Israeli · Italian Citizen</span>
                   </div>
                 </div>
               </div>
@@ -1457,7 +1500,7 @@
       window.addEventListener('scroll', function () {
         if (sntick) return; sntick = true;
         requestAnimationFrame(function () {
-          snav.classList.toggle('snav-visible', heroEl.getBoundingClientRect().bottom <= window.innerHeight * 0.45);
+          snav.classList.toggle('snav-visible', window.scrollY > 60);
           sntick = false;
         });
       }, { passive: true });
@@ -1548,17 +1591,23 @@
       resizeStar();
       window.addEventListener('resize', resizeStar, { passive: true });
 
-      /* 260 stars — fixed overlay above all sections */
-      for (var i = 0; i < 260; i++) {
+      /* 360 stars: regular, bright anchors, warm gold flecks */
+      for (var i = 0; i < 360; i++) {
+        var isBright = i < 28;         /* first 28 = large bright anchors */
+        var isWarm   = i >= 28 && i < 62; /* next 34 = warm gold flecks */
         stars.push({
           x:     Math.random() * (SW || 1400),
           y:     Math.random() * (SH || 900),
-          r:     Math.random() * 2.4 + 0.3,
-          base:  Math.random() * 0.38 + 0.10,
+          r:     isBright ? Math.random() * 1.6 + 1.8
+                          : (Math.random() * 2.0 + 0.3),
+          base:  isBright ? Math.random() * 0.22 + 0.42
+                          : (isWarm ? Math.random() * 0.20 + 0.18
+                                    : Math.random() * 0.36 + 0.10),
           phase: Math.random() * Math.PI * 2,
           speed: Math.random() * 0.022 + 0.007,
           vx:    (Math.random() - 0.5) * 0.03,
-          vy:    Math.random() * 0.015 + 0.004
+          vy:    Math.random() * 0.015 + 0.004,
+          warm:  isWarm
         });
       }
 
@@ -1588,10 +1637,17 @@
             var px = smX * -14 * (s.r / 1.4);
             var py = smY * -8  * (s.r / 1.4);
 
-            /* Star color: mostly white, faint accent tint */
-            var sr = Math.round(235 + (activeRgb[0] - 212) * 0.12);
-            var sg = Math.round(238 + (activeRgb[1] - 176) * 0.12);
-            var sb = Math.round(248 + (activeRgb[2] -  80) * 0.12);
+            /* Star color: white with faint accent tint, or warm gold for flecks */
+            var sr, sg, sb;
+            if (s.warm) {
+              sr = Math.min(255, Math.round(240 + (activeRgb[0] - 212) * 0.4));
+              sg = Math.min(255, Math.round(188 + (activeRgb[1] - 176) * 0.2));
+              sb = Math.max(0,   Math.round( 60 + (activeRgb[2] -  80) * 0.1));
+            } else {
+              sr = Math.round(235 + (activeRgb[0] - 212) * 0.12);
+              sg = Math.round(238 + (activeRgb[1] - 176) * 0.12);
+              sb = Math.round(248 + (activeRgb[2] -  80) * 0.12);
+            }
             sctx.beginPath();
             sctx.arc(s.x + px, s.y + py, s.r, 0, Math.PI * 2);
             sctx.fillStyle = 'rgba(' + sr + ',' + sg + ',' + sb + ',' + op + ')';
