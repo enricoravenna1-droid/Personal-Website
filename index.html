@@ -100,11 +100,15 @@
       pointer-events: none;
     }
     @keyframes bannerSheen { from { left: -55%; } to { left: 155%; } }
-    @keyframes bannerGlow {
-      0%,100% { box-shadow: inset 0 0 0px 0 rgba(212,176,80,0); }
-      50%      { box-shadow: inset 0 0 28px 0 rgba(212,176,80,0.11); }
+    @keyframes bannerGlow { 0%,100% { opacity:0; } 50% { opacity:1; } }
+    #utility-banner::before {
+      content: '';
+      position: absolute;
+      inset: 0;
+      pointer-events: none;
+      background: radial-gradient(ellipse 80% 200% at 50% 50%, rgba(212,176,80,0.22) 0%, transparent 100%);
+      animation: bannerGlow 6s ease-in-out infinite;
     }
-    #utility-banner { animation: bannerGlow 6s ease-in-out infinite; }
     #utility-banner a { color: var(--accent); font-weight: 600; text-underline-offset: 3px; transition: color 0.2s ease; }
     /* OPTIONAL HEART: Remove the .snav-heart rule below to hide the heart icon */
     .snav-heart { color: var(--accent); font-size: 18px; margin-left: 7px; opacity: 0.85; vertical-align: middle; display:inline-block; animation: heartPulse 3s ease-in-out infinite; }
@@ -754,15 +758,16 @@
     #areas           { position:relative; z-index:12; background:var(--bg); }
     #people          { position:relative; z-index:13; background:var(--bg); }
     #vision          { position:relative; z-index:14; background:var(--bg); }
-    #reut-spotlight  { position:relative; z-index:15; background:var(--bg); --sa:#5BA8CC; --sa-glow:rgba(91,168,204,0.28); }
-    #spotlight       { position:relative; z-index:16; background:var(--bg); }
-    #insights        { position:relative; z-index:17; background:var(--bg); }
-    #cta             { position:relative; z-index:18; background:var(--bg); }
-    footer           { position:relative; z-index:19; background:var(--bg); }
+    #reut-spotlight   { position:relative; z-index:15; background:var(--bg); --sa:#5BA8CC; --sa-glow:rgba(91,168,204,0.28); }
+    #spotlight        { position:relative; z-index:16; background:var(--bg); }
+    #elswick-spotlight{ position:relative; z-index:17; background:var(--bg); --sa:#D4915A; --sa-glow:rgba(212,145,90,0.28); }
+    #insights         { position:relative; z-index:18; background:var(--bg); }
+    #cta              { position:relative; z-index:19; background:var(--bg); }
+    footer            { position:relative; z-index:20; background:var(--bg); }
 
     /* Top accent glow line per section — gives the "new card rising" feel */
     #journey::before, #areas::before, #people::before,
-    #vision::before, #reut-spotlight::before, #spotlight::before, #insights::before, #cta::before {
+    #vision::before, #reut-spotlight::before, #spotlight::before, #elswick-spotlight::before, #insights::before, #cta::before {
       content: '';
       position: absolute;
       top: 0; left: 10%; right: 10%;
@@ -813,6 +818,9 @@
     /* ── Reut spotlight: full widescreen frame, no crop ─────────── */
     #reut-spotlight .spotlight-img-panel { aspect-ratio:16/9; background:#060a15; }
     #reut-spotlight .spotlight-img { object-fit:contain; background:#060a15; }
+    /* Elswick photo is landscape; rotate if EXIF not honored by browser */
+    #elswick-spotlight .spotlight-img-panel { aspect-ratio:4/3; overflow:hidden; }
+    #elswick-spotlight .spotlight-img { object-fit:cover; transform:rotate(-90deg) scale(1.35); transform-origin:center center; }
 
     /* ── Spotlight image Ken Burns + reveal ─────────────────────── */
     .spotlight-img-panel { overflow: hidden; }
@@ -856,6 +864,7 @@
       .banner-dot { animation:none; opacity:1; }
       #utility-banner::after { animation:none; }
       #utility-banner { animation:none; }
+      #utility-banner::before { animation:none; opacity:0; }
       .avatar-outer-glow { animation:none; opacity:0.5; }
       .avatar-far-glow { animation:none; opacity:0.3; }
     }
@@ -892,7 +901,7 @@
         <a href="#journey">Story</a>
         <a href="#areas">Areas</a>
         <a href="#vision">Vision</a>
-        <a href="#spotlight">Initiative</a>
+        <a href="#reut-spotlight">Initiative</a>
         <a href="#insights">Insights</a>
         <a href="#cta">Connect</a>
       </div>
@@ -1283,6 +1292,32 @@
                alt="Enrico Omri Ravenna with students at University of Arkansas"
                width="600" height="450"
                onerror="this.parentElement.innerHTML='<div class=spotlight-placeholder><span>photo-campus.jpg</span></div>';">
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ══════════════════════════════════════════════════════════════════
+       FEATURE SPOTLIGHT — DAVE ELSWICK SHOW
+  ══════════════════════════════════════════════════════════════════ -->
+  <section id="elswick-spotlight" class="curtain-rise">
+    <div class="container">
+      <div class="spotlight-grid">
+        <div class="reveal">
+          <span class="spotlight-kicker">Local Media</span>
+          <h2 class="spotlight-h">A regular voice on <em>The Dave Elswick Show.</em></h2>
+          <p class="spotlight-body">I appear regularly on The Dave Elswick Show on KARK/iHeart Radio as the go-to Jewish community voice in Arkansas. Every appearance is a chance to bring Israel, antisemitism, and Jewish community life into a conversation that reaches well beyond our walls. That reach matters. Influence does not stop at the synagogue door.</p>
+          <!-- EDIT: Replace href with the real show URL when available -->
+          <a href="#PASTE-SHOW-URL-HERE" class="btn-primary">
+            Listen to the Show
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><path stroke-linecap="round" stroke-linejoin="round" d="M13.5 4.5 21 12m0 0-7.5 7.5M21 12H3"/></svg>
+          </a>
+        </div>
+        <div class="spotlight-img-panel reveal d2">
+          <img src="photo-elswick.jpg" class="spotlight-img"
+               alt="Enrico Omri Ravenna at The Dave Elswick Show studio, KARK iHeart Radio, Arkansas"
+               width="600" height="450"
+               onerror="this.parentElement.innerHTML='<div class=spotlight-placeholder><span>photo-elswick.jpg</span></div>';">
         </div>
       </div>
     </div>
@@ -1710,9 +1745,22 @@
         });
       }
 
+      /* Deep background layer — 420 very tiny, very faint stars (drawn first, behind everything) */
+      for (var j = 0; j < 420; j++) {
+        stars.push({
+          x: Math.random() * (SW || 1400), y: Math.random() * (SH || 900),
+          r: Math.random() * 0.28 + 0.05,
+          base: Math.random() * 0.055 + 0.018,
+          phase: Math.random() * Math.PI * 2,
+          speed: Math.random() * 0.007 + 0.003,
+          vx: (Math.random() - 0.5) * 0.004, vy: Math.random() * 0.0015 + 0.0004,
+          par: 0.1, warm: false, layer: 2
+        });
+      }
+
       /* Shooting stars — more frequent, longer tails, varied directions */
       var shooters  = [];
-      var nextShoot = 200; /* ~3.3s before first streak */
+      var nextShoot = 150; /* ~2.5s before first streak */
 
       document.addEventListener('mousemove', function (e) {
         targetMX = (e.clientX - SW / 2) / (SW / 2);
@@ -1731,8 +1779,8 @@
           smX += (targetMX - smX) * 0.04;
           smY += (targetMY - smY) * 0.04;
 
-          /* Far layer first (painter's algorithm: behind near) */
-          [0, 1].forEach(function (layer) {
+          /* Layer 2 (deep bg) → 0 (far) → 1 (near): painter's algorithm */
+          [2, 0, 1].forEach(function (layer) {
             stars.forEach(function (s) {
               if (s.layer !== layer) return;
               s.x += s.vx; s.y += s.vy;
@@ -1778,7 +1826,7 @@
               len:  Math.random() * 150 + 110,
               r:    Math.random() * 1.4 + 1.2
             });
-            nextShoot = starTime + Math.floor(Math.random() * 300 + 200);
+            nextShoot = starTime + Math.floor(Math.random() * 240 + 150);
           }
           shooters = shooters.filter(function (sh) { return sh.life > 0; });
           shooters.forEach(function (sh) {
@@ -1849,7 +1897,7 @@
 
     /* Outgoing section subtle recede — runs on scroll */
     if (!reduced) {
-      var recedePanels = Array.from(document.querySelectorAll('#areas,#people,#vision,#reut-spotlight,#spotlight,#insights,#cta,footer'));
+      var recedePanels = Array.from(document.querySelectorAll('#areas,#people,#vision,#reut-spotlight,#spotlight,#elswick-spotlight,#insights,#cta,footer'));
       var recTick = false;
       window.addEventListener('scroll', function () {
         if (recTick) return; recTick = true;
@@ -1890,7 +1938,7 @@
     }
 
     var accentZones = Array.from(document.querySelectorAll(
-      '#hero,.ch-1,.ch-interlude,.ch-2,.ch-3,#areas,#people,#vision,#reut-spotlight,#spotlight,#insights,#cta'
+      '#hero,.ch-1,.ch-interlude,.ch-2,.ch-3,#areas,#people,#vision,#reut-spotlight,#spotlight,#elswick-spotlight,#insights,#cta'
     ));
     /* Force --sa recompute after overriding :root accent */
     document.documentElement.style.setProperty('--sa', '#D4B050');
