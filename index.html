@@ -88,9 +88,44 @@
       color: var(--muted);
       position: relative;
       z-index: 700;
+      overflow: hidden;
     }
+    #utility-banner::after {
+      content: '';
+      position: absolute;
+      top: 0; bottom: 0;
+      width: 50%;
+      background: linear-gradient(90deg, transparent 0%, rgba(212,176,80,0.10) 50%, transparent 100%);
+      animation: bannerSheen 6s linear infinite;
+      pointer-events: none;
+    }
+    @keyframes bannerSheen { from { left: -55%; } to { left: 155%; } }
     #utility-banner a { color: var(--accent); font-weight: 600; text-underline-offset: 3px; transition: color 0.2s ease; }
     #utility-banner a:hover { color: var(--accent-hover); }
+    .banner-dot {
+      display: inline-block;
+      width: 5px; height: 5px;
+      border-radius: 50%;
+      background: var(--accent);
+      margin-right: 8px;
+      vertical-align: middle;
+      animation: dotPulse 3s ease-in-out infinite;
+    }
+    @keyframes dotPulse {
+      0%,100% { opacity: 0.4; transform: scale(1); }
+      50%      { opacity: 1.0; transform: scale(1.45); }
+    }
+    #banner-msg { transition: opacity 0.55s ease; }
+
+    /* ── Section wipe overlay ────────────────────────────────── */
+    #wipe-overlay {
+      position: fixed;
+      inset: 0;
+      z-index: 50;
+      pointer-events: none;
+      clip-path: inset(0 100% 0 0);
+      will-change: clip-path;
+    }
 
     /* ── Progress bar ───────────────────────────────────────────── */
     #progress-bar { position:fixed; top:0; left:0; width:0%; height:2px; background:linear-gradient(90deg,#9A7220,var(--accent),#F0E4B4,var(--accent)); background-size:200% auto; animation:progressShimmer 3s linear infinite; z-index:1100; pointer-events:none; transition:width .08s linear; }
@@ -167,26 +202,42 @@
     /* Rotating glow ring */
     @keyframes ringRotate { from{transform:rotate(0deg)} to{transform:rotate(360deg)} }
 
-    .avatar-ring { position:absolute; inset:-6px; border-radius:50%; border:1px solid var(--accent); opacity:0.4; animation:ringPulse 3.5s ease-in-out infinite; }
+    .avatar-ring { position:absolute; inset:-6px; border-radius:50%; border:1px solid var(--accent); opacity:0.4; animation:ringPulse 3s ease-in-out infinite; }
     @keyframes ringPulse { 0%,100%{transform:scale(1);opacity:.4} 50%{transform:scale(1.05);opacity:.85} }
-    .avatar-ring-2 { position:absolute; inset:-14px; border-radius:50%; border:1px solid var(--accent); opacity:0.12; animation:ringPulse 3.5s ease-in-out infinite 1s; }
-    /* Conic gradient rotating ring */
+    .avatar-ring-2 { position:absolute; inset:-14px; border-radius:50%; border:1px solid var(--accent); opacity:0.12; animation:ringPulse 3s ease-in-out infinite 1s; }
+    /* Conic gradient rotating ring — intensified */
     .avatar-ring-glow {
       position: absolute;
-      inset: -4px;
+      inset: -6px;
       border-radius: 50%;
       background: conic-gradient(from 0deg,
         transparent 0%,
-        rgba(212,176,80,0.7) 18%,
-        rgba(79,200,220,0.45) 38%,
+        rgba(212,176,80,0.95) 18%,
+        rgba(79,200,220,0.72) 38%,
         transparent 55%,
-        rgba(98,184,224,0.35) 75%,
-        rgba(212,176,80,0.6) 92%,
+        rgba(98,184,224,0.62) 75%,
+        rgba(212,176,80,0.90) 92%,
         transparent 100%);
-      -webkit-mask: radial-gradient(circle, transparent calc(100% - 3px), white calc(100% - 1.5px), white 100%);
-      mask: radial-gradient(circle, transparent calc(100% - 3px), white calc(100% - 1.5px), white 100%);
+      -webkit-mask: radial-gradient(circle, transparent calc(100% - 8px), white calc(100% - 4px), white 100%);
+      mask: radial-gradient(circle, transparent calc(100% - 8px), white calc(100% - 4px), white 100%);
+      filter: blur(2px);
       animation: ringRotate 9s linear infinite;
       pointer-events: none;
+    }
+    /* Outer glow halo — larger, softer, emanates into hero space */
+    .avatar-outer-glow {
+      position: absolute;
+      inset: -36px;
+      border-radius: 50%;
+      background: radial-gradient(circle, rgba(212,176,80,0.20) 28%, rgba(79,200,220,0.09) 62%, transparent 100%);
+      filter: blur(24px);
+      animation: outerGlowPulse 6s ease-in-out infinite;
+      pointer-events: none;
+      z-index: -1;
+    }
+    @keyframes outerGlowPulse {
+      0%,100% { opacity:0.55; transform:scale(1); }
+      50%      { opacity:1.0;  transform:scale(1.07); }
     }
     /* Float shadow — sits below the image */
     .avatar-float-shadow {
@@ -789,6 +840,10 @@
       .section-receding > .container { transform:none; opacity:1; }
       .spotlight-img { clip-path:none !important; animation:none; }
       .reveal.in .spotlight-img { animation:none; }
+      #wipe-overlay { display:none; }
+      .banner-dot { animation:none; opacity:1; }
+      #utility-banner::after { animation:none; }
+      .avatar-outer-glow { animation:none; opacity:0.5; }
     }
   </style>
 </head>
@@ -798,6 +853,8 @@
   <!-- Global canvases — fixed, behind all content -->
   <canvas id="star-canvas"   aria-hidden="true"></canvas>
   <canvas id="cursor-canvas" aria-hidden="true"></canvas>
+  <!-- Section transition wipe layer -->
+  <div id="wipe-overlay" aria-hidden="true"></div>
 
   <!-- Reading progress bar -->
   <div id="progress-bar" aria-hidden="true" role="progressbar" aria-valuemin="0" aria-valuemax="100"></div>
@@ -810,8 +867,7 @@
 
   <!-- EDIT: Utility banner copy and link -->
   <div id="utility-banner">
-    Available for board, advisory, and speaking inquiries &nbsp;·&nbsp;
-    <a href="https://www.linkedin.com/in/enricoravenna" target="_blank" rel="noopener noreferrer">Connect on LinkedIn →</a>
+    <span class="banner-dot" aria-hidden="true"></span><span id="banner-msg">Available for board, advisory, and speaking inquiries</span>&nbsp;·&nbsp;<a href="https://www.linkedin.com/in/enricoravenna" target="_blank" rel="noopener noreferrer">Connect on LinkedIn →</a>
   </div>
 
   <!-- Sticky condensed nav -->
@@ -846,6 +902,7 @@
       <!-- Large headshot — the dominant image on the page -->
       <div class="hero-photo-col">
         <div class="avatar-wrap reveal">
+          <div class="avatar-outer-glow" aria-hidden="true"></div>
           <div class="avatar-ring-glow" aria-hidden="true"></div>
           <div class="avatar-ring"></div>
           <div class="avatar-ring-2"></div>
@@ -1478,6 +1535,25 @@
       window.addEventListener('scroll', hideH, { passive: true });
     }
 
+    /* ── 6b. Top bar rotating messages ───────────────────────── */
+    var bannerMsgEl = document.getElementById('banner-msg');
+    if (bannerMsgEl && !reduced) {
+      var bannerMessages = [
+        'Available for board, advisory, and speaking inquiries',
+        'Jewish communal thought leader · Strategic partner',
+        'Seeking the next large-city Federation CEO role'
+      ];
+      var bannerIdx = 0;
+      setInterval(function () {
+        bannerMsgEl.style.opacity = '0';
+        setTimeout(function () {
+          bannerIdx = (bannerIdx + 1) % bannerMessages.length;
+          bannerMsgEl.textContent = bannerMessages[bannerIdx];
+          bannerMsgEl.style.opacity = '1';
+        }, 560);
+      }, 5000);
+    }
+
     /* ── 7. Reading progress bar ──────────────────────────────── */
     var pbar = document.getElementById('progress-bar');
     if (pbar) {
@@ -1591,25 +1667,37 @@
       resizeStar();
       window.addEventListener('resize', resizeStar, { passive: true });
 
-      /* 360 stars: regular, bright anchors, warm gold flecks */
+      /* 360 stars across two depth layers: far (slow/small) + near (fast/large) */
       for (var i = 0; i < 360; i++) {
-        var isBright = i < 28;         /* first 28 = large bright anchors */
-        var isWarm   = i >= 28 && i < 62; /* next 34 = warm gold flecks */
+        var isFar    = i < 240;
+        var isBright = !isFar && i < 268;
+        var isWarm   = !isFar && !isBright && i < 302;
         stars.push({
-          x:     Math.random() * (SW || 1400),
-          y:     Math.random() * (SH || 900),
-          r:     isBright ? Math.random() * 1.6 + 1.8
-                          : (Math.random() * 2.0 + 0.3),
-          base:  isBright ? Math.random() * 0.22 + 0.42
-                          : (isWarm ? Math.random() * 0.20 + 0.18
-                                    : Math.random() * 0.36 + 0.10),
-          phase: Math.random() * Math.PI * 2,
-          speed: Math.random() * 0.022 + 0.007,
-          vx:    (Math.random() - 0.5) * 0.03,
-          vy:    Math.random() * 0.015 + 0.004,
-          warm:  isWarm
+          x:       Math.random() * (SW || 1400),
+          y:       Math.random() * (SH || 900),
+          r:       isFar    ? Math.random() * 0.9 + 0.2
+                   : isBright ? Math.random() * 1.6 + 1.8
+                   :            Math.random() * 1.5 + 0.4,
+          base:    isFar    ? Math.random() * 0.16 + 0.04
+                   : isBright ? Math.random() * 0.22 + 0.42
+                   : isWarm  ? Math.random() * 0.20 + 0.18
+                   :            Math.random() * 0.28 + 0.08,
+          phase:   Math.random() * Math.PI * 2,
+          speed:   isFar ? Math.random() * 0.012 + 0.005
+                         : Math.random() * 0.018 + 0.009,
+          vx:      isFar ? (Math.random() - 0.5) * 0.012
+                         : (Math.random() - 0.5) * 0.042,
+          vy:      isFar ? Math.random() * 0.005 + 0.001
+                         : Math.random() * 0.026 + 0.008,
+          par:     isFar ? 0.45 : 1.75,   /* parallax factor per layer */
+          warm:    isWarm,
+          layer:   isFar ? 0 : 1
         });
       }
+
+      /* Shooting stars */
+      var shooters  = [];
+      var nextShoot = 420; /* ~7s before first streak */
 
       document.addEventListener('mousemove', function (e) {
         targetMX = (e.clientX - SW / 2) / (SW / 2);
@@ -1628,31 +1716,64 @@
           smX += (targetMX - smX) * 0.04;
           smY += (targetMY - smY) * 0.04;
 
-          stars.forEach(function (s) {
-            s.x += s.vx; s.y += s.vy;
-            if (s.x < 0) s.x += SW; if (s.x > SW) s.x -= SW;
-            if (s.y < 0) s.y += SH; if (s.y > SH) s.y -= SH;
+          /* Far layer first (painter's algorithm: behind near) */
+          [0, 1].forEach(function (layer) {
+            stars.forEach(function (s) {
+              if (s.layer !== layer) return;
+              s.x += s.vx; s.y += s.vy;
+              if (s.x < 0) s.x += SW; if (s.x > SW) s.x -= SW;
+              if (s.y < 0) s.y += SH; if (s.y > SH) s.y -= SH;
 
-            var op = s.base * (0.5 + 0.5 * Math.sin(starTime * s.speed + s.phase));
-            var px = smX * -14 * (s.r / 1.4);
-            var py = smY * -8  * (s.r / 1.4);
+              var op = s.base * (0.5 + 0.5 * Math.sin(starTime * s.speed + s.phase));
+              var px = smX * -14 * s.par;
+              var py = smY * -8  * s.par;
 
-            /* Star color: white with faint accent tint, or warm gold for flecks */
-            var sr, sg, sb;
-            if (s.warm) {
-              sr = Math.min(255, Math.round(240 + (activeRgb[0] - 212) * 0.4));
-              sg = Math.min(255, Math.round(188 + (activeRgb[1] - 176) * 0.2));
-              sb = Math.max(0,   Math.round( 60 + (activeRgb[2] -  80) * 0.1));
-            } else {
-              sr = Math.round(235 + (activeRgb[0] - 212) * 0.12);
-              sg = Math.round(238 + (activeRgb[1] - 176) * 0.12);
-              sb = Math.round(248 + (activeRgb[2] -  80) * 0.12);
-            }
-            sctx.beginPath();
-            sctx.arc(s.x + px, s.y + py, s.r, 0, Math.PI * 2);
-            sctx.fillStyle = 'rgba(' + sr + ',' + sg + ',' + sb + ',' + op + ')';
-            sctx.fill();
+              var sr, sg, sb;
+              if (s.warm) {
+                sr = Math.min(255, Math.round(240 + (activeRgb[0] - 212) * 0.4));
+                sg = Math.min(255, Math.round(188 + (activeRgb[1] - 176) * 0.2));
+                sb = Math.max(0,   Math.round( 60 + (activeRgb[2] -  80) * 0.1));
+              } else {
+                sr = Math.round(235 + (activeRgb[0] - 212) * 0.12);
+                sg = Math.round(238 + (activeRgb[1] - 176) * 0.12);
+                sb = Math.round(248 + (activeRgb[2] -  80) * 0.12);
+              }
+              sctx.beginPath();
+              sctx.arc(s.x + px, s.y + py, s.r, 0, Math.PI * 2);
+              sctx.fillStyle = 'rgba(' + sr + ',' + sg + ',' + sb + ',' + op + ')';
+              sctx.fill();
+            });
           });
+
+          /* Occasional shooting star */
+          if (starTime >= nextShoot && shooters.length < 2) {
+            var ang   = (Math.random() * 28 + 12) * Math.PI / 180;
+            var spd   = Math.random() * 2.5 + 2.2;
+            shooters.push({
+              x: Math.random() * SW * 0.65 + SW * 0.05,
+              y: Math.random() * SH * 0.38,
+              vx: Math.cos(ang) * spd, vy: Math.sin(ang) * spd,
+              life: 1.0, decay: 0.006 + Math.random() * 0.004,
+              len: Math.random() * 90 + 55, r: Math.random() * 1.0 + 0.7
+            });
+            nextShoot = starTime + Math.floor(Math.random() * 540 + 420);
+          }
+          shooters = shooters.filter(function (sh) { return sh.life > 0; });
+          shooters.forEach(function (sh) {
+            var bAng = Math.atan2(sh.vy, sh.vx) + Math.PI;
+            var tx = sh.x + Math.cos(bAng) * sh.len * sh.life;
+            var ty = sh.y + Math.sin(bAng) * sh.len * sh.life;
+            var sg2 = sctx.createLinearGradient(sh.x, sh.y, tx, ty);
+            sg2.addColorStop(0,   'rgba(255,255,248,' + (sh.life * 0.95) + ')');
+            sg2.addColorStop(0.55,'rgba(255,255,248,' + (sh.life * 0.22) + ')');
+            sg2.addColorStop(1,   'rgba(255,255,248,0)');
+            sctx.beginPath(); sctx.moveTo(sh.x, sh.y); sctx.lineTo(tx, ty);
+            sctx.strokeStyle = sg2; sctx.lineWidth = sh.r; sctx.stroke();
+            sctx.beginPath(); sctx.arc(sh.x, sh.y, sh.r * 1.6, 0, Math.PI * 2);
+            sctx.fillStyle = 'rgba(255,255,255,' + sh.life + ')'; sctx.fill();
+            sh.x += sh.vx * 3.8; sh.y += sh.vy * 3.8; sh.life -= sh.decay;
+          });
+
           requestAnimationFrame(starLoop);
         })();
       }
@@ -1778,6 +1899,46 @@
       activeRgb[2] += (targetRgb[2] - activeRgb[2]) * 0.035;
       requestAnimationFrame(accentLerp);
     })();
+
+    /* ── 18. Section boundary wipe (Step 1) ──────────────────── */
+    var wipeEl = document.getElementById('wipe-overlay');
+    if (wipeEl && !reduced) {
+      var isWiping     = false;
+      var prevWipeRgb  = [212, 176, 80];
+
+      function triggerWipe(fromRgb, toRgb) {
+        if (isWiping) return;
+        isWiping = true;
+        var r1 = fromRgb[0], g1 = fromRgb[1], b1 = fromRgb[2];
+        var r2 = toRgb[0],   g2 = toRgb[1],   b2 = toRgb[2];
+        wipeEl.style.background =
+          'linear-gradient(90deg,rgba(' + r1 + ',' + g1 + ',' + b1 + ',0.17),rgba(' + r2 + ',' + g2 + ',' + b2 + ',0.22))';
+        wipeEl.style.transition = 'clip-path 0.24s cubic-bezier(0.4,0,0.2,1)';
+        wipeEl.style.clipPath   = 'inset(0 0% 0 0)';
+        setTimeout(function () {
+          wipeEl.style.transition = 'clip-path 0.28s cubic-bezier(0.6,0,1,1)';
+          wipeEl.style.clipPath   = 'inset(0 0% 0 100%)';
+          setTimeout(function () {
+            wipeEl.style.transition = 'none';
+            wipeEl.style.clipPath   = 'inset(0 100% 0 0)';
+            isWiping = false;
+          }, 280);
+        }, 240);
+      }
+
+      var wipeZones = Array.from(document.querySelectorAll(
+        '#journey,#areas,#people,#vision,#reut-spotlight,#spotlight,#insights,#cta'
+      ));
+      var wipeIO = new IntersectionObserver(function (entries) {
+        entries.forEach(function (entry) {
+          if (!entry.isIntersecting) return;
+          var toRgb = parseSa(entry.target);
+          triggerWipe(prevWipeRgb, toRgb);
+          prevWipeRgb = [toRgb[0], toRgb[1], toRgb[2]];
+        });
+      }, { rootMargin: '-48% 0px -51% 0px', threshold: 0 });
+      wipeZones.forEach(function (el) { wipeIO.observe(el); });
+    }
 
   })();
   </script>
