@@ -100,7 +100,14 @@
       pointer-events: none;
     }
     @keyframes bannerSheen { from { left: -55%; } to { left: 155%; } }
+    @keyframes bannerGlow {
+      0%,100% { box-shadow: inset 0 0 0px 0 rgba(212,176,80,0); }
+      50%      { box-shadow: inset 0 0 28px 0 rgba(212,176,80,0.11); }
+    }
+    #utility-banner { animation: bannerGlow 6s ease-in-out infinite; }
     #utility-banner a { color: var(--accent); font-weight: 600; text-underline-offset: 3px; transition: color 0.2s ease; }
+    /* OPTIONAL HEART: Remove the .snav-heart rule below to hide the heart icon */
+    .snav-heart { color: var(--accent); font-size: 9px; margin-left: 5px; opacity: 0.7; vertical-align: middle; }
     #utility-banner a:hover { color: var(--accent-hover); }
     .banner-dot {
       display: inline-block;
@@ -117,15 +124,8 @@
     }
     #banner-msg { transition: opacity 0.55s ease; }
 
-    /* ── Section wipe overlay ────────────────────────────────── */
-    #wipe-overlay {
-      position: fixed;
-      inset: 0;
-      z-index: 50;
-      pointer-events: none;
-      clip-path: inset(0 100% 0 0);
-      will-change: clip-path;
-    }
+    /* ── Comet canvas — section transition layer ─────────────── */
+    #comet-canvas { position:fixed; inset:0; width:100vw; height:100vh; pointer-events:none; z-index:55; }
 
     /* ── Progress bar ───────────────────────────────────────────── */
     #progress-bar { position:fixed; top:0; left:0; width:0%; height:2px; background:linear-gradient(90deg,#9A7220,var(--accent),#F0E4B4,var(--accent)); background-size:200% auto; animation:progressShimmer 3s linear infinite; z-index:1100; pointer-events:none; transition:width .08s linear; }
@@ -220,18 +220,29 @@
         transparent 100%);
       -webkit-mask: radial-gradient(circle, transparent calc(100% - 8px), white calc(100% - 4px), white 100%);
       mask: radial-gradient(circle, transparent calc(100% - 8px), white calc(100% - 4px), white 100%);
-      filter: blur(2px);
+      filter: blur(5px);
       animation: ringRotate 9s linear infinite;
       pointer-events: none;
     }
-    /* Outer glow halo — larger, softer, emanates into hero space */
+    /* Mid glow halo */
     .avatar-outer-glow {
       position: absolute;
-      inset: -36px;
+      inset: -52px;
       border-radius: 50%;
-      background: radial-gradient(circle, rgba(212,176,80,0.20) 28%, rgba(79,200,220,0.09) 62%, transparent 100%);
-      filter: blur(24px);
+      background: radial-gradient(circle, rgba(212,176,80,0.28) 26%, rgba(79,200,220,0.13) 58%, transparent 100%);
+      filter: blur(38px);
       animation: outerGlowPulse 6s ease-in-out infinite;
+      pointer-events: none;
+      z-index: -1;
+    }
+    /* Far glow — very large, very soft, third pass */
+    .avatar-far-glow {
+      position: absolute;
+      inset: -88px;
+      border-radius: 50%;
+      background: radial-gradient(circle, rgba(212,176,80,0.13) 18%, rgba(98,184,224,0.06) 52%, transparent 100%);
+      filter: blur(52px);
+      animation: outerGlowPulse 6s ease-in-out infinite 1s;
       pointer-events: none;
       z-index: -1;
     }
@@ -840,10 +851,12 @@
       .section-receding > .container { transform:none; opacity:1; }
       .spotlight-img { clip-path:none !important; animation:none; }
       .reveal.in .spotlight-img { animation:none; }
-      #wipe-overlay { display:none; }
+      #comet-canvas { display:none; }
       .banner-dot { animation:none; opacity:1; }
       #utility-banner::after { animation:none; }
+      #utility-banner { animation:none; }
       .avatar-outer-glow { animation:none; opacity:0.5; }
+      .avatar-far-glow { animation:none; opacity:0.3; }
     }
   </style>
 </head>
@@ -853,8 +866,8 @@
   <!-- Global canvases — fixed, behind all content -->
   <canvas id="star-canvas"   aria-hidden="true"></canvas>
   <canvas id="cursor-canvas" aria-hidden="true"></canvas>
-  <!-- Section transition wipe layer -->
-  <div id="wipe-overlay" aria-hidden="true"></div>
+  <!-- Comet wipe canvas — section transition layer -->
+  <canvas id="comet-canvas" aria-hidden="true"></canvas>
 
   <!-- Reading progress bar -->
   <div id="progress-bar" aria-hidden="true" role="progressbar" aria-valuemin="0" aria-valuemax="100"></div>
@@ -873,7 +886,7 @@
   <!-- Sticky condensed nav -->
   <nav id="sticky-nav" aria-label="Page navigation">
     <div class="snav-inner">
-      <span class="snav-name">Enrico Omri Ravenna</span>
+      <span class="snav-name">Enrico Omri Ravenna<span class="snav-heart" aria-hidden="true">♥</span></span>
       <div class="snav-links">
         <a href="#journey">Story</a>
         <a href="#areas">Areas</a>
@@ -902,6 +915,7 @@
       <!-- Large headshot — the dominant image on the page -->
       <div class="hero-photo-col">
         <div class="avatar-wrap reveal">
+          <div class="avatar-far-glow" aria-hidden="true"></div>
           <div class="avatar-outer-glow" aria-hidden="true"></div>
           <div class="avatar-ring-glow" aria-hidden="true"></div>
           <div class="avatar-ring"></div>
@@ -1695,9 +1709,9 @@
         });
       }
 
-      /* Shooting stars */
+      /* Shooting stars — more frequent, longer tails, varied directions */
       var shooters  = [];
-      var nextShoot = 420; /* ~7s before first streak */
+      var nextShoot = 200; /* ~3.3s before first streak */
 
       document.addEventListener('mousemove', function (e) {
         targetMX = (e.clientX - SW / 2) / (SW / 2);
@@ -1745,18 +1759,25 @@
             });
           });
 
-          /* Occasional shooting star */
-          if (starTime >= nextShoot && shooters.length < 2) {
-            var ang   = (Math.random() * 28 + 12) * Math.PI / 180;
-            var spd   = Math.random() * 2.5 + 2.2;
+          /* Shooting stars — varied direction, long bright tails */
+          if (starTime >= nextShoot && shooters.length < 3) {
+            var goRight = Math.random() > 0.28; /* 72% go left→right, 28% right→left */
+            var baseAng = goRight
+              ? (Math.random() * 48 + 6)         /* 6–54° downward-right */
+              : (180 - Math.random() * 48 - 6);  /* 126–174° downward-left */
+            var ang2 = baseAng * Math.PI / 180;
+            var spd  = Math.random() * 2.8 + 2.4;
             shooters.push({
-              x: Math.random() * SW * 0.65 + SW * 0.05,
-              y: Math.random() * SH * 0.38,
-              vx: Math.cos(ang) * spd, vy: Math.sin(ang) * spd,
-              life: 1.0, decay: 0.006 + Math.random() * 0.004,
-              len: Math.random() * 90 + 55, r: Math.random() * 1.0 + 0.7
+              x:    goRight ? Math.random() * SW * 0.35 : SW * 0.65 + Math.random() * SW * 0.3,
+              y:    Math.random() * SH * 0.65,
+              vx:   Math.cos(ang2) * spd,
+              vy:   Math.sin(ang2) * spd,
+              life: 1.0,
+              decay: 0.005 + Math.random() * 0.004,
+              len:  Math.random() * 150 + 110,
+              r:    Math.random() * 1.4 + 1.2
             });
-            nextShoot = starTime + Math.floor(Math.random() * 540 + 420);
+            nextShoot = starTime + Math.floor(Math.random() * 300 + 200);
           }
           shooters = shooters.filter(function (sh) { return sh.life > 0; });
           shooters.forEach(function (sh) {
@@ -1764,14 +1785,23 @@
             var tx = sh.x + Math.cos(bAng) * sh.len * sh.life;
             var ty = sh.y + Math.sin(bAng) * sh.len * sh.life;
             var sg2 = sctx.createLinearGradient(sh.x, sh.y, tx, ty);
-            sg2.addColorStop(0,   'rgba(255,255,248,' + (sh.life * 0.95) + ')');
-            sg2.addColorStop(0.55,'rgba(255,255,248,' + (sh.life * 0.22) + ')');
-            sg2.addColorStop(1,   'rgba(255,255,248,0)');
+            sg2.addColorStop(0,    'rgba(255,255,252,' + (sh.life * 0.98) + ')');
+            sg2.addColorStop(0.45, 'rgba(255,255,230,' + (sh.life * 0.35) + ')');
+            sg2.addColorStop(1,    'rgba(255,255,220,0)');
             sctx.beginPath(); sctx.moveTo(sh.x, sh.y); sctx.lineTo(tx, ty);
             sctx.strokeStyle = sg2; sctx.lineWidth = sh.r; sctx.stroke();
-            sctx.beginPath(); sctx.arc(sh.x, sh.y, sh.r * 1.6, 0, Math.PI * 2);
+            /* Outer glow pass */
+            var sg3 = sctx.createLinearGradient(sh.x, sh.y, tx, ty);
+            sg3.addColorStop(0,   'rgba(212,200,150,' + (sh.life * 0.28) + ')');
+            sg3.addColorStop(1,   'rgba(212,200,150,0)');
+            sctx.beginPath(); sctx.moveTo(sh.x, sh.y); sctx.lineTo(tx, ty);
+            sctx.strokeStyle = sg3; sctx.lineWidth = sh.r * 3.5; sctx.stroke();
+            /* Head dot + halo */
+            sctx.beginPath(); sctx.arc(sh.x, sh.y, sh.r * 2.4, 0, Math.PI * 2);
             sctx.fillStyle = 'rgba(255,255,255,' + sh.life + ')'; sctx.fill();
-            sh.x += sh.vx * 3.8; sh.y += sh.vy * 3.8; sh.life -= sh.decay;
+            sctx.beginPath(); sctx.arc(sh.x, sh.y, sh.r * 5, 0, Math.PI * 2);
+            sctx.fillStyle = 'rgba(240,220,160,' + (sh.life * 0.22) + ')'; sctx.fill();
+            sh.x += sh.vx * 4.2; sh.y += sh.vy * 4.2; sh.life -= sh.decay;
           });
 
           requestAnimationFrame(starLoop);
@@ -1810,24 +1840,10 @@
     }
 
     /* ── 15. Curtain-rise section entrances ──────────────────── */
+    /* reduced: immediate reveal. non-reduced: comet system (section 18) handles timing. */
     var curtainEls = document.querySelectorAll('.curtain-rise');
-    if (curtainEls.length) {
-      if (reduced) {
-        curtainEls.forEach(function (s) { s.classList.add('curtain-in'); });
-      } else {
-        var crio = new IntersectionObserver(function (entries) {
-          entries.forEach(function (e) {
-            if (e.isIntersecting) { e.target.classList.add('curtain-in'); crio.unobserve(e.target); }
-          });
-        }, { threshold: 0.04 });
-        curtainEls.forEach(function (s) { crio.observe(s); });
-        /* Also immediately reveal anything already in viewport */
-        setTimeout(function () {
-          curtainEls.forEach(function (s) {
-            if (s.getBoundingClientRect().top < window.innerHeight * 0.96) s.classList.add('curtain-in');
-          });
-        }, 60);
-      }
+    if (curtainEls.length && reduced) {
+      curtainEls.forEach(function (s) { s.classList.add('curtain-in'); });
     }
 
     /* Outgoing section subtle recede — runs on scroll */
@@ -1900,44 +1916,140 @@
       requestAnimationFrame(accentLerp);
     })();
 
-    /* ── 18. Section boundary wipe (Step 1) ──────────────────── */
-    var wipeEl = document.getElementById('wipe-overlay');
-    if (wipeEl && !reduced) {
-      var isWiping     = false;
-      var prevWipeRgb  = [212, 176, 80];
+    /* ── 18. Comet wipe — section transition engine ──────────── */
+    var cometCanvas = document.getElementById('comet-canvas');
+    if (cometCanvas && !reduced) {
+      var cctx = cometCanvas.getContext('2d');
+      var CW, CH;
+      function resizeComet() {
+        CW = cometCanvas.width  = window.innerWidth;
+        CH = cometCanvas.height = window.innerHeight;
+      }
+      resizeComet();
+      window.addEventListener('resize', resizeComet, { passive: true });
 
-      function triggerWipe(fromRgb, toRgb) {
-        if (isWiping) return;
-        isWiping = true;
-        var r1 = fromRgb[0], g1 = fromRgb[1], b1 = fromRgb[2];
-        var r2 = toRgb[0],   g2 = toRgb[1],   b2 = toRgb[2];
-        wipeEl.style.background =
-          'linear-gradient(90deg,rgba(' + r1 + ',' + g1 + ',' + b1 + ',0.17),rgba(' + r2 + ',' + g2 + ',' + b2 + ',0.22))';
-        wipeEl.style.transition = 'clip-path 0.24s cubic-bezier(0.4,0,0.2,1)';
-        wipeEl.style.clipPath   = 'inset(0 0% 0 0)';
-        setTimeout(function () {
-          wipeEl.style.transition = 'clip-path 0.28s cubic-bezier(0.6,0,1,1)';
-          wipeEl.style.clipPath   = 'inset(0 0% 0 100%)';
-          setTimeout(function () {
-            wipeEl.style.transition = 'none';
-            wipeEl.style.clipPath   = 'inset(0 100% 0 0)';
-            isWiping = false;
-          }, 280);
-        }, 240);
+      var cometBusy = false;
+
+      function launchComet(sectionEl, accentRgb) {
+        /* If already visible or another comet running, just reveal instantly */
+        if (cometBusy) { sectionEl.classList.add('curtain-in'); return; }
+        cometBusy = true;
+
+        var duration = 480;
+        var startMs  = performance.now();
+        var sY0      = CH * (0.28 + Math.random() * 0.42);
+        var sYend    = sY0 + (Math.random() - 0.5) * CH * 0.16;
+        var ar = accentRgb[0], ag = accentRgb[1], ab = accentRgb[2];
+
+        /* Clip section only when it's still below the fold */
+        var clipping = sectionEl.getBoundingClientRect().top > window.innerHeight * 0.1;
+        if (clipping) {
+          sectionEl.style.transition = 'none';
+          sectionEl.style.clipPath   = 'inset(0 100% 0 0)';
+        }
+
+        var curtainFired = false;
+
+        function frame(now) {
+          var t  = Math.min((now - startMs) / duration, 1);
+          var e  = t < 0.5 ? 2 * t * t : -1 + (4 - 2 * t) * t; /* easeInOut */
+          var hx = e * CW;
+          var hy = sY0 + (sYend - sY0) * e;
+
+          /* Section reveal: 65ms lag behind comet head */
+          if (clipping) {
+            var lt = Math.max(0, Math.min((now - startMs - 65) / duration, 1));
+            var le = lt < 0.5 ? 2 * lt * lt : -1 + (4 - 2 * lt) * lt;
+            sectionEl.style.clipPath = 'inset(0 ' + Math.max(0, (1 - le) * 100).toFixed(2) + '% 0 0)';
+          }
+
+          /* Fire curtain-in at 55% */
+          if (!curtainFired && t >= 0.55) {
+            curtainFired = true;
+            sectionEl.classList.add('curtain-in');
+          }
+
+          /* Draw comet */
+          cctx.clearRect(0, 0, CW, CH);
+
+          /* Tail */
+          var tailLen = Math.min(hx, 280 + 120 * e);
+          var tailX   = hx - tailLen;
+          var tailY   = hy - (hy - sY0) * (tailLen / Math.max(hx, 1)); /* unused var — tail drawn to sY0 */
+          var tg = cctx.createLinearGradient(hx, hy, tailX, sY0);
+          tg.addColorStop(0,    'rgba(255,255,252,0.92)');
+          tg.addColorStop(0.15, 'rgba(' + ar + ',' + ag + ',' + ab + ',0.48)');
+          tg.addColorStop(0.6,  'rgba(' + ar + ',' + ag + ',' + ab + ',0.10)');
+          tg.addColorStop(1,    'rgba(' + ar + ',' + ag + ',' + ab + ',0)');
+          cctx.beginPath(); cctx.moveTo(hx, hy); cctx.lineTo(tailX, sY0);
+          cctx.strokeStyle = tg; cctx.lineWidth = 2.2; cctx.stroke();
+
+          /* Wide glow pass */
+          var gg = cctx.createLinearGradient(hx, hy, tailX, sY0);
+          gg.addColorStop(0,   'rgba(' + ar + ',' + ag + ',' + ab + ',0.20)');
+          gg.addColorStop(0.5, 'rgba(' + ar + ',' + ag + ',' + ab + ',0.06)');
+          gg.addColorStop(1,   'rgba(' + ar + ',' + ag + ',' + ab + ',0)');
+          cctx.beginPath(); cctx.moveTo(hx, hy); cctx.lineTo(tailX, sY0);
+          cctx.strokeStyle = gg; cctx.lineWidth = 24; cctx.stroke();
+
+          /* Head glow */
+          var hg = cctx.createRadialGradient(hx, hy, 0, hx, hy, 32);
+          hg.addColorStop(0,   'rgba(255,255,255,0.96)');
+          hg.addColorStop(0.2, 'rgba(255,248,220,0.72)');
+          hg.addColorStop(0.55,'rgba(' + ar + ',' + ag + ',' + ab + ',0.30)');
+          hg.addColorStop(1,   'rgba(' + ar + ',' + ag + ',' + ab + ',0)');
+          cctx.beginPath(); cctx.arc(hx, hy, 32, 0, Math.PI * 2);
+          cctx.fillStyle = hg; cctx.fill();
+
+          /* Bright core */
+          cctx.beginPath(); cctx.arc(hx, hy, 3.2, 0, Math.PI * 2);
+          cctx.fillStyle = 'rgba(255,255,255,1)'; cctx.fill();
+
+          if (t < 1) {
+            requestAnimationFrame(frame);
+          } else {
+            /* 200ms tail fade-out */
+            var fs = performance.now();
+            (function tailFade(fn) {
+              var fp = Math.min((fn - fs) / 200, 1);
+              cctx.clearRect(0, 0, CW, CH);
+              if (fp < 1) {
+                cctx.globalAlpha = (1 - fp) * 0.35;
+                var rg = cctx.createLinearGradient(CW, sYend, CW - 100, sYend);
+                rg.addColorStop(0, 'rgba(255,255,255,0.5)');
+                rg.addColorStop(1, 'rgba(255,255,255,0)');
+                cctx.beginPath(); cctx.moveTo(CW, sYend); cctx.lineTo(CW - 100, sYend);
+                cctx.strokeStyle = rg; cctx.lineWidth = 1.5; cctx.stroke();
+                cctx.globalAlpha = 1;
+                requestAnimationFrame(tailFade);
+              } else {
+                cctx.clearRect(0, 0, CW, CH);
+                if (clipping) sectionEl.style.clipPath = '';
+                if (!sectionEl.classList.contains('curtain-in')) sectionEl.classList.add('curtain-in');
+                cometBusy = false;
+              }
+            })(fs);
+          }
+        }
+        requestAnimationFrame(frame);
       }
 
-      var wipeZones = Array.from(document.querySelectorAll(
-        '#journey,#areas,#people,#vision,#reut-spotlight,#spotlight,#insights,#cta'
-      ));
-      var wipeIO = new IntersectionObserver(function (entries) {
+      /* Observe all curtain-rise sections; reveal in-viewport ones immediately */
+      var cometIO = new IntersectionObserver(function (entries) {
         entries.forEach(function (entry) {
           if (!entry.isIntersecting) return;
-          var toRgb = parseSa(entry.target);
-          triggerWipe(prevWipeRgb, toRgb);
-          prevWipeRgb = [toRgb[0], toRgb[1], toRgb[2]];
+          launchComet(entry.target, parseSa(entry.target));
+          cometIO.unobserve(entry.target);
         });
-      }, { rootMargin: '-48% 0px -51% 0px', threshold: 0 });
-      wipeZones.forEach(function (el) { wipeIO.observe(el); });
+      }, { rootMargin: '0px 0px -4% 0px', threshold: 0.02 });
+
+      Array.from(document.querySelectorAll('.curtain-rise')).forEach(function (s) {
+        if (s.getBoundingClientRect().top < window.innerHeight * 0.9) {
+          s.classList.add('curtain-in'); /* already in view — instant reveal */
+        } else {
+          cometIO.observe(s);
+        }
+      });
     }
 
   })();
