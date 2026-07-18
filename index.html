@@ -845,24 +845,17 @@
     /* ── Reut spotlight: full widescreen frame, no crop ─────────── */
     #reut-spotlight .spotlight-img-panel { aspect-ratio:16/9; background:#060a15; }
     #reut-spotlight .spotlight-img { object-fit:contain; background:#060a15; }
-    /* Elswick photo is landscape; rotate if EXIF not honored by browser */
-    /* Elswick: EXIF orientation 6 = rotate-90CW. Img sized 133%×75% so after
-       rotate(90deg) it maps exactly to the 3/4 portrait panel with no cropping. */
-    #elswick-spotlight .spotlight-img-panel { aspect-ratio:3/4; overflow:hidden; position:relative; }
-    #elswick-spotlight .spotlight-img {
-      position:absolute; width:133.34%; height:75%;
-      left:-16.67%; top:12.5%;
-      object-fit:cover; transform-origin:center center;
-      transform:rotate(90deg);
-    }
+    /* Elswick: photo-elswick.jpg is now correctly portrait (3024×4032), no rotation needed */
+    #elswick-spotlight .spotlight-img-panel { aspect-ratio:3/4; overflow:hidden; }
+    #elswick-spotlight .spotlight-img { object-fit:cover; object-position:center top; }
     #elswick-spotlight .reveal.in .spotlight-img {
       animation: kbElswick 22s 1.2s ease-in-out infinite alternate;
     }
     @keyframes kbElswick {
-      0%   { transform: rotate(90deg) scale(1)    translate(0%,  0%); }
-      33%  { transform: rotate(90deg) scale(1.06) translate(2%,  1%); }
-      66%  { transform: rotate(90deg) scale(1.09) translate(-2%, 2%); }
-      100% { transform: rotate(90deg) scale(1.12) translate(1%, -2%); }
+      0%   { transform: scale(1)    translate(0%,   0%); }
+      33%  { transform: scale(1.06) translate(1.5%, -2%); }
+      66%  { transform: scale(1.09) translate(-1%,  -4%); }
+      100% { transform: scale(1.12) translate(2%,   -2%); }
     }
 
     /* ── Spotlight image Ken Burns + reveal ─────────────────────── */
@@ -1003,8 +996,6 @@
             <span class="hero-authority-item">Maccabee Task Force</span>
             <span class="hero-authority-sep">·</span>
             <span class="hero-authority-item">Jewish Federation of Arkansas</span>
-            <span class="hero-authority-sep">·</span>
-            <span class="hero-authority-item">Reut USA</span>
           </div>
         </div>
 
@@ -1464,7 +1455,7 @@
           <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" aria-hidden="true"><path stroke-linecap="round" stroke-linejoin="round" d="M21.75 6.75v10.5a2.25 2.25 0 01-2.25 2.25h-15a2.25 2.25 0 01-2.25-2.25V6.75m19.5 0A2.25 2.25 0 0019.5 4.5h-15a2.25 2.25 0 00-2.25 2.25m19.5 0v.243a2.25 2.25 0 01-1.07 1.916l-7.5 4.615a2.25 2.25 0 01-2.36 0L3.32 8.91a2.25 2.25 0 01-1.07-1.916V6.75"/></svg>
           Email Me
         </a>
-        <a href="Enrico Ravenna Resume - Reut USA - 2026-07-17.pdf" download class="btn-secondary">
+        <a href="Enrico Ravenna Resumepdf.pdf" download class="btn-secondary">
           <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" aria-hidden="true"><path stroke-linecap="round" stroke-linejoin="round" d="M3 16.5v2.25A2.25 2.25 0 005.25 21h13.5A2.25 2.25 0 0021 18.75V16.5M16.5 12 12 16.5m0 0L7.5 12m4.5 4.5V3"/></svg>
           Download Resume
         </a>
@@ -1499,7 +1490,7 @@
       </div>
       <p class="footer-meta">Enrico Omri Ravenna &nbsp;·&nbsp; 2026</p>
       <p class="footer-a11y"><a href="#" aria-label="Accessibility statement">Accessibility Statement</a></p> <!-- EDIT: replace # with real URL -->
-      <p class="footer-a11y"><a href="Enrico Ravenna Resume - Reut USA - 2026-07-17.pdf" download>Download Resume</a></p>
+      <p class="footer-a11y"><a href="Enrico Ravenna Resumepdf.pdf" download>Download Resume</a></p>
     </div>
   </footer>
 
