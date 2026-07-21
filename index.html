@@ -553,6 +553,9 @@
     /* ── Featured testimonial section ───────────────────────────── */
     #colleagues { padding:var(--gap) 0; border-top:1px solid var(--border-subtle); }
     .featured-testimonial { display:grid; grid-template-columns:1fr 2fr; gap:clamp(40px,6vw,88px); align-items:start; }
+    .featured-testimonial--reverse { direction:rtl; }
+    .featured-testimonial--reverse > * { direction:ltr; }
+    .testimonial-divider { border:none; border-top:1px solid var(--border-subtle); margin:clamp(48px,7vh,80px) 0; }
     .featured-testimonial-photo-col { position:sticky; top:120px; }
     .featured-testimonial-photo-wrap { position:relative; border-radius:4px; overflow:hidden; aspect-ratio:1/1; max-width:320px; }
     .featured-testimonial-photo-wrap img { width:100%; height:100%; object-fit:cover; object-position:center top; display:block; }
@@ -1191,7 +1194,37 @@
       <p class="label reveal">What Colleagues Say</p>
       <h2 class="reveal d1">Peers who've seen it <em>up close.</em></h2>
 
+      <!-- Jordenne Parker -->
       <div class="featured-testimonial" style="margin-top:clamp(40px,6vh,72px);">
+        <div class="featured-testimonial-photo-col reveal">
+          <div class="featured-testimonial-photo-wrap">
+            <div class="featured-testimonial-photo-glow"></div>
+            <img src="photo-jordenne.jpg"
+                 alt="Jordenne Parker, Maccabee Task Force"
+                 width="320" height="320"
+                 onerror="this.style.display='none';">
+          </div>
+          <div class="featured-testimonial-attr">
+            <p class="featured-testimonial-name">Jordenne Parker</p>
+            <p class="featured-testimonial-title">Maccabee Task Force</p>
+          </div>
+        </div>
+
+        <div class="featured-testimonial-content reveal d2">
+          <span class="featured-testimonial-open" aria-hidden="true">&ldquo;</span>
+          <div class="featured-testimonial-body">
+            <p class="highlight">I've had the privilege of partnering with Enrico on multiple geopolitical trips to Israel, including leading the first Maccabee Task Force campus delegation to return after October 7.</p>
+            <p>He never asks people to stop asking hard questions. Instead, he helps them ask better ones. I've watched students leave conversations with Enrico feeling more confident in their own voices, more curious about complexity, and more willing to engage thoughtfully with their communities back on campus.</p>
+            <p>He has an extraordinary ability to balance empathy with honesty, creating spaces where students can challenge assumptions without ever feeling judged. His leadership is rooted in humility, genuine curiosity, and an unwavering belief in people's potential.</p>
+            <p class="highlight">What has always stood out to me is that he doesn't seek out the easy path. He embraces challenges because he knows they are opportunities to learn, adapt, and become better. Watching that growth has been just as inspiring as experiencing the impact he has on students.</p>
+          </div>
+        </div>
+      </div>
+
+      <hr class="testimonial-divider">
+
+      <!-- Jessie Dowsakul -->
+      <div class="featured-testimonial featured-testimonial--reverse">
         <div class="featured-testimonial-photo-col reveal">
           <div class="featured-testimonial-photo-wrap">
             <div class="featured-testimonial-photo-glow"></div>
