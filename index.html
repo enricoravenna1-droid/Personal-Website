@@ -808,19 +808,20 @@
     #hero             { position:relative; z-index:10; background:var(--bg); }
     #journey          { position:relative; z-index:11; background:var(--bg); }
     #colleagues        { position:relative; z-index:12; background:var(--bg); }
-    .initiatives-intro{ position:relative; z-index:13; background:var(--bg); padding:clamp(40px,6vw,80px) 0 clamp(20px,3vw,40px); border-top:1px solid var(--border-subtle); }
-    #reut-spotlight   { position:relative; z-index:14; background:var(--bg); --sa:#5BA8CC; --sa-glow:rgba(91,168,204,0.28); }
-    #spotlight        { position:relative; z-index:15; background:var(--bg); }
-    #elswick-spotlight{ position:relative; z-index:16; background:var(--bg); --sa:#D4915A; --sa-glow:rgba(212,145,90,0.28); }
-    #areas            { position:relative; z-index:17; background:var(--bg); }
-    #people           { position:relative; z-index:18; background:var(--bg); }
-    #vision           { position:relative; z-index:19; background:var(--bg); }
-    #insights         { position:relative; z-index:20; background:var(--bg); }
-    #cta              { position:relative; z-index:21; background:var(--bg); }
-    footer            { position:relative; z-index:22; background:var(--bg); }
+    #team-voices      { position:relative; z-index:13; background:var(--bg); }
+    .initiatives-intro{ position:relative; z-index:14; background:var(--bg); padding:clamp(40px,6vw,80px) 0 clamp(20px,3vw,40px); border-top:1px solid var(--border-subtle); }
+    #reut-spotlight   { position:relative; z-index:15; background:var(--bg); --sa:#5BA8CC; --sa-glow:rgba(91,168,204,0.28); }
+    #spotlight        { position:relative; z-index:16; background:var(--bg); }
+    #elswick-spotlight{ position:relative; z-index:17; background:var(--bg); --sa:#D4915A; --sa-glow:rgba(212,145,90,0.28); }
+    #areas            { position:relative; z-index:18; background:var(--bg); }
+    #people           { position:relative; z-index:19; background:var(--bg); }
+    #vision           { position:relative; z-index:20; background:var(--bg); }
+    #insights         { position:relative; z-index:21; background:var(--bg); }
+    #cta              { position:relative; z-index:22; background:var(--bg); }
+    footer            { position:relative; z-index:23; background:var(--bg); }
 
     /* Top accent glow line per section — gives the "new card rising" feel */
-    #journey::before, .initiatives-intro::before, #reut-spotlight::before, #spotlight::before, #elswick-spotlight::before,
+    #journey::before, #team-voices::before, .initiatives-intro::before, #reut-spotlight::before, #spotlight::before, #elswick-spotlight::before,
     #areas::before, #people::before, #vision::before, #insights::before, #cta::before {
       content: '';
       position: absolute;
@@ -963,6 +964,7 @@
       <div class="snav-links">
         <a href="#journey">Story</a>
         <a href="#colleagues">Colleagues</a>
+        <a href="#team-voices">My Team</a>
         <a href="#initiatives">Initiatives</a>
         <a href="#areas">Areas of Focus</a>
         <a href="#vision">Vision</a>
@@ -1247,6 +1249,34 @@
             <p>What sets him apart is that he leads with humility. He doesn't seek recognition or try to be the loudest voice in the room. He listens first, asks thoughtful questions, and creates space for others to grow. He has a unique gift for making people feel seen, valued, and capable of accomplishing more than they thought possible.</p>
             <p>He challenged me to think bigger, dream bolder, and never accept that being a smaller community meant we had to think small.</p>
             <p class="highlight">Enrico believes deeply in people. He believes in communities. And he believes that leadership is about lifting others up. That belief is contagious, and it has made me a better leader.</p>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <section id="team-voices" class="curtain-rise">
+    <div class="container">
+      <p class="label reveal">From My Team</p>
+      <h2 class="reveal d1">People who work <em>alongside me.</em></h2>
+
+      <div class="featured-testimonial" style="margin-top:clamp(40px,6vh,72px);">
+        <div class="featured-testimonial-photo-col reveal">
+          <div class="featured-testimonial-photo-wrap" style="background:#1a1a1a; display:flex; align-items:center; justify-content:center;">
+            <img src="photo-erin.jpg" alt="Erin Cohen, Community Engagement Manager, Jewish Federation of Arkansas"
+              style="width:100%; height:100%; object-fit:cover; object-position:center top; display:block;"
+              onerror="this.style.display='none'; this.parentElement.innerHTML='<span style=\'font-family:var(--font-sans);font-size:32px;color:var(--muted);letter-spacing:.05em;font-weight:300;\'>EC</span>';">
+          </div>
+          <div class="featured-testimonial-attr">
+            <p class="featured-testimonial-name">Erin Cohen</p>
+            <p class="featured-testimonial-title">Community Engagement Manager<br>Jewish Federation of Arkansas</p>
+          </div>
+        </div>
+        <div class="featured-testimonial-content reveal d2">
+          <span class="featured-testimonial-open">&ldquo;</span>
+          <div class="featured-testimonial-body">
+            <p class="highlight">He consistently trusted and empowered me to focus on the needs of Northwest Arkansas — and advocated successfully with the Executive Board to expand my role, allowing me to take on more meaningful work in programming, outreach, relationship-building, and long-term community engagement.</p>
+            <p>Enrico's trust-based leadership gives me the autonomy to focus on the needs of Northwest Arkansas while ensuring I have what I need to build and engage community. I believe his leadership has helped create momentum for the continued growth of Jewish life in Northwest Arkansas — and for the work our community needs and deserves.</p>
           </div>
         </div>
       </div>
@@ -2075,7 +2105,7 @@
 
     /* Outgoing section subtle recede — runs on scroll */
     if (!reduced) {
-      var recedePanels = Array.from(document.querySelectorAll('#colleagues,.initiatives-intro,#reut-spotlight,#spotlight,#elswick-spotlight,#areas,#people,#vision,#insights,#cta,footer'));
+      var recedePanels = Array.from(document.querySelectorAll('#colleagues,#team-voices,.initiatives-intro,#reut-spotlight,#spotlight,#elswick-spotlight,#areas,#people,#vision,#insights,#cta,footer'));
       var recTick = false;
       window.addEventListener('scroll', function () {
         if (recTick) return; recTick = true;
@@ -2116,7 +2146,7 @@
     }
 
     var accentZones = Array.from(document.querySelectorAll(
-      '#hero,.ch-1,.ch-interlude,.ch-2,.ch-3,#colleagues,#reut-spotlight,#spotlight,#elswick-spotlight,#areas,#people,#vision,#insights,#cta'
+      '#hero,.ch-1,.ch-interlude,.ch-2,.ch-3,#colleagues,#team-voices,#reut-spotlight,#spotlight,#elswick-spotlight,#areas,#people,#vision,#insights,#cta'
     ));
     /* Force --sa recompute after overriding :root accent */
     document.documentElement.style.setProperty('--sa', '#D4B050');
