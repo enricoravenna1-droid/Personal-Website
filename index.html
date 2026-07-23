@@ -809,21 +809,28 @@
     /* Sections stack via z-index; solid background creates the cover */
     #hero             { position:relative; z-index:10; background:var(--bg); }
     #journey          { position:relative; z-index:11; background:var(--bg); }
-    #colleagues        { position:relative; z-index:12; background:var(--bg); }
-    #team-voices      { position:relative; z-index:13; background:var(--bg); }
-    .initiatives-intro{ position:relative; z-index:14; background:var(--bg); padding:clamp(40px,6vw,80px) 0 clamp(20px,3vw,40px); border-top:1px solid var(--border-subtle); }
-    #reut-spotlight   { position:relative; z-index:15; background:var(--bg); --sa:#5BA8CC; --sa-glow:rgba(91,168,204,0.28); }
-    #spotlight        { position:relative; z-index:16; background:var(--bg); }
-    #elswick-spotlight{ position:relative; z-index:17; background:var(--bg); --sa:#D4915A; --sa-glow:rgba(212,145,90,0.28); }
-    #areas            { position:relative; z-index:18; background:var(--bg); }
-    #people           { position:relative; z-index:19; background:var(--bg); }
-    #vision           { position:relative; z-index:20; background:var(--bg); }
-    #insights         { position:relative; z-index:21; background:var(--bg); }
-    #cta              { position:relative; z-index:22; background:var(--bg); }
-    footer            { position:relative; z-index:23; background:var(--bg); }
+    #field-voice      { position:relative; z-index:12; background:var(--bg); }
+    #colleagues        { position:relative; z-index:13; background:var(--bg); }
+    #team-voices      { position:relative; z-index:14; background:var(--bg); }
+    .initiatives-intro{ position:relative; z-index:15; background:var(--bg); padding:clamp(40px,6vw,80px) 0 clamp(20px,3vw,40px); border-top:1px solid var(--border-subtle); }
+    #reut-spotlight   { position:relative; z-index:16; background:var(--bg); --sa:#5BA8CC; --sa-glow:rgba(91,168,204,0.28); }
+    #spotlight        { position:relative; z-index:17; background:var(--bg); }
+    #elswick-spotlight{ position:relative; z-index:18; background:var(--bg); --sa:#D4915A; --sa-glow:rgba(212,145,90,0.28); }
+    #areas            { position:relative; z-index:19; background:var(--bg); }
+    #people           { position:relative; z-index:20; background:var(--bg); }
+    #vision           { position:relative; z-index:21; background:var(--bg); }
+    #insights         { position:relative; z-index:22; background:var(--bg); }
+    #cta              { position:relative; z-index:23; background:var(--bg); }
+    footer            { position:relative; z-index:24; background:var(--bg); }
+
+    /* Field voice stats strip */
+    .field-voice-stats { display:flex; flex-direction:column; gap:14px; }
+    .field-voice-stat { display:flex; flex-direction:column; gap:2px; }
+    .field-voice-num { font-family:var(--font-serif); font-size:clamp(22px,3vw,30px); font-weight:700; color:var(--accent); line-height:1; }
+    .field-voice-label { font-family:var(--font-sans); font-size:10px; font-weight:500; letter-spacing:.1em; text-transform:uppercase; color:var(--muted); }
 
     /* Top accent glow line per section — gives the "new card rising" feel */
-    #journey::before, #team-voices::before, .initiatives-intro::before, #reut-spotlight::before, #spotlight::before, #elswick-spotlight::before,
+    #journey::before, #field-voice::before, #team-voices::before, .initiatives-intro::before, #reut-spotlight::before, #spotlight::before, #elswick-spotlight::before,
     #areas::before, #people::before, #vision::before, #insights::before, #cta::before {
       content: '';
       position: absolute;
@@ -966,6 +973,7 @@
       <span class="snav-name">Enrico Omri Ravenna<span class="snav-heart" aria-hidden="true">♥</span></span>
       <div class="snav-links">
         <a href="#journey">Story</a>
+        <a href="#field-voice">From Israel</a>
         <a href="#colleagues">Colleagues</a>
         <a href="#team-voices">My Team</a>
         <a href="#initiatives">Initiatives</a>
@@ -1188,8 +1196,42 @@
   </section>
 
   <!-- ══════════════════════════════════════════════════════════════════
-       INITIATIVES — group heading anchor
+       FROM THE FIELD — Eyal Dror
   ══════════════════════════════════════════════════════════════════ -->
+  <section id="field-voice" class="curtain-rise">
+    <div class="container">
+      <p class="label reveal">A Voice From Israel</p>
+      <h2 class="reveal d1">Seen from the <em>front lines.</em></h2>
+
+      <div class="featured-testimonial" style="margin-top:clamp(40px,6vh,72px);">
+        <div class="featured-testimonial-photo-col reveal">
+          <div class="featured-testimonial-photo-wrap">
+            <div class="featured-testimonial-photo-glow"></div>
+            <img src="photo-eyal.jpg" alt="Lt. Col. (Res.) Eyal Dror, Commander of Operation Good Neighbor"
+              style="width:100%; height:100%; object-fit:cover; object-position:center top; display:block;">
+          </div>
+          <div class="featured-testimonial-attr">
+            <p class="featured-testimonial-name">Lt. Col. (Res.) Eyal Dror</p>
+            <p class="featured-testimonial-title">Founder &amp; Commander, Operation Good Neighbor<br>IDF Northern Command · 24 Years of Service</p>
+          </div>
+          <div class="field-voice-stats reveal" style="margin-top:20px;">
+            <div class="field-voice-stat"><span class="field-voice-num">700</span><span class="field-voice-label">Humanitarian Missions</span></div>
+            <div class="field-voice-stat"><span class="field-voice-num">4,500</span><span class="field-voice-label">Syrians Treated in Israel</span></div>
+            <div class="field-voice-stat"><span class="field-voice-num">420</span><span class="field-voice-label">White Helmets Rescued</span></div>
+          </div>
+        </div>
+        <div class="featured-testimonial-content reveal d2">
+          <span class="featured-testimonial-open">&ldquo;</span>
+          <div class="featured-testimonial-body">
+            <p class="highlight">He is a deeply committed Zionist who understands that educating the next generation requires not only words, but presence, responsibility, and leadership.</p>
+            <p>What makes Enrico especially unique is that he is both profoundly connected to American Jewish life and genuinely Israeli in his experience and outlook, including through his meaningful military service. This rare combination enables him to understand both communities from within and to build authentic bridges between them.</p>
+            <p>Enrico is a dedicated and highly professional leader who, in my view, deserves to become one of the leading Jewish voices in the United States, and I am proud to call him my friend, to have hosted him and his family in my home, and to support the important path he is leading.</p>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
   <!-- ══════════════════════════════════════════════════════════════════
        COLLEAGUES — Featured testimonial
   ══════════════════════════════════════════════════════════════════ -->
@@ -2107,7 +2149,7 @@
 
     /* Outgoing section subtle recede — runs on scroll */
     if (!reduced) {
-      var recedePanels = Array.from(document.querySelectorAll('#colleagues,#team-voices,.initiatives-intro,#reut-spotlight,#spotlight,#elswick-spotlight,#areas,#people,#vision,#insights,#cta,footer'));
+      var recedePanels = Array.from(document.querySelectorAll('#field-voice,#colleagues,#team-voices,.initiatives-intro,#reut-spotlight,#spotlight,#elswick-spotlight,#areas,#people,#vision,#insights,#cta,footer'));
       var recTick = false;
       window.addEventListener('scroll', function () {
         if (recTick) return; recTick = true;
@@ -2148,7 +2190,7 @@
     }
 
     var accentZones = Array.from(document.querySelectorAll(
-      '#hero,.ch-1,.ch-interlude,.ch-2,.ch-3,#colleagues,#team-voices,#reut-spotlight,#spotlight,#elswick-spotlight,#areas,#people,#vision,#insights,#cta'
+      '#hero,.ch-1,.ch-interlude,.ch-2,.ch-3,#field-voice,#colleagues,#team-voices,#reut-spotlight,#spotlight,#elswick-spotlight,#areas,#people,#vision,#insights,#cta'
     ));
     /* Force --sa recompute after overriding :root accent */
     document.documentElement.style.setProperty('--sa', '#D4B050');
