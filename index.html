@@ -156,11 +156,13 @@
     /* ── Sticky nav ─────────────────────────────────────────────── */
     #sticky-nav { position:fixed; top:0; left:0; right:0; z-index:900; transform:translateY(-100%); transition:transform .38s cubic-bezier(0.16,1,0.3,1); background:rgba(11,17,32,0.93); backdrop-filter:blur(14px); -webkit-backdrop-filter:blur(14px); border-bottom:1px solid var(--border-subtle); }
     #sticky-nav.snav-visible { transform:translateY(0); }
-    .snav-inner { max-width:var(--max-w); margin:0 auto; padding:0 var(--pad); height:80px; display:flex; align-items:center; gap:32px; }
+    .snav-inner { max-width:var(--max-w); margin:0 auto; padding:0 var(--pad); height:80px; display:grid; grid-template-columns:1fr auto 1fr; align-items:center; gap:24px; }
+    .snav-identity { display:flex; align-items:center; gap:12px; }
     .snav-avatar { width:38px; height:38px; border-radius:50%; object-fit:cover; object-position:center top; border:1.5px solid rgba(212,176,80,0.4); box-shadow:0 0 10px rgba(212,176,80,0.18); flex-shrink:0; opacity:0; transform:scale(0.6); transition:opacity .45s cubic-bezier(0.16,1,0.3,1), transform .45s cubic-bezier(0.16,1,0.3,1); transition-delay:.08s; }
     #sticky-nav.snav-visible .snav-avatar { opacity:1; transform:scale(1); }
-    .snav-name { font-family:var(--font-serif); font-size:17px; font-weight:700; color:var(--text); white-space:nowrap; flex-shrink:0; }
-    .snav-links { display:flex; gap:28px; flex:1; justify-content:center; }
+    .snav-name { font-family:var(--font-serif); font-size:17px; font-weight:700; color:var(--text); white-space:nowrap; }
+    .snav-links { display:flex; gap:28px; justify-content:center; }
+    .snav-cta { justify-self:end; }
     .snav-links a { font-family:var(--font-sans); font-size:13px; font-weight:500; letter-spacing:.1em; text-transform:uppercase; color:var(--muted); transition:color .2s ease; white-space:nowrap; }
     .snav-links a:hover { color:var(--text); }
     .snav-cta { font-family:var(--font-sans); font-size:13px; font-weight:600; letter-spacing:.1em; text-transform:uppercase; padding:11px 26px; background:var(--accent); color:#0B1120; border-radius:2px; white-space:nowrap; flex-shrink:0; transition:background .2s ease; }
@@ -969,8 +971,10 @@
   <!-- Sticky condensed nav -->
   <nav id="sticky-nav" aria-label="Page navigation">
     <div class="snav-inner">
-      <img src="photo.jpg" alt="" class="snav-avatar" aria-hidden="true">
-      <span class="snav-name">Enrico Omri Ravenna<span class="snav-heart" aria-hidden="true">♥</span></span>
+      <div class="snav-identity">
+        <img src="photo.jpg" alt="" class="snav-avatar" aria-hidden="true">
+        <span class="snav-name">Enrico Omri Ravenna<span class="snav-heart" aria-hidden="true">♥</span></span>
+      </div>
       <div class="snav-links">
         <a href="#journey">Story</a>
         <a href="#field-voice">From Israel</a>
