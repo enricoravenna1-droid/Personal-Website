@@ -601,6 +601,23 @@
     .testimonial-quote { font-family:var(--font-serif); font-optical-sizing:auto; font-style:italic; font-weight:300; font-size:clamp(15px,2.3vw,19px); color:var(--text); line-height:1.65; margin-bottom:20px; position:relative; }
     .testimonial-attr { font-family:var(--font-sans); font-size:11px; font-style:normal; font-weight:600; letter-spacing:.12em; text-transform:uppercase; color:var(--accent); opacity:.75; }
 
+    /* ── Community Voices — full-bleed photo cards ──────────────── */
+    .cv-cards { display:grid; grid-template-columns:1fr 1fr; gap:clamp(16px,2.5vw,28px); margin-top:clamp(40px,6vh,72px); }
+    .cv-card { position:relative; aspect-ratio:3/4; border-radius:6px; overflow:hidden; cursor:default; }
+    .cv-card-photo { position:absolute; inset:0; width:100%; height:100%; object-fit:cover; object-position:center top; transition:transform .9s cubic-bezier(0.16,1,0.3,1), filter .6s ease; }
+    .cv-card:hover .cv-card-photo { transform:scale(1.05); filter:brightness(1.18); }
+    .cv-card-overlay { position:absolute; inset:0; background:linear-gradient(to top, rgba(4,8,20,0.92) 0%, rgba(4,8,20,0.55) 45%, rgba(4,8,20,0.12) 100%); transition:background .5s ease; }
+    .cv-card:hover .cv-card-overlay { background:linear-gradient(to top, rgba(4,8,20,0.88) 0%, rgba(4,8,20,0.42) 45%, rgba(4,8,20,0.06) 100%); }
+    .cv-card-content { position:absolute; bottom:0; left:0; right:0; padding:clamp(24px,3.5vw,44px); }
+    .cv-card-open { font-family:var(--font-serif); font-size:clamp(44px,5vw,64px); color:var(--accent); opacity:.55; line-height:.7; display:block; margin-bottom:14px; }
+    .cv-card-quote { font-family:var(--font-serif); font-style:italic; font-weight:300; font-size:clamp(13px,1.4vw,16.5px); color:rgba(255,255,255,0.9); line-height:1.7; margin-bottom:22px; }
+    .cv-card-name { font-family:var(--font-sans); font-size:12px; font-weight:700; letter-spacing:.08em; text-transform:uppercase; color:var(--accent); }
+    .cv-card-title { font-family:var(--font-sans); font-size:10.5px; color:rgba(255,255,255,0.45); margin-top:5px; line-height:1.5; }
+    @media (max-width:640px) {
+      .cv-cards { grid-template-columns:1fr; }
+      .cv-card { aspect-ratio:4/5; }
+    }
+
     /* ═══════════════════════════════════════════════════════════════
        FEATURE SPOTLIGHT
     ═══════════════════════════════════════════════════════════════ */
@@ -1338,45 +1355,26 @@
       <p class="label reveal">Voices From the Community</p>
       <h2 class="reveal d1">What those outside the Jewish world <em>see.</em></h2>
 
-      <div class="featured-testimonial" style="margin-top:clamp(40px,6vh,72px);">
-        <div class="featured-testimonial-photo-col reveal">
-          <div class="featured-testimonial-photo-wrap">
-            <div class="featured-testimonial-photo-glow"></div>
-            <img src="photo-cathie.jpg" alt="Dr. Cathie Dorsch, CEO Commission Fields"
-              style="width:100%; height:100%; object-fit:cover; object-position:center top; display:block;">
-          </div>
-          <div class="featured-testimonial-attr">
-            <p class="featured-testimonial-name">Dr. Cathie Dorsch, PhD</p>
-            <p class="featured-testimonial-title">CEO, Commission Fields<br>Judeo-Christian Studies &amp; Ethics</p>
-          </div>
-        </div>
-        <div class="featured-testimonial-content reveal d2">
-          <span class="featured-testimonial-open">&ldquo;</span>
-          <div class="featured-testimonial-body">
-            <p class="highlight">He is a skilled communicator and a builder of generational unity who is unafraid of hard conversations. His leadership drew out new and younger leaders who had been discounted and marginalized.</p>
-            <p>He is a passionate and courageous representative of Jewish identity, of American ideals, of shared Judeo-Christian values, and of the existential necessity for a strong Israel.</p>
+      <div class="cv-cards">
+        <div class="cv-card reveal">
+          <img src="photo-cathie.jpg" alt="Dr. Cathie Dorsch with Enrico Ravenna" class="cv-card-photo">
+          <div class="cv-card-overlay"></div>
+          <div class="cv-card-content">
+            <span class="cv-card-open">&ldquo;</span>
+            <p class="cv-card-quote">He is a skilled communicator and a builder of generational unity who is unafraid of hard conversations. His leadership drew out new and younger leaders who had been discounted and marginalized. He is a passionate and courageous representative of Jewish identity, of American ideals, of shared Judeo-Christian values, and of the existential necessity for a strong Israel.</p>
+            <p class="cv-card-name">Dr. Cathie Dorsch, PhD</p>
+            <p class="cv-card-title">CEO, Commission Fields · Judeo-Christian Studies &amp; Ethics</p>
           </div>
         </div>
-      </div>
 
-      <hr class="testimonial-divider">
-
-      <div class="featured-testimonial featured-testimonial--reverse">
-        <div class="featured-testimonial-photo-col reveal">
-          <div class="featured-testimonial-photo-wrap">
-            <div class="featured-testimonial-photo-glow"></div>
-            <img src="photo-perry.jpg" alt="Pastor Perry Black, Founding Pastor, Family Church Bryant"
-              style="width:100%; height:100%; object-fit:cover; object-position:center top; display:block;">
-          </div>
-          <div class="featured-testimonial-attr">
-            <p class="featured-testimonial-name">Pastor Perry Black</p>
-            <p class="featured-testimonial-title">Founding Pastor<br>Family Church Bryant</p>
-          </div>
-        </div>
-        <div class="featured-testimonial-content reveal d2">
-          <span class="featured-testimonial-open">&ldquo;</span>
-          <div class="featured-testimonial-body">
-            <p class="highlight">I do not know of a more important time in my life to have such a dynamic and energetic bridge builder for the Jewish community like Enrico Ravenna.</p>
+        <div class="cv-card reveal d2">
+          <img src="photo-perry.jpg" alt="Pastor Perry Black with Enrico Ravenna" class="cv-card-photo">
+          <div class="cv-card-overlay"></div>
+          <div class="cv-card-content">
+            <span class="cv-card-open">&ldquo;</span>
+            <p class="cv-card-quote">I do not know of a more important time in my life to have such a dynamic and energetic bridge builder for the Jewish community like Enrico Ravenna.</p>
+            <p class="cv-card-name">Pastor Perry Black</p>
+            <p class="cv-card-title">Founding Pastor · Family Church Bryant</p>
           </div>
         </div>
       </div>
