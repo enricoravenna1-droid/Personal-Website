@@ -814,16 +814,17 @@
     #field-voice      { position:relative; z-index:12; background:var(--bg); }
     #colleagues        { position:relative; z-index:13; background:var(--bg); }
     #team-voices      { position:relative; z-index:14; background:var(--bg); }
-    .initiatives-intro{ position:relative; z-index:15; background:var(--bg); padding:clamp(40px,6vw,80px) 0 clamp(20px,3vw,40px); border-top:1px solid var(--border-subtle); }
-    #reut-spotlight   { position:relative; z-index:16; background:var(--bg); --sa:#5BA8CC; --sa-glow:rgba(91,168,204,0.28); }
-    #spotlight        { position:relative; z-index:17; background:var(--bg); }
-    #elswick-spotlight{ position:relative; z-index:18; background:var(--bg); --sa:#D4915A; --sa-glow:rgba(212,145,90,0.28); }
-    #areas            { position:relative; z-index:19; background:var(--bg); }
-    #people           { position:relative; z-index:20; background:var(--bg); }
-    #vision           { position:relative; z-index:21; background:var(--bg); }
-    #insights         { position:relative; z-index:22; background:var(--bg); }
-    #cta              { position:relative; z-index:23; background:var(--bg); }
-    footer            { position:relative; z-index:24; background:var(--bg); }
+    #community-voices { position:relative; z-index:15; background:var(--bg); }
+    .initiatives-intro{ position:relative; z-index:17; background:var(--bg); padding:clamp(40px,6vw,80px) 0 clamp(20px,3vw,40px); border-top:1px solid var(--border-subtle); }
+    #reut-spotlight   { position:relative; z-index:18; background:var(--bg); --sa:#5BA8CC; --sa-glow:rgba(91,168,204,0.28); }
+    #spotlight        { position:relative; z-index:19; background:var(--bg); }
+    #elswick-spotlight{ position:relative; z-index:20; background:var(--bg); --sa:#D4915A; --sa-glow:rgba(212,145,90,0.28); }
+    #areas            { position:relative; z-index:21; background:var(--bg); }
+    #people           { position:relative; z-index:22; background:var(--bg); }
+    #vision           { position:relative; z-index:23; background:var(--bg); }
+    #insights         { position:relative; z-index:24; background:var(--bg); }
+    #cta              { position:relative; z-index:25; background:var(--bg); }
+    footer            { position:relative; z-index:26; background:var(--bg); }
 
     /* Field voice stats strip */
     .field-voice-stats { display:flex; flex-direction:column; gap:14px; }
@@ -832,7 +833,7 @@
     .field-voice-label { font-family:var(--font-sans); font-size:10px; font-weight:500; letter-spacing:.1em; text-transform:uppercase; color:var(--muted); }
 
     /* Top accent glow line per section — gives the "new card rising" feel */
-    #journey::before, #field-voice::before, #team-voices::before, .initiatives-intro::before, #reut-spotlight::before, #spotlight::before, #elswick-spotlight::before,
+    #journey::before, #field-voice::before, #team-voices::before, #community-voices::before, .initiatives-intro::before, #reut-spotlight::before, #spotlight::before, #elswick-spotlight::before,
     #areas::before, #people::before, #vision::before, #insights::before, #cta::before {
       content: '';
       position: absolute;
@@ -1329,6 +1330,58 @@
     </div>
   </section>
 
+  <!-- ══════════════════════════════════════════════════════════════════
+       COMMUNITY VOICES — Cathie Dorsch + Pastor Perry
+  ══════════════════════════════════════════════════════════════════ -->
+  <section id="community-voices" class="curtain-rise">
+    <div class="container">
+      <p class="label reveal">Voices From the Community</p>
+      <h2 class="reveal d1">What those outside the Jewish world <em>see.</em></h2>
+
+      <div class="featured-testimonial" style="margin-top:clamp(40px,6vh,72px);">
+        <div class="featured-testimonial-photo-col reveal">
+          <div class="featured-testimonial-photo-wrap">
+            <div class="featured-testimonial-photo-glow"></div>
+            <img src="photo-cathie.jpg" alt="Dr. Cathie Dorsch, CEO Commission Fields"
+              style="width:100%; height:100%; object-fit:cover; object-position:center top; display:block;">
+          </div>
+          <div class="featured-testimonial-attr">
+            <p class="featured-testimonial-name">Dr. Cathie Dorsch, PhD</p>
+            <p class="featured-testimonial-title">CEO, Commission Fields<br>Judeo-Christian Studies &amp; Ethics</p>
+          </div>
+        </div>
+        <div class="featured-testimonial-content reveal d2">
+          <span class="featured-testimonial-open">&ldquo;</span>
+          <div class="featured-testimonial-body">
+            <p class="highlight">He is a skilled communicator and a builder of generational unity who is unafraid of hard conversations. His leadership drew out new and younger leaders who had been discounted and marginalized.</p>
+            <p>He is a passionate and courageous representative of Jewish identity, of American ideals, of shared Judeo-Christian values, and of the existential necessity for a strong Israel.</p>
+          </div>
+        </div>
+      </div>
+
+      <hr class="testimonial-divider">
+
+      <div class="featured-testimonial featured-testimonial--reverse">
+        <div class="featured-testimonial-photo-col reveal">
+          <div class="featured-testimonial-photo-wrap" style="background:#1a1a1a; display:flex; align-items:center; justify-content:center;">
+            <span style="font-family:var(--font-sans);font-size:32px;color:var(--muted);letter-spacing:.05em;font-weight:300;">PB</span>
+          </div>
+          <div class="featured-testimonial-attr">
+            <p class="featured-testimonial-name">Pastor Perry Black</p>
+            <p class="featured-testimonial-title">Founding Pastor<br>Family Church Bryant</p>
+          </div>
+        </div>
+        <div class="featured-testimonial-content reveal d2">
+          <span class="featured-testimonial-open">&ldquo;</span>
+          <div class="featured-testimonial-body">
+            <p class="highlight">I do not know of a more important time in my life to have such a dynamic and energetic bridge builder for the Jewish community like Enrico Ravenna.</p>
+          </div>
+        </div>
+      </div>
+
+    </div>
+  </section>
+
   <div id="initiatives" class="initiatives-intro">
     <div class="container">
       <p class="label reveal">Active Work</p>
@@ -1482,32 +1535,6 @@
         </div>
       </div>
 
-      <!-- Testimonials -->
-      <div class="testimonials-header reveal">
-        <p class="testimonials-label">What People Say</p>
-        <div class="stars" aria-label="5 out of 5 stars">
-          <svg viewBox="0 0 20 20" xmlns="http://www.w3.org/2000/svg"><path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z"/></svg>
-          <svg viewBox="0 0 20 20" xmlns="http://www.w3.org/2000/svg"><path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z"/></svg>
-          <svg viewBox="0 0 20 20" xmlns="http://www.w3.org/2000/svg"><path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z"/></svg>
-          <svg viewBox="0 0 20 20" xmlns="http://www.w3.org/2000/svg"><path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z"/></svg>
-          <svg viewBox="0 0 20 20" xmlns="http://www.w3.org/2000/svg"><path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z"/></svg>
-        </div>
-      </div>
-      <!-- EDIT: testimonial quotes and attributions -->
-      <div class="testimonial-stack">
-        <div class="testimonial-card reveal d2">
-          <blockquote class="testimonial-quote">"He is a skilled communicator and a builder of generational unity who is unafraid of hard conversations. His leadership drew out new and younger leaders who had been discounted and marginalized. He is a passionate and courageous representative of Jewish identity, of American ideals, of shared Judeo-Christian values, and of the existential necessity for a strong Israel."</blockquote>
-          <cite class="testimonial-attr">— Dr. Cathie Dorsch, PhD &nbsp;·&nbsp; CEO, Commission Fields &nbsp;·&nbsp; Judeo-Christian Studies &amp; Ethics</cite>
-        </div>
-        <div class="testimonial-card reveal d3">
-          <blockquote class="testimonial-quote">"I do not know of a more important time in my life to have such a dynamic and energetic bridge builder for the Jewish community like Enrico Ravenna."</blockquote>
-          <cite class="testimonial-attr">— Pastor Perry Black &nbsp;·&nbsp; Founding Pastor, Family Church Bryant</cite>
-        </div>
-        <div class="testimonial-card reveal d4">
-          <blockquote class="testimonial-quote">"Enrico's trust-based leadership gives me the autonomy to focus on the needs of Northwest Arkansas while ensuring I have what I need to build and engage community. I believe his leadership has helped create momentum for the continued growth of Jewish life in Northwest Arkansas — and for the work our community needs and deserves."</blockquote>
-          <cite class="testimonial-attr">— Erin Cohen &nbsp;·&nbsp; Community Engagement Manager, JFAR</cite>
-        </div>
-      </div>
     </div>
   </section>
 
@@ -2151,7 +2178,7 @@
 
     /* Outgoing section subtle recede — runs on scroll */
     if (!reduced) {
-      var recedePanels = Array.from(document.querySelectorAll('#field-voice,#colleagues,#team-voices,.initiatives-intro,#reut-spotlight,#spotlight,#elswick-spotlight,#areas,#people,#vision,#insights,#cta,footer'));
+      var recedePanels = Array.from(document.querySelectorAll('#field-voice,#colleagues,#team-voices,#community-voices,.initiatives-intro,#reut-spotlight,#spotlight,#elswick-spotlight,#areas,#people,#vision,#insights,#cta,footer'));
       var recTick = false;
       window.addEventListener('scroll', function () {
         if (recTick) return; recTick = true;
@@ -2192,7 +2219,7 @@
     }
 
     var accentZones = Array.from(document.querySelectorAll(
-      '#hero,.ch-1,.ch-interlude,.ch-2,.ch-3,#field-voice,#colleagues,#team-voices,#reut-spotlight,#spotlight,#elswick-spotlight,#areas,#people,#vision,#insights,#cta'
+      '#hero,.ch-1,.ch-interlude,.ch-2,.ch-3,#field-voice,#colleagues,#team-voices,#community-voices,#reut-spotlight,#spotlight,#elswick-spotlight,#areas,#people,#vision,#insights,#cta'
     ));
     /* Force --sa recompute after overriding :root accent */
     document.documentElement.style.setProperty('--sa', '#D4B050');
