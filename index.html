@@ -601,6 +601,17 @@
     .testimonial-quote { font-family:var(--font-serif); font-optical-sizing:auto; font-style:italic; font-weight:300; font-size:clamp(15px,2.3vw,19px); color:var(--text); line-height:1.65; margin-bottom:20px; position:relative; }
     .testimonial-attr { font-family:var(--font-sans); font-size:11px; font-style:normal; font-weight:600; letter-spacing:.12em; text-transform:uppercase; color:var(--accent); opacity:.75; }
 
+    /* ── Solo quote — full-width, no photo ──────────────────────── */
+    .solo-quote { max-width:780px; margin:0 auto; padding:clamp(40px,5vh,64px) 0; }
+    .solo-quote-open { font-family:var(--font-serif); font-size:clamp(56px,7vw,88px); color:var(--accent); opacity:.3; line-height:.7; display:block; margin-bottom:20px; }
+    .solo-quote-body { display:flex; flex-direction:column; gap:20px; margin-bottom:36px; }
+    .solo-quote-text { font-family:var(--font-serif); font-style:italic; font-weight:300; font-size:clamp(16px,2.2vw,21px); color:var(--muted-light); line-height:1.75; }
+    .solo-quote-text.highlight { font-size:clamp(18px,2.6vw,24px); color:var(--text); font-weight:400; }
+    .solo-quote-attr { display:flex; align-items:center; gap:20px; }
+    .solo-quote-rule { display:block; width:40px; height:1px; background:var(--accent); opacity:.5; flex-shrink:0; }
+    .solo-quote-name { font-family:var(--font-sans); font-size:13px; font-weight:700; letter-spacing:.05em; color:var(--text); }
+    .solo-quote-title { font-family:var(--font-sans); font-size:11px; color:var(--muted); margin-top:3px; letter-spacing:.04em; }
+
     /* ── Community Voices — full-bleed photo cards ──────────────── */
     .cv-cards { display:grid; grid-template-columns:1fr 1fr; gap:clamp(16px,2.5vw,28px); margin-top:clamp(40px,6vh,72px); }
     .cv-card { position:relative; aspect-ratio:3/4; border-radius:6px; overflow:hidden; cursor:default; }
@@ -1344,6 +1355,24 @@
           </div>
         </div>
       </div>
+
+      <hr class="testimonial-divider">
+
+      <div class="solo-quote reveal">
+        <span class="solo-quote-open">&ldquo;</span>
+        <div class="solo-quote-body">
+          <p class="solo-quote-text highlight">What he brings to an organization is something that cannot be taught — he simply has it. His passion, energy, and ability to envision what is possible are both remarkable and contagious.</p>
+          <p class="solo-quote-text">He approaches challenges with optimism and resilience, seeing obstacles as opportunities rather than setbacks&hellip; One of Enrico's greatest strengths as a manager is the trust he places in his team. Rather than micromanaging, he provides steadfast support, encouragement, and advocacy for his staff — ensuring employees always know they have a leader who is invested in their success.</p>
+        </div>
+        <div class="solo-quote-attr">
+          <span class="solo-quote-rule"></span>
+          <div>
+            <p class="solo-quote-name">Wendy Paquette</p>
+            <p class="solo-quote-title">Office Manager, Jewish Federation of Arkansas</p>
+          </div>
+        </div>
+      </div>
+
     </div>
   </section>
 
