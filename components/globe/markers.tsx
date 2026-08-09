@@ -76,7 +76,16 @@ export function GlobeMarkers({
       // A slow breath so the field is never dead, keyed off index so they
       // are not all pulsing in lockstep.
       const pulse = 1 + Math.sin(t * 1.4 + i * 0.7) * 0.09;
-      const scale = 0.012 + m.weight * 0.026;
+      /**
+       * Marker radius as a fraction of Earth's radius.
+       *
+       * The first pass used 0.012 + weight*0.026, giving the largest markers
+       * a radius of 0.038 — 3.8% of the planet, or roughly 240km. On screen
+       * that was a solid disc covering Israel, Lebanon, Jordan and a slice of
+       * Syria. A marker has to be legible without being a landmass; 0.016 at
+       * the top end reads as a pin at every distance in the sequence.
+       */
+      const scale = 0.005 + m.weight * 0.011;
       dummy.position.copy(m.pos);
       dummy.scale.setScalar(shown * scale * pulse);
       dummy.updateMatrix();

@@ -1105,7 +1105,9 @@ footer { padding:64px 0 52px; border-top:1px solid var(--hairline); text-align:c
    globe happens to be doing behind it. */
 .arc-stage::after {
   content: ''; position: absolute; inset: 0; pointer-events: none; z-index: 1;
-  background: linear-gradient(to top, var(--bg) 0%, rgba(8,9,12,0.72) 26%, transparent 58%);
+  background: linear-gradient(to top,
+    var(--bg) 0%, rgba(8,9,12,0.88) 14%, rgba(8,9,12,0.55) 30%,
+    rgba(8,9,12,0.22) 46%, transparent 64%);
 }
 
 .arc-beats { position: relative; z-index: 2; list-style: none; width: 100%; max-width: var(--max-w); padding: 0 var(--pad) clamp(56px, 12vh, 120px); }
@@ -1119,10 +1121,16 @@ footer { padding:64px 0 52px; border-top:1px solid var(--hairline); text-align:c
 .arc-beat::before {
   content: '';
   position: absolute;
-  inset: -34px -40px -60px -40px;
+  /* Reaches transparent well inside its own box. An earlier version stopped
+     at 78% of a box inset only 34px above the text, so the gradient was still
+     ~0.8 opaque where the element ended and drew a hard horizontal seam
+     straight across the planet. */
+  inset: -190px -60px -90px -70px;
   z-index: -1;
   pointer-events: none;
-  background: radial-gradient(120% 130% at 12% 70%, rgba(8,9,12,0.92) 0%, rgba(8,9,12,0.72) 45%, transparent 78%);
+  background: radial-gradient(95% 105% at 16% 80%,
+    rgba(8,9,12,0.94) 0%, rgba(8,9,12,0.72) 34%,
+    rgba(8,9,12,0.34) 58%, rgba(8,9,12,0.08) 74%, transparent 86%);
 }
 .arc-beat-kicker {
   font-family: var(--font-sans); font-size: 10.5px; font-weight: 700;
