@@ -8,3 +8,16 @@
 # The pre-resize versions are also recoverable from git history
 # (see the commit before the 2026-08-09 image pass).
 Originals/
+
+# Next.js
+/.next/
+/node_modules/
+next-env.d.ts
+tsconfig.tsbuildinfo
+
+# Loose source stills kept locally, not used by the site
+/0635ef65-*.jpg
+/Arkansas Alive Interview with Cathie.jpeg
+/Eyal Dror Headshot.jpg
+/Interview with Pastor Perry.jpeg
+/Screenshot *.png
