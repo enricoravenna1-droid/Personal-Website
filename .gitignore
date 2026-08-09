@@ -1,0 +1,10 @@
+# macOS
+.DS_Store
+
+# Local Claude workspace config
+.claude/
+
+# Full-resolution source photos. Not served, ~18 MB.
+# The pre-resize versions are also recoverable from git history
+# (see the commit before the 2026-08-09 image pass).
+Originals/
