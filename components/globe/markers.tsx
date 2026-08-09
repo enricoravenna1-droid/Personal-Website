@@ -1,6 +1,6 @@
 "use client";
 
-import { useMemo, useRef } from "react";
+import { useEffect, useMemo, useRef } from "react";
 import { useFrame } from "@react-three/fiber";
 import * as THREE from "three";
 import { MARKERS, GLOBE_RADIUS, markerOpacity } from "@/lib/arc";
@@ -52,17 +52,22 @@ export function GlobeMarkers({
     [],
   );
 
-  // Beat 3 is the campuses. They read as a different kind of work from the
-  // regional beats, so they carry the bone accent rather than the red.
-  const colors = useMemo(() => {
-    const arr = new Float32Array(placed.length * 3);
+  /**
+   * Beat 3 is the campuses. They read as a different kind of work from the
+   * regional beats, so they carry the bone accent rather than the red.
+   *
+   * Written through `setColorAt`, which is the per-instance colour API. The
+   * first version attached the array as a *geometry* attribute named `color`,
+   * which is per-VERTEX: the 12x12 sphere has 169 vertices but only 30 colours
+   * were supplied, so the shader read past the end of the buffer.
+   */
+  useEffect(() => {
+    const node = mesh.current;
+    if (!node) return;
     placed.forEach((m, i) => {
-      const c = m.beat === 3 ? BONE : RED;
-      arr[i * 3] = c.r;
-      arr[i * 3 + 1] = c.g;
-      arr[i * 3 + 2] = c.b;
+      node.setColorAt(i, m.beat === 3 ? BONE : RED);
     });
-    return arr;
+    if (node.instanceColor) node.instanceColor.needsUpdate = true;
   }, [placed]);
 
   useFrame(({ clock }) => {
@@ -100,20 +105,10 @@ export function GlobeMarkers({
       args={[undefined, undefined, placed.length]}
       frustumCulled={false}
     >
-      <sphereGeometry args={[1, 12, 12]}>
-        <instancedBufferAttribute
-          attach="attributes-color"
-          args={[colors, 3]}
-        />
-      </sphereGeometry>
+      <sphereGeometry args={[1, 12, 12]} />
       {/* Unlit on purpose. These are annotations on a map, not objects in the
           world; shading them would make the ones on the terminator vanish. */}
-      <meshBasicMaterial
-        vertexColors
-        toneMapped={false}
-        transparent
-        opacity={0.95}
-      />
+      <meshBasicMaterial toneMapped={false} transparent opacity={0.95} />
     </instancedMesh>
   );
 }

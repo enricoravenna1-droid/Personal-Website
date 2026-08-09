@@ -130,8 +130,14 @@ const fragmentShader = /* glsl */ `
     dayC *= 0.55 + shade * 0.75;
 
     // Sun glint, water only. Land is rough and should not shine.
+    //
+    // Exponent raised from 90 and strength cut from 0.65: at AJ2054's fixed
+    // camera distance the highlight was a small sparkle, but this sequence
+    // flies in to 2.95 radii, and at that range the same lobe covered a
+    // quarter of the Atlantic as a flat grey smudge. Tighter and dimmer reads
+    // as a glint at every distance in the arc.
     vec3 H = normalize(L + V);
-    float spec = pow(max(dot(N, H), 0.0), 90.0) * water * lit;
+    float spec = pow(max(dot(N, H), 0.0), 190.0) * water * lit;
 
     // City lights, warmed. uIgnite lets beat 3 push them without touching day.
     vec3 nightC = night * vec3(1.0, 0.80, 0.52) * uNightBoost * (1.0 + uIgnite * 1.6);
@@ -139,7 +145,7 @@ const fragmentShader = /* glsl */ `
     // pure black reads as a hole cut in the image.
     nightC += vec3(0.012, 0.026, 0.055) * (1.0 - water * 0.4);
 
-    vec3 col = mix(nightC, dayC, lit) + spec * 0.65;
+    vec3 col = mix(nightC, dayC, lit) + spec * 0.28;
 
     // Limb brightening, so the sphere reads as a body with air on it.
     float rim = pow(1.0 - max(dot(N, V), 0.0), 3.0);
