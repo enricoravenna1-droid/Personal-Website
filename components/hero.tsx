@@ -103,9 +103,10 @@ export function Hero() {
           <div className="hero-text-col">
             <h1 className="hero-name">{SITE.name}</h1>
             <p className="hero-communal">{SITE.positioning}</p>
-            {/* EDIT: role line */}
+            {/* EDIT: role line. Dates rather than "Former": the tenure reads
+                as a credential instead of a demotion, and it is unambiguous. */}
             <p className="hero-title">
-              Executive Director · Jewish Federation of Arkansas
+              Executive Director, Jewish Federation of Arkansas · 2025–2026
             </p>
 
             <div className="hero-quote">

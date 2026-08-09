@@ -109,7 +109,7 @@ export const CHAPTERS: Chapter[] = [
     headline: "The",
     headlineAccent: "Leader.",
     body: [
-      "Today I lead the Jewish Federation of Arkansas. A lean team. An outsized mission. In under two years we tripled programming, rebuilt a dormant donor base, forged security partnerships across law enforcement and government, and put Arkansas on the national Jewish communal map.",
+      "I led the Jewish Federation of Arkansas from 2025 to 2026. A lean team. An outsized mission. In just over a year we tripled programming, rebuilt a dormant donor base, forged security partnerships across law enforcement and government, and put Arkansas on the national Jewish communal map.",
       "The community is small. The stakes are not.",
     ],
     photo: "/photo-leader.jpg",
@@ -264,10 +264,10 @@ export const COMMUNITY_VOICES = [
 export const INITIATIVES = [
   {
     id: "reut-spotlight",
-    kicker: "Current Initiative",
+    kicker: "National Work",
     headline: "AJ 2026 — Toward a Decade of Renewal of",
     headlineAccent: "American Jewry.",
-    body: "In March 2026, Enrico was invited to the Reut USA American Jewry Un-Conference in Miami as part of AJ 2026, a gathering of national Jewish leadership focused on the decade ahead. He made the case that the future of American Jewry runs through communities like Arkansas, not only the major metros. Small communities are not the margins of the Jewish world. They are where the next chapter gets written.",
+    body: "In March 2026 I was invited to the Reut USA American Jewry Un-Conference in Miami as part of AJ 2026, a gathering of national Jewish leadership focused on the decade ahead. I made the case that the future of American Jewry runs through communities like Arkansas, not only the major metros. Small communities are not the margins of the Jewish world. They are where the next chapter gets written.",
     cta: { label: "View AJ 2026", href: "https://aj-2026.vercel.app/" },
     photo: "/photo-reut.jpg",
     alt: "Enrico Omri Ravenna at AJ 2026 — Toward a Decade of Renewal of American Jewry, Miami",
@@ -277,10 +277,10 @@ export const INITIATIVES = [
   },
   {
     id: "spotlight",
-    kicker: "Current Initiative",
+    kicker: "At the Federation",
     headline: "Campus leadership at the",
     headlineAccent: "University of Arkansas.",
-    body: "The next generation of Jewish leaders is already on campus. Through Hillel at the University of Arkansas, JFAR is investing in student leaders, funding development opportunities, and building the pipeline of young people who will run Jewish communities a decade from now. We are not waiting for them to find us.",
+    body: "The next generation of Jewish leaders is already on campus. Through Hillel at the University of Arkansas, we invested in student leaders, funded development opportunities, and built the pipeline of young people who will run Jewish communities a decade from now. We did not wait for them to find us.",
     cta: { label: "Learn More", href: "https://jewisharkansas.org" },
     photo: "/photo-campus.jpg",
     alt: "Enrico Omri Ravenna with students at University of Arkansas",
@@ -292,7 +292,7 @@ export const INITIATIVES = [
     kicker: "Local Media",
     headline: "A regular voice on",
     headlineAccent: "The Dave Elswick Show.",
-    body: "I appear regularly on The Dave Elswick Show on KARK/iHeart Radio as the go-to Jewish community voice in Arkansas. Every appearance is a chance to bring Israel, antisemitism, and Jewish community life into a conversation that reaches well beyond our walls. That reach matters. Influence does not stop at the synagogue door.",
+    body: "I appeared regularly on The Dave Elswick Show on KARK/iHeart Radio as the go-to Jewish community voice in Arkansas. Every appearance is a chance to bring Israel, antisemitism, and Jewish community life into a conversation that reaches well beyond our walls. That reach matters. Influence does not stop at the synagogue door.",
     /** No link until there is a real show URL. Deliberate. */
     cta: null,
     photo: "/photo-elswick.jpg",

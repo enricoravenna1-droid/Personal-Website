@@ -74,7 +74,7 @@ export default function VoicesPage() {
         <div className="container">
           <p className="label reveal">From My Team</p>
           <h2 className="reveal d1">
-            People who work <em>alongside me.</em>
+            People who worked <em>alongside me.</em>
           </h2>
           {TEAM_VOICES.map((person, i) => (
             <div key={person.name}>

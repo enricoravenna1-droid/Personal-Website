@@ -179,4 +179,83 @@ check("longitude convention puts Little Rock in North America", () => {
   assert.ok(x < 0 && z > 0, `unexpected octant: ${[x, y, z].map((n) => n.toFixed(2))}`);
 });
 
+
+console.log("what each beat actually frames");
+
+check("each beat's own markers are on the visible hemisphere", () => {
+  // The check a screenshot would have made for me. A camera can be pointed at
+  // exactly the right coordinates and still frame the wrong thing if the
+  // marker projection and the texture projection disagree about longitude —
+  // the markers would sit on the far side of the sphere, hidden.
+  const { MARKERS } = mod;
+  for (let i = 0; i < BEATS.length; i++) {
+    const b = BEATS[i];
+    const cam = latLonToVec3(b.lat, b.lon, GLOBE_RADIUS * b.distance);
+    const camLen = Math.hypot(...cam);
+    const camDir = cam.map((v) => v / camLen);
+
+    const own = MARKERS.filter((m) => m.beat === i + 1);
+    assert.ok(own.length > 0, `beat ${i + 1} has no markers`);
+
+    for (const m of own) {
+      const p = latLonToVec3(m.lat, m.lon, GLOBE_RADIUS);
+      // Facing the camera at all: surface normal vs camera direction.
+      const facing = p[0] * camDir[0] + p[1] * camDir[1] + p[2] * camDir[2];
+      assert.ok(
+        facing > 0.15,
+        `beat ${i + 1} "${m.label}" is on the far side of the globe (facing ${facing.toFixed(3)})`,
+      );
+    }
+  }
+});
+
+check("each beat's markers fall inside the camera frustum", () => {
+  const { MARKERS } = mod;
+  const halfFov = ((CAMERA_FOV / 2) * Math.PI) / 180;
+
+  for (let i = 0; i < BEATS.length; i++) {
+    const b = BEATS[i];
+    const cam = latLonToVec3(b.lat, b.lon, GLOBE_RADIUS * b.distance);
+    // Camera looks at the origin, so the view axis is -cam normalised.
+    const camLen = Math.hypot(...cam);
+    const axis = cam.map((v) => -v / camLen);
+
+    for (const m of MARKERS.filter((x) => x.beat === i + 1)) {
+      const p = latLonToVec3(m.lat, m.lon, GLOBE_RADIUS);
+      const toM = [p[0] - cam[0], p[1] - cam[1], p[2] - cam[2]];
+      const toLen = Math.hypot(...toM);
+      const cos =
+        (toM[0] * axis[0] + toM[1] * axis[1] + toM[2] * axis[2]) / toLen;
+      const angle = Math.acos(Math.min(1, Math.max(-1, cos)));
+      assert.ok(
+        angle < halfFov,
+        `beat ${i + 1} "${m.label}" is ${((angle * 180) / Math.PI).toFixed(1)}° off axis, outside the ${(CAMERA_FOV / 2).toFixed(0)}° half-FOV`,
+      );
+    }
+  }
+});
+
+check("the pull-back frames the continental US", () => {
+  // Beat 5's claim is "the map is bigger than the metros", which only lands if
+  // the shot actually contains both coasts.
+  const b = BEATS[BEATS.length - 1];
+  const cam = latLonToVec3(b.lat, b.lon, GLOBE_RADIUS * b.distance);
+  const camLen = Math.hypot(...cam);
+  const axis = cam.map((v) => -v / camLen);
+  const halfFov = ((CAMERA_FOV / 2) * Math.PI) / 180;
+
+  for (const [label, lat, lon] of [
+    ["Seattle", 47.61, -122.33],
+    ["Boston", 42.36, -71.06],
+    ["Miami", 25.76, -80.19],
+  ]) {
+    const p = latLonToVec3(lat, lon, GLOBE_RADIUS);
+    const toM = [p[0] - cam[0], p[1] - cam[1], p[2] - cam[2]];
+    const toLen = Math.hypot(...toM);
+    const cos = (toM[0] * axis[0] + toM[1] * axis[1] + toM[2] * axis[2]) / toLen;
+    const angle = Math.acos(Math.min(1, Math.max(-1, cos)));
+    assert.ok(angle < halfFov, `${label} is outside the final frame`);
+  }
+});
+
 console.log(`\n${passed} checks passed`);
