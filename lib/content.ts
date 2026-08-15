@@ -430,3 +430,60 @@ export const CTA = {
   headline: "Ready to build something that matters.",
   sub: "If you're working on something serious in the Jewish nonprofit space, I want to hear about it.",
 } as const;
+
+/**
+ * The accessibility statement.
+ *
+ * Every claim under `does` was verified against this codebase, and the
+ * contrast figures are the measured ratios recorded in globals.css. That is
+ * the only reason `gaps` is here too: a statement that lists strengths and
+ * no limits reads as marketing, and an accessibility statement that
+ * overstates is worse than not having one. If the site changes, re-check
+ * these rather than letting the page drift.
+ */
+export const A11Y = {
+  standard: "WCAG 2.2 Level AA",
+  reviewed: "15 August 2026",
+
+  does: [
+    {
+      heading: "Keyboard access",
+      body: "Every interactive element is reachable by keyboard and shows a visible focus ring, offset far enough from the element that it never clips. A skip link is the first thing focus lands on, and it jumps straight past the navigation to the main content.",
+    },
+    {
+      heading: "Reduced motion",
+      body: "The site reads your system's reduced-motion setting. With it on, animation stops and the scroll-driven career sequence becomes the same five beats as a plain list. It is the same argument delivered without the ride, not a stripped-down version of it.",
+    },
+    {
+      heading: "Colour contrast",
+      body: "Every text colour is measured against the background it sits on and the ratio is recorded in the stylesheet. Body text is 17.7:1, secondary text 6.8:1, and the red accent 5.2:1. The AA threshold is 4.5:1.",
+    },
+    {
+      heading: "Structure and semantics",
+      body: "One first-level heading per page, headings in order beneath it, landmark regions around the navigation, main content and footer, a declared page language, and alt text on every image. Decorative graphics are hidden from assistive technology so they are not read out as noise.",
+    },
+    {
+      heading: "The career sequence",
+      body: "The five beats stay in the page markup the whole time rather than appearing at a particular scroll position, so a screen reader receives the sequence as one continuous block. A link inside it skips the whole thing.",
+    },
+  ],
+
+  gaps: [
+    {
+      heading: "No independent audit",
+      body: "The checks above were run against the code by hand. No third party has reviewed this site and there is no VPAT behind it. Treat the claims as specific and testable, not as certified.",
+    },
+    {
+      heading: "The resume PDF is untagged",
+      body: "It carries no document structure, so a screen reader reads it as loose text with no headings or reading order. Email me and I will send the same content in a format that works for you.",
+    },
+    {
+      heading: "The career sequence is a long scroll on a phone",
+      body: "The skip link inside it is the honest fix and it helps. The sequence is still long on a small screen.",
+    },
+    {
+      heading: "The globe needs WebGL",
+      body: "The animated globe requires a browser with WebGL enabled. Turning on reduced motion loads the static version, which needs no WebGL at all.",
+    },
+  ],
+} as const;

@@ -54,7 +54,6 @@ export function SiteFooter() {
           {SITE.name} &nbsp;·&nbsp; {new Date().getFullYear()}
         </p>
         <p className="footer-a11y">
-          {/* EDIT: replace with a real accessibility statement URL */}
           <a href="/accessibility">Accessibility Statement</a>
         </p>
         <p className="footer-a11y">

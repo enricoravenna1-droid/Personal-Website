@@ -1276,6 +1276,54 @@ footer { padding:64px 0 52px; border-top:1px solid var(--hairline); text-align:c
 .home-outro-body { margin-top: 20px; font-size: clamp(15px,2.1vw,17px); color: var(--muted-light); line-height: 1.8; max-width: 56ch; }
 .home-outro-links { display: flex; flex-wrap: wrap; gap: 16px; margin-top: 40px; }
 
+/* ═══════════════════════════════════════════════════════════════
+   ACCESSIBILITY STATEMENT
+   A <dl> rather than a grid of cards: these are term/description
+   pairs, and the markup on this page of all pages should say what
+   the content actually is.
+═══════════════════════════════════════════════════════════════ */
+/* .section-rise carries motion but no spacing, and these sections have no
+   internal padding of their own, so without this the "Where it falls short"
+   label lands right on the rule closing the list above it. */
+.a11y-section { padding-top: clamp(56px, 9vh, 96px); }
+
+.a11y-list { margin-top: 40px; display: grid; gap: 2px; max-width: 74ch; }
+.a11y-item {
+  padding: 26px 0 24px;
+  border-top: 1px solid var(--hairline);
+}
+.a11y-item:last-child { border-bottom: 1px solid var(--hairline); }
+.a11y-item-h {
+  font-family: var(--font-sans); font-size: 13px; font-weight: 700;
+  letter-spacing: .13em; text-transform: uppercase; color: var(--accent);
+  margin-bottom: 12px;
+}
+.a11y-item-b {
+  margin: 0; font-size: clamp(15px, 2.1vw, 17px);
+  color: var(--muted-light); line-height: 1.8;
+}
+/* The limits are stated in the same voice as the strengths, so they get the
+   same weight of type. Only the rule colour cools off. */
+.a11y-list-gaps .a11y-item-h { color: var(--steel); }
+
+.a11y-contact { margin-top: 20px; padding: clamp(28px, 5vw, 48px); border-radius: var(--r); max-width: 74ch; }
+.a11y-contact-h {
+  font-family: var(--font-serif); font-optical-sizing: auto;
+  font-size: clamp(24px, 4vw, 36px); font-weight: 700;
+  line-height: 1.15; letter-spacing: -.02em;
+}
+.a11y-contact-b {
+  margin-top: 16px; font-size: clamp(15px, 2.1vw, 17px);
+  color: var(--muted-light); line-height: 1.8; max-width: 56ch;
+}
+/* The shared .cta-row centres itself for the full-width CTA sections. Inside
+   this card everything else is left-aligned, so the button follows the text. */
+.a11y-contact .cta-row { margin-top: 32px; justify-content: flex-start; }
+.a11y-meta {
+  margin-top: 30px; padding-top: 22px; border-top: 1px solid var(--hairline);
+  font-size: 13px; color: var(--muted); letter-spacing: .02em;
+}
+
 /* Skip link. Off-screen until focused, then a real target. */
 .skip-link {
   position: fixed; top: 8px; left: 8px; z-index: 2000;
