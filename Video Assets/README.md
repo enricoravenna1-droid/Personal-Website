@@ -1,0 +1,160 @@
+# Video Assets — Personal Website Hero
+
+Generated 2026-08-15 with the Higgsfield MCP connector. **165 credits total.**
+
+## What shipped
+
+Both live in `../public/` and are wired into `components/hero.tsx`.
+
+| File | Size | What it is |
+|---|---|---|
+| `hero-portrait.mp4` | 47 KB | The studio headshot, animated. 680×680, 2.9s seamless loop. |
+| `hero-portrait-poster.jpg` | 20 KB | First-paint and reduced-motion fallback. |
+| `hero-plate-sunrise.mp4` | 124 KB | Sunrise over the same desert. 1280×720, 13.0s crossfade loop, graded near-black. |
+| `hero-plate-sunrise-poster.jpg` | 14 KB | Same. |
+
+Total added weight: **212 KB**. For reference, the raw model output was 7.77 MB
+for the portrait alone.
+
+The original static pre-dawn plate (`hero-plate-desert.mp4`, 84 KB) is superseded
+and now lives in `Sources/`. It is still a good fallback if the sunrise ever
+reads as too much movement.
+
+## The sunrise, and why it loops differently (2026-08-15)
+
+Generated with **Kling 3.0 at 15s** rather than Veo, because Veo caps at 8s and
+a sunrise compressed into 8 seconds looks like a timelapse instead of weather.
+Kling 15s costs 22.5 credits against Veo's 22 for 8s, so it is nearly double the
+runtime for the same money.
+
+**Continuity trick:** the last frame of the approved pre-dawn plate was extracted,
+uploaded, and passed as `start_image`. The sunrise therefore happens in the exact
+landscape already signed off on, rather than a new roll of the dice.
+
+**The sun is deliberately never visible.** The prompt pins it below the ridge so
+only its glow rises. A visible sun disk would be a blown highlight in the middle
+of the frame and would destroy the contrast budget below.
+
+**Ping-pong is wrong here.** Reversing a sunrise makes the sun un-rise. The loop
+is built by dissolving the tail back into the head over 2s. The script that
+does it is `xfade_loop.py`, kept in this folder:
+
+    R(t) = clip(D-X+t)*(1 - t/X) + clip(t)*(t/X)   for t < X
+    R(t) = clip(t)                                  for t >= X
+
+Measured: the first and last frames differ by **0.84/255** mean, against **5.99**
+for two genuinely different frames from the same clip. The 2s dissolve does show
+faint ridge ghosting when viewed at full brightness in isolation; at 86% opacity
+under the scrim it is not perceptible on the page, which was verified in the
+browser before shipping.
+
+## The two rules that made this work
+
+**1. Cut before the likeness drifts.** Image-to-video holds a real face for
+only so long. Measured on this source photo:
+
+- **Kling 2.6** holds the face and the smile to ~1.5s, then the jaw narrows
+  and the smile flattens into a different, more severe man.
+- **Cinema Studio** loses the smile by ~0.8s.
+
+So the shipped clip is Kling trimmed at 1.5s and **ping-ponged** (forward then
+reversed) into a 2.9s loop. It never plays a frame that is not him, and it has
+no visible loop cut. See `Sheet Drift.jpg` for the frame-by-frame evidence.
+
+**Redo this test on any new source photo.** The safe window is a property of
+the photo, not a constant.
+
+**2. Never say "35mm", "anamorphic", or "film grain" to Veo.** It renders the
+artifact literally: the first desert plate came back with a fake film border,
+sprocket holes, and Kodak edge lettering baked into the image. Ask for
+"clean modern digital cinema frame, edge to edge, no film border, no sprocket
+holes, no lettering" instead. Compare `Sheet Plates.jpg` (v1, broken) with
+`Sheet Plates V2.jpg` (v2, fixed).
+
+## Plate visibility vs. contrast (revised 2026-08-15)
+
+The plate was turned up from `opacity: 0.50` to `0.86`, and the frame is pushed
+down with `transform: scale(1.3) translateY(10%)` so the ember horizon lands in
+the lower third instead of behind the quote. The scrim changed from a radial
+pool to a vertical ramp.
+
+**This site publishes contrast ratios, so the plate was measured, not eyeballed.**
+Method: replicate the exact composite in a canvas (video frame → `globalAlpha
+0.86` → the same gradient stops), then read back the brightest pixel inside each
+text element's box and compute the ratio against its computed color. Re-measured against the
+sunrise plate at 14 points across the 13.0s loop, including its brightest frame.
+
+| Element | px | Needs | Worst across loop |
+|---|---|---|---|
+| Name | 58 | 3.0 | 16.10 |
+| Positioning | 26 | 3.0 | 4.55 |
+| Role line | 11.5 | 4.5 | 5.47 |
+| Quote | 33 | 3.0 | 12.56 |
+| Quote byline | 10 | 4.5 | 4.99 |
+| BACKGROUND label | 9 | 4.5 | 5.63 |
+| Background list | 16 | 4.5 | 15.73 |
+
+The byline measured **3.66:1 and failed** at the first pass. The fix is the
+deliberate alpha bump at the 63% stop in `.hero-plate::after`, which sits above
+the horizon glow and so costs nothing visually. **If the plate, its transform,
+or the hero type sizes change, re-run this measurement.** The byline has the
+least headroom and will fail first.
+
+## Costs measured, not guessed
+
+Use `get_cost: true` to preflight any generation before spending.
+
+| Generation | Credits |
+|---|---|
+| Kling 2.6 / Cinema Studio, 1:1, 5s, silent | 5 |
+| Veo 3.1, 16:9, 8s, `quality: basic`, `variant: fast` | 22 |
+| Veo 3.1, 16:9, 8s, `quality: high`, `variant: preview` | 58 |
+| Seedance 2.0, 16:9, 5s, 1080p | 45 |
+| Kling 3.0, 16:9, 10s, `mode: std`, silent | 15 |
+| Kling 3.0, 16:9, 15s, `mode: std`, silent | 22.5 |
+
+Veo `basic` is the right buy for a background plate. `high` costs 2.6× for
+detail that a scrimmed, half-opacity backdrop throws away.
+
+## Rejected, and why
+
+Kept in `Sources/` rather than deleted, because the reasons are reusable.
+
+- **`plate-sanctuary.mp4`** — the best-looking render of the batch and
+  completely unusable. Veo produced an unmistakable **church**: gothic arches,
+  an altar, pews. On the site of a Jewish Federation executive that is a
+  self-inflicted wound. Replaced by `plate-hall-v2.mp4`, a plain community room
+  with folding chairs, which carries the same meaning with no iconography to
+  get wrong. Avoid generating Jewish ritual objects or Hebrew lettering
+  entirely: the models render both badly, and this audience notices.
+- **`plate-mainstreet.mp4`** — good shot, wrong palette. Bright saturated blue
+  sky fights the `#08090C` page. A graded version exists
+  (`plate-mainstreet-graded.mp4`, 1.3 MB) but it is 15× the weight of the
+  desert plate for a worse palette fit.
+- **`portrait-cinema.mp4`** — lost the smile too early. See rule 1.
+
+## Alternates ready to use
+
+`plate-hall.mp4` (744 KB) and `plate-mainstreet-graded.mp4` (1.3 MB) are graded
+and loop-ready if a second or third section ever wants a plate. Neither is
+currently referenced by the site, so neither ships.
+
+## Rebuilding
+
+`xfade_loop.py` in this folder builds a crossfade loop from any clip:
+
+```bash
+python3 xfade_loop.py sunrise-a.mp4 out.mp4 "eq=brightness=-0.06:saturation=0.78:contrast=1.04"
+```
+
+For a ping-pong loop instead (correct only when the clip's content does not
+progress), it is one ffmpeg call:
+
+```bash
+ffmpeg -y -i raw.mp4 -filter_complex "[0:v]trim=0:1.5,setpts=PTS-STARTPTS,scale=680:680:flags=lanczos,split[a][b];[b]reverse,trim=start_frame=1,setpts=PTS-STARTPTS[r];[a][r]concat=n=2:v=1[v]" -map "[v]" -an -c:v libx264 -profile:v main -pix_fmt yuv420p -crf 30 -preset slow -movflags +faststart out.mp4
+```
+
+There is no system ffmpeg on this Mac. Install a contained one with
+`pip install --target=./pylibs imageio-ffmpeg`.
+
+**Last updated: 2026-08-15** (sunrise plate)

@@ -9,6 +9,13 @@
 # (see the commit before the 2026-08-09 image pass).
 Originals/
 
+# Raw Higgsfield renders behind the hero videos. Not served, ~41 MB.
+# The shipped clips live in public/; the method, costs, and the reasons each
+# take was rejected are written down in Video Assets/README.md, which IS
+# committed. Regenerating a source costs credits, so these are kept locally
+# rather than thrown away.
+Video Assets/Sources/
+
 # Next.js
 /.next/
 /node_modules/

@@ -68,6 +68,35 @@ export function Hero() {
   return (
     <section id="hero">
       <div className="hero-space" ref={stage}>
+        {/* Depth layer 0: the plate. A 13s sunrise over the same desert, graded
+            near-black. It sits deepest in Z and is scrimmed by its own ::after,
+            because the hero type has to stay readable over it at every frame —
+            the plate is atmosphere, not content.
+
+            Looped by crossfade, not by ping-pong. Ping-pong is free and seamless
+            but it plays the clip backwards, which on a sunrise means the sun
+            un-rises. Here the tail dissolves into the head over 2s so the light
+            only ever moves forward. Measured endpoint difference is 0.84/255,
+            against 5.99 for two genuinely different frames.
+
+            Reduced motion gets the poster frame and no <video> at all, so the
+            file is never even fetched. */}
+        <div className="hero-plate hero-layer hero-layer-deep" aria-hidden="true">
+          {reduced ? (
+            <img src="/hero-plate-sunrise-poster.jpg" alt="" />
+          ) : (
+            <video
+              src="/hero-plate-sunrise.mp4"
+              poster="/hero-plate-sunrise-poster.jpg"
+              autoPlay
+              muted
+              loop
+              playsInline
+              preload="auto"
+            />
+          )}
+        </div>
+
         {/* Depth layer 1: aurora, furthest back, moves least */}
         <div className="aurora hero-layer hero-layer-far" aria-hidden="true">
           <span className="a1" />
@@ -88,15 +117,36 @@ export function Hero() {
               <div className="avatar-outer-glow" aria-hidden="true" />
               <div className="avatar-ring-glow" aria-hidden="true" />
               <div className="avatar-float-shadow" aria-hidden="true" />
-              <Image
-                src="/photo.jpg"
-                alt={SITE.name}
-                className="avatar-img"
-                width={340}
-                height={340}
-                priority
-                fetchPriority="high"
-              />
+              {/* The portrait is the real studio photograph, animated. The model
+                  holds the likeness for about a second and a half before the face
+                  starts drifting off-model, so the clip is cut at 1.5s and
+                  ping-ponged: it never reaches a frame that is not him. Reduced
+                  motion falls back to the original still. */}
+              {reduced ? (
+                <Image
+                  src="/photo.jpg"
+                  alt={SITE.name}
+                  className="avatar-img"
+                  width={340}
+                  height={340}
+                  priority
+                  fetchPriority="high"
+                />
+              ) : (
+                <video
+                  className="avatar-img"
+                  src="/hero-portrait.mp4"
+                  poster="/hero-portrait-poster.jpg"
+                  width={340}
+                  height={340}
+                  autoPlay
+                  muted
+                  loop
+                  playsInline
+                  preload="auto"
+                  aria-label={SITE.name}
+                />
+              )}
             </div>
           </div>
 
