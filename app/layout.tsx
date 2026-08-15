@@ -42,9 +42,17 @@ export const metadata: Metadata = {
     type: "website",
     url: SITE.domain,
     siteName: SITE.name,
-    images: ["/photo.jpg"],
+    /**
+     * A purpose-built 1200x630 card, not the portrait. `summary_large_image`
+     * promises a landscape crop, and photo.jpg is 733x1100 — LinkedIn and
+     * Instagram cropped it to a band across his chest. Rebuild with
+     * `python3 tools/build_og_card.py` after editing tools/og-card.html.
+     */
+    images: [
+      { url: "/og.jpg", width: 1200, height: 630, alt: `${SITE.name} — ${SITE.positioning}` },
+    ],
   },
-  twitter: { card: "summary_large_image", images: ["/photo.jpg"] },
+  twitter: { card: "summary_large_image", images: ["/og.jpg"] },
 };
 
 export const viewport = {

@@ -21,3 +21,6 @@ tsconfig.tsbuildinfo
 /Eyal Dror Headshot.jpg
 /Interview with Pastor Perry.jpeg
 /Screenshot *.png
+
+# Scratch dir for tools/build_og_card.py (inlined fonts + 2x render, ~1 MB)
+/tools/.build/

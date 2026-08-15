@@ -1,0 +1,81 @@
+<!doctype html>
+<html><head><meta charset="utf-8">
+<style>__FONTS__</style>
+<style>
+  * { margin:0; padding:0; box-sizing:border-box; }
+  html,body { width:1200px; height:630px; }
+  body {
+    background:#08090C;
+    font-family:'Manrope',system-ui,sans-serif;
+    -webkit-font-smoothing:antialiased;
+    overflow:hidden; position:relative;
+  }
+  .card { position:absolute; inset:0; }
+
+  /* ── ambient red field: kept behind the portrait edge so the name stays on clean ink ── */
+  .glow-a { position:absolute; width:620px; height:620px; right:-120px; top:-250px;
+            background:radial-gradient(circle, rgba(224,82,82,0.22) 0%, rgba(224,82,82,0.06) 40%, transparent 68%);
+            pointer-events:none; }
+  .glow-b { position:absolute; width:520px; height:520px; left:-240px; bottom:-300px;
+            background:radial-gradient(circle, rgba(139,26,26,0.16) 0%, transparent 66%);
+            pointer-events:none; }
+
+  /* ── portrait ── */
+  .portrait { position:absolute; right:0; top:0; width:512px; height:630px; overflow:hidden; }
+  .portrait img {
+    width:100%; height:100%; object-fit:cover; object-position:50% 13%;
+    filter:contrast(1.07) brightness(0.96) saturate(0.93);
+  }
+  .portrait::after {
+    content:''; position:absolute; inset:0;
+    background:
+      linear-gradient(90deg, #08090C 0%, rgba(8,9,12,0.96) 10%, rgba(8,9,12,0.72) 22%,
+                             rgba(8,9,12,0.30) 40%, rgba(8,9,12,0.06) 60%, rgba(8,9,12,0) 78%),
+      linear-gradient(0deg,  rgba(8,9,12,0.88) 0%, rgba(8,9,12,0.12) 30%, rgba(8,9,12,0) 44%),
+      linear-gradient(180deg, rgba(8,9,12,0.66) 0%, rgba(8,9,12,0) 24%);
+  }
+
+  /* ── type ── */
+  .type { position:relative; z-index:2; padding:92px 0 58px 78px; width:760px;
+          display:flex; flex-direction:column; height:100%; }
+
+  .kicker { font-size:15px; font-weight:700; letter-spacing:.24em; text-transform:uppercase;
+            color:#E05252; margin-bottom:24px; }
+
+  .name { font-family:'Fraunces',Georgia,serif; font-weight:700; font-size:86px; line-height:0.93;
+          letter-spacing:-0.02em;
+          background:linear-gradient(150deg,#FFFDF8 0%,#F4F1ED 42%,#C9C4BE 100%);
+          -webkit-background-clip:text; background-clip:text; color:transparent; }
+
+  .rule { width:78px; height:3px; margin:28px 0 26px;
+          background:linear-gradient(90deg,#E05252 0%,#8B1A1A 100%); border-radius:2px; }
+
+  .quote { font-family:'Fraunces',Georgia,serif; font-weight:300; font-style:italic;
+           font-size:30px; line-height:1.38; color:#C9C4BE; letter-spacing:-0.005em; }
+
+  .spacer { flex:1; }
+
+  /* one quiet line — texture at feed size, legible at full size, and it keeps
+     the red for the kicker and rule instead of spending it three more times */
+  .creds { font-size:13px; font-weight:600; letter-spacing:.13em; text-transform:uppercase;
+           color:#9C968F; margin-bottom:18px; white-space:nowrap; }
+  .creds i { color:#E05252; font-style:normal; margin:0 9px; }
+
+  .footline { display:flex; align-items:center; gap:16px; }
+  .domain { font-size:18px; font-weight:700; letter-spacing:.03em; color:#F4F1ED; }
+  .hair { flex:1; height:1px; max-width:170px; background:rgba(255,255,255,0.13); }
+</style></head>
+<body><div class="card">
+  <div class="glow-a"></div>
+  <div class="glow-b"></div>
+  <div class="portrait"><img src="data:image/jpeg;base64,__PHOTO__" alt=""></div>
+  <div class="type">
+    <div class="kicker">Jewish Communal Leader</div>
+    <div class="name">Enrico Omri<br>Ravenna</div>
+    <div class="rule"></div>
+    <div class="quote">&ldquo;Where there is a possibility,<br>there&rsquo;s a responsibility.&rdquo;</div>
+    <div class="spacer"></div>
+    <div class="creds">Israeli American Council<i>&middot;</i>Maccabee Task Force<i>&middot;</i>Jewish Federation of Arkansas</div>
+    <div class="footline"><span class="domain">enricoravenna.com</span><span class="hair"></span></div>
+  </div>
+</div></body></html>
