@@ -65,6 +65,66 @@ export function Hero() {
     };
   }, [reduced]);
 
+  /**
+   * Autoplay is a request, and phones refuse it more often than desktops.
+   *
+   * `autoplay muted playsinline` is the correct incantation and it is what
+   * these elements carry, but iOS Low Power Mode refuses it outright, and so
+   * does Safari with Auto-Play set to Never. A refused <video autoplay> does
+   * not retry: it sits on its poster for the rest of the session, which is
+   * exactly the "the headshot isn't moving on my phone" report.
+   *
+   * So ask directly rather than only declaring it, and if the answer is no,
+   * ask again on the two occasions the answer can change: when the tab
+   * becomes visible, and on the first real gesture. A user gesture is the one
+   * thing every autoplay policy accepts, including Low Power Mode, so the
+   * portrait starts the moment the visitor touches or scrolls the page.
+   *
+   * Listeners are dropped as soon as everything is playing, so the common
+   * case (autoplay allowed) costs one pass and nothing after it.
+   */
+  useEffect(() => {
+    const node = stage.current;
+    if (!node || reduced) return;
+
+    const videos = Array.from(node.querySelectorAll("video"));
+    if (!videos.length) return;
+
+    function attempt() {
+      for (const video of videos) {
+        if (!video.paused) continue;
+        // A rejection here is the policy saying no, not an error worth
+        // reporting. The retry is the handling.
+        void video.play().catch(() => {});
+      }
+    }
+
+    // Only the transition *to* visible can change the answer.
+    function onVisibility() {
+      if (document.visibilityState === "visible") attempt();
+    }
+
+    // These stay for the life of the component rather than being torn down
+    // once playback starts. Stopping on first success was the tempting
+    // optimisation and it is wrong: playback stops again every time the
+    // phone locks, the visitor switches apps, or Low Power Mode engages
+    // mid-session, and those are precisely the moments recovery is needed.
+    // The cost of keeping them is a paused-check per gesture.
+    document.addEventListener("visibilitychange", onVisibility);
+    window.addEventListener("pointerdown", attempt, { passive: true });
+    window.addEventListener("touchstart", attempt, { passive: true });
+    window.addEventListener("scroll", attempt, { passive: true });
+
+    attempt();
+
+    return () => {
+      document.removeEventListener("visibilitychange", onVisibility);
+      window.removeEventListener("pointerdown", attempt);
+      window.removeEventListener("touchstart", attempt);
+      window.removeEventListener("scroll", attempt);
+    };
+  }, [reduced]);
+
   return (
     <section id="hero">
       <div className="hero-space" ref={stage}>
