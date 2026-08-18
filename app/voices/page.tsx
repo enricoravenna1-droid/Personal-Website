@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
-import Image from "next/image";
+import { CommunityVoiceCard } from "@/components/community-voice-card";
 import { PageNav } from "@/components/page-nav";
+import { SectionMark } from "@/components/section-mark";
 import { FeaturedTestimonial, SoloQuote } from "@/components/testimonial";
 import {
   COLLEAGUES,
@@ -72,6 +73,7 @@ export default function VoicesPage() {
 
       <section id="team-voices" className="section-rise">
         <div className="container">
+          <SectionMark name="voices" />
           <p className="label reveal">From My Team</p>
           <h2 className="reveal d1">
             People who worked <em>alongside me.</em>
@@ -92,27 +94,16 @@ export default function VoicesPage() {
             What those outside the Jewish world <em>see.</em>
           </h2>
 
+          <p className="cv-cards-hint reveal d2">
+            Hover a card, or tap it, for the full quote.
+          </p>
           <div className="cv-cards">
             {COMMUNITY_VOICES.map((v, i) => (
-              <figure key={v.name} className={`cv-card reveal${i > 0 ? " d2" : ""}`}>
-                <Image
-                  src={v.photo}
-                  alt={v.alt}
-                  className="cv-card-photo"
-                  width={1200}
-                  height={900}
-                  sizes="(max-width: 640px) 92vw, 44vw"
-                />
-                <div className="cv-card-overlay" aria-hidden="true" />
-                <figcaption className="cv-card-content">
-                  <span className="cv-card-open" aria-hidden="true">
-                    &ldquo;
-                  </span>
-                  <blockquote className="cv-card-quote">{v.quote}</blockquote>
-                  <p className="cv-card-name">{v.name}</p>
-                  <p className="cv-card-title">{v.title}</p>
-                </figcaption>
-              </figure>
+              <CommunityVoiceCard
+                key={v.name}
+                voice={v}
+                delay={i > 0 ? "d2" : undefined}
+              />
             ))}
           </div>
         </div>

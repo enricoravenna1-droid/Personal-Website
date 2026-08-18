@@ -9,6 +9,14 @@
 # (see the commit before the 2026-08-09 image pass).
 Originals/
 
+# Contained ffmpeg (pip install --target=./pylibs imageio-ffmpeg), plus the
+# working copies and sampled frames the plate scripts leave behind. All three
+# are regenerable from the scripts, which ARE committed.
+Video Assets/pylibs/
+Video Assets/_frames/
+Video Assets/hero-plate-sunrise-sharp.mp4
+Video Assets/hero-plate-sunrise-sharp-poster.jpg
+
 # Raw Higgsfield renders behind the hero videos. Not served, ~41 MB.
 # The shipped clips live in public/; the method, costs, and the reasons each
 # take was rejected are written down in Video Assets/README.md, which IS

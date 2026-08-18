@@ -3,17 +3,24 @@
 import { Suspense, useRef } from "react";
 import { Canvas, useFrame, useThree } from "@react-three/fiber";
 import * as THREE from "three";
-import { CAMERA_FOV, GLOBE_RADIUS, cameraAt, latLonToVec3 } from "@/lib/arc";
+import {
+  CAMERA_FOV,
+  GLOBE_RADIUS,
+  cameraApproach,
+  cameraAt,
+  latLonToVec3,
+} from "@/lib/arc";
 import { GlobeEarth } from "./earth";
 import { GlobeMarkers } from "./markers";
 
 /**
  * Camera rig.
  *
- * The camera is what carries the argument here: it flies from Israel to
- * Atlanta to the Midwest to Arkansas and then pulls back. `cameraAt` returns
- * the framing for any scroll position, and this places the camera on that
- * bearing at that distance, always looking at the centre of the globe.
+ * The camera is what carries the argument here: it arrives from deep space
+ * while the hero dissolves, then flies from Israel to Atlanta to the Midwest
+ * to Arkansas and pulls back. `cameraApproach` returns the framing for the
+ * handoff and `cameraAt` for everything after it; this places the camera on
+ * that bearing at that distance, always looking at the centre of the globe.
  *
  * The position is *eased toward* the target rather than set to it. Scroll
  * events do not arrive at a steady rate — a trackpad flick delivers a burst
@@ -23,9 +30,11 @@ import { GlobeMarkers } from "./markers";
  */
 function CameraRig({
   progress,
+  entry,
   reducedMotion,
 }: {
   progress: React.RefObject<number>;
+  entry: React.RefObject<number>;
   reducedMotion: boolean;
 }) {
   const { camera } = useThree();
@@ -33,8 +42,12 @@ function CameraRig({
   const started = useRef(false);
 
   useFrame((_, delta) => {
-    const p = progress.current ?? 0;
-    const { lat, lon, distance } = cameraAt(p);
+    const e = entry.current ?? 0;
+    // Below 1 the approach owns the camera; at 1 the beats take over. The two
+    // meet at exactly beat one's framing, by construction in `cameraApproach`,
+    // so the handover is not a cut even though the source of the number changes.
+    const { lat, lon, distance } =
+      e < 1 ? cameraApproach(e) : cameraAt(progress.current ?? 0);
     const target = latLonToVec3(lat, lon, GLOBE_RADIUS * distance);
     const targetVec = new THREE.Vector3(...target);
 
@@ -45,7 +58,12 @@ function CameraRig({
       // Frame-rate independent smoothing. A raw `lerp(0.1)` per frame is
       // twice as fast at 120Hz as at 60Hz, which makes the whole sequence
       // feel different on a ProMotion display than on an external monitor.
-      const k = reducedMotion ? 1 : 1 - Math.pow(0.0016, delta);
+      //
+      // The approach gets a tighter follow than the beats. Over a dolly from
+      // 9.2 radii to 3.05 the loose constant lags far enough behind that the
+      // globe is still visibly growing after the hero has gone, which reads as
+      // the transition running late rather than as weight.
+      const k = reducedMotion ? 1 : 1 - Math.pow(e < 1 ? 0.00004 : 0.0016, delta);
       current.current.lerp(targetVec, k);
     }
 
@@ -58,10 +76,12 @@ function CameraRig({
 
 export default function GlobeScene({
   progress,
+  entry,
   reducedMotion,
   compact,
 }: {
   progress: React.RefObject<number>;
+  entry: React.RefObject<number>;
   reducedMotion: boolean;
   compact: boolean;
 }) {
@@ -74,14 +94,19 @@ export default function GlobeScene({
       gl={{ antialias: true, alpha: true, powerPreference: "high-performance" }}
       style={{ width: "100%", height: "100%" }}
     >
-      <CameraRig progress={progress} reducedMotion={reducedMotion} />
+      <CameraRig
+        progress={progress}
+        entry={entry}
+        reducedMotion={reducedMotion}
+      />
       <Suspense fallback={null}>
         <GlobeEarth
           progress={progress}
+          entry={entry}
           reducedMotion={reducedMotion}
           compact={compact}
         />
-        <GlobeMarkers progress={progress} />
+        <GlobeMarkers progress={progress} entry={entry} />
       </Suspense>
     </Canvas>
   );

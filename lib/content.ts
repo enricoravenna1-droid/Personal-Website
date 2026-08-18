@@ -238,12 +238,26 @@ export const TEAM_VOICES: Testimonial[] = [
   },
 ];
 
+/**
+ * `pull` is the line the card shows at rest, `quote` the whole thing.
+ *
+ * These cards used to lay the entire quote over the photograph, and on a
+ * sixty-word quote that meant the panel covered most of the picture — the two
+ * people in the room were the evidence, and they were behind the text about
+ * them. The card now shows the photograph and one line; the rest arrives on
+ * hover, focus or tap, and the photograph racks out of focus behind it.
+ *
+ * So `pull` has a job: it has to work as a standalone claim, because for most
+ * visitors it is the only line of this quote they will read. Take the sharpest
+ * clause, not the first one.
+ */
 export const COMMUNITY_VOICES = [
   {
     name: "Dr. Cathie Dorsch, PhD",
     title: "CEO, Commission Fields · Judeo-Christian Studies & Ethics",
     photo: "/photo-cathie.jpg",
     alt: "Dr. Cathie Dorsch with Enrico Ravenna",
+    pull: "A builder of generational unity who is unafraid of hard conversations.",
     quote:
       "He is a skilled communicator and a builder of generational unity who is unafraid of hard conversations. His leadership drew out new and younger leaders who had been discounted and marginalized. He is a passionate and courageous representative of Jewish identity, of American ideals, of shared Judeo-Christian values, and of the existential necessity for a strong Israel.",
   },
@@ -252,6 +266,7 @@ export const COMMUNITY_VOICES = [
     title: "Founding Pastor · Family Church Bryant",
     photo: "/photo-perry.jpg",
     alt: "Pastor Perry Black with Enrico Ravenna",
+    pull: "A dynamic and energetic bridge builder for the Jewish community.",
     quote:
       "I do not know of a more important time in my life to have such a dynamic and energetic bridge builder for the Jewish community like Enrico Ravenna.",
   },
@@ -268,7 +283,23 @@ export const INITIATIVES = [
     headline: "AJ 2026 — Toward a Decade of Renewal of",
     headlineAccent: "American Jewry.",
     body: "In March 2026 I was invited to the Reut USA American Jewry Un-Conference in Miami as part of AJ 2026, a gathering of national Jewish leadership focused on the decade ahead. I made the case that the future of American Jewry runs through communities like Arkansas, not only the major metros. Small communities are not the margins of the Jewish world. They are where the next chapter gets written.",
-    cta: { label: "View AJ 2026", href: "https://aj-2026.vercel.app/" },
+    /**
+     * Points at AJ 2054, not AJ 2026, and the distinction is load-bearing.
+     *
+     * AJ 2026 was the gathering — the Un-Conference in Miami in March 2026,
+     * which is what the copy above describes and what he was actually in the
+     * room for. AJ 2054 is Reut USA's wider initiative, "American Jewry in
+     * 2054", which runs that conference series; what lives at this domain is
+     * the Emerging Communities work inside it.
+     *
+     * The old href was `aj-2026.vercel.app`, the single-file app that the AJ
+     * 2054 site absorbed as its atlas. It is still deployed and nothing links
+     * to it any more, so this was pointing a visitor at a retired build.
+     *
+     * The label follows the destination rather than the copy, because a button
+     * that says one thing and opens another is the one mistake a link can make.
+     */
+    cta: { label: "View AJ 2054", href: "https://aj2054.vercel.app" },
     photo: "/photo-reut.jpg",
     alt: "Enrico Omri Ravenna at AJ 2026 — Toward a Decade of Renewal of American Jewry, Miami",
     /** Widescreen frame, contained rather than cropped. */

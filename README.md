@@ -1,39 +1,58 @@
 # Personal Website — Enrico Omri Ravenna
 
-One HTML file. No build step. No dependencies beyond Google Fonts.
+Next.js 16 App Router, five routes, hand-written CSS. React Three Fiber for the
+career-arc globe. No CSS framework: every colour in `app/globals.css` carries a
+measured contrast ratio in a comment, and a token layer alongside that would mean
+two sources of truth for the same decisions.
 
-**Last major change: 2026-08-09 — full design and motion rebuild.** See "What changed
-in the 2026-08-09 rebuild" near the bottom for the reasoning behind each decision.
+**Last major change: 2026-08-18.** See "What changed on 2026-08-18" below.
+
+> **Note on the sections further down this file.** Everything from "Images" to
+> "What changed in the 2026-08-09 rebuild" was written when this was a single
+> `index.html` with no build step. The reasoning in it is still good and worth
+> reading; the file paths in it are not. There is no `index.html`, no `serve.js`
+> and no `serve.py` any more.
 
 ---
 
 ## Preview locally
 
-Claude can launch it directly (`.claude/launch.json` → `personal-website`, port 8080).
+Claude can launch it directly (`.claude/launch.json` → `personal-website`, port 3001).
 
 To do it yourself:
 
 ```bash
-node "Projects/Personal Website/serve.js" 8080
+npm run dev
 ```
 
-Then open **http://localhost:8080**. Stop with `Control + C`.
+Then open **http://localhost:3001**. Stop with `Control + C`.
 
-`serve.js` exists because `python3 -m http.server` fails in this workspace: the
-sandbox denies `os.getcwd()`, and the stdlib module calls it at import time to build
-its `--directory` default, so it dies before it ever binds a port.
+```bash
+npm run build && npm run typecheck && node tests/arc.test.mjs
+```
+
+`tests/arc.test.mjs` is the camera choreography: 18 checks over framing distances,
+longitude interpolation, beat windows and the approach. It exists because **the
+globe cannot be verified by eye in the Claude preview pane** — the pane throttles
+requestAnimationFrame, so WebGL never paints and a screenshot of the arc comes back
+black. That is a limitation of the harness, not of the scene, and it is the reason
+the framing maths is asserted rather than looked at.
 
 ---
 
 ## Edit your content
 
-Everything you need to change is marked with `EDIT:` in the file.
-Search for `EDIT:` in index.html to jump to each spot.
+**Every word on the site lives in `lib/content.ts`.** Name, positioning line, quote,
+the rotating banner, the three story chapters, all six testimonials, the initiatives,
+the capability areas, the numbers, the vision beats, the insights cards, the
+accessibility statement. Edit there and it changes everywhere it appears.
 
-The two main areas:
+That is the point of the file. The old build kept copy inline in a 2,400-line HTML
+file, which is fine with one page and is how two pages end up disagreeing about the
+same fact once there are five.
 
-1. **`<head>`** — page title, SEO description, and social preview tags (OG/Twitter)
-2. **`<body>`** — your name, title, quote, bio, stat cards, and links
+Per-page titles and social preview tags are the `metadata` export at the top of each
+`app/*/page.tsx`; the site-wide defaults are in `app/layout.tsx`.
 
 ---
 
@@ -76,6 +95,109 @@ pre-resize versions are also recoverable from git history, at the commit before 
 portrait rather than a purpose-built card. Add a `1200×630` JPEG as `og-image.jpg` and
 point `og:image` at it. LinkedIn caches previews, so afterwards run the URL through
 [LinkedIn Post Inspector](https://www.linkedin.com/post-inspector/) to force a refresh.
+
+---
+
+## What changed on 2026-08-18
+
+Five changes, all from the same note: make the front door look like the work of
+someone who is about to run a large-city Federation.
+
+### 1. The hero plate is sharper and faster
+
+Rebuilt from the 15s Kling master: letterbox cropped, upscaled, sharpened, sped
+1.45×, re-encoded at ten times the bitrate. 124 KB → 836 KB, 1280×720 → 1920×816,
+13.0s → 8.5s. Full reasoning and the CRF sweep in `Video Assets/README.md`; the
+script is `Video Assets/build_plate_sharp.py`.
+
+Two hero text colours moved from `--muted` to `--muted-light` as a consequence. A
+sharper plate carries more contrast of its own, and the 10px byline and 9px
+BACKGROUND label sit directly over the ember horizon; they measured 4.61 and 4.83
+against a 4.5 floor. Deepening the scrim would have fixed that by throwing away the
+picture. Numbers in `Video Assets/README.md`, re-runnable with
+`python3 "Video Assets/measure_hero_contrast.py"`.
+
+### 2. The JFAR role line is gone from the hero
+
+`Executive Director, Jewish Federation of Arkansas · 2025–2026` is still in the
+BACKGROUND list a few lines below it and is chapter three of `/story`. On the one
+screen that has to land in two seconds it was a third mention, and it argued for
+the past.
+
+### 3. The hero and the globe now share a screen
+
+This was the real work. The two used to be butted together: the hero scrolled away,
+the runway's sticky stage arrived already pinned, and beat one was fully framed on
+its first painted pixel. A cut, not a transition.
+
+Now **the runway is pulled up under the hero by exactly one viewport**
+(`APPROACH_VH` in `lib/arc.ts`, applied as an inline `margin-top` so the constant
+and the layout cannot disagree). Across that overlap:
+
+- the camera flies in from 9.2 sphere radii to beat one's 3.05 — a marble at 12.5%
+  of frame height growing to a planet at 82% — eased twice so it hangs distant for
+  most of the move and closes fast at the end;
+- the hero dissolves, its plate receding 4% as it goes, driven by a single
+  `--hero-exit` custom property that the cinematic's scroll handler writes;
+- the globe's brightness, its clouds and its markers ramp with it, so nothing pops
+  in behind a half-faded hero;
+- a **dawn band** sits at the screen height the plate's horizon occupies and cools
+  from ember toward `#3f85f6`, the exact colour of the atmosphere shell, as the
+  planet's own limb arrives to take the job over.
+
+One measurement drives all of it. The camera and the dissolve cannot disagree about
+how far through the handoff they are.
+
+The scene's mount trigger changed with it. It used to be an IntersectionObserver on
+the runway; the runway now starts at the top of the hero, so that would have put
+three megabytes of earth texture in the landing page's critical path. It now mounts
+on the first idle moment after `load`, or on a scroll past a tenth of a viewport,
+whichever comes first.
+
+### 4. Community voice cards: rack focus instead of a permanent panel
+
+`Voices → Voices From the Community` laid the whole quote on a glass panel over the
+photograph. On Dr. Dorsch's 55-word quote that covered two thirds of the frame — the
+two people in the room were behind the text about them.
+
+The card now has two complete states. At rest it is the photograph, with an
+attribution and one pulled line. On hover, focus or tap a quote rises and **the
+photograph pulls back, dims and goes soft behind it**: a lens cannot hold the
+foreground and the background at once, and neither can a reader.
+
+- The cards break out to 1180px, wider than the 900px prose measure, and are square
+  — the sources are 4:3 group shots, so a square crops 12% off each side and nothing
+  off the top or bottom.
+- Two-up down to 820px, one column below that, and **stacked (photo above, caption
+  below, no overlay at all) below 600px**. Both breakpoints are measured against the
+  longest quote in the set, not chosen; the numbers are in `app/globals.css`.
+- The full quote is in the markup in both states, the control is a real button with
+  `aria-expanded`, Escape closes it, and reduced motion gets it open and static.
+
+`lib/content.ts` gained a `pull` field per voice. It is the only line most visitors
+will read, so it has to work as a standalone claim.
+
+### 5. Section marks
+
+Six line-art emblems above the sections that are only words — "Where I add value",
+"What I'm thinking about", "People, not just programs", "Let's Connect", "From My
+Team", "Where to next". Same vocabulary as `components/area-icon.tsx`: 24px viewBox,
+one stroke weight, the accent red, with the rotating conic "lit edge" the hero
+avatar already uses.
+
+Deliberately not organisational marks. The standing rule on this account is that
+documents are unbranded and the name is the brand; these are furniture, not a logo.
+`components/section-mark.tsx` records which glyphs were rejected and why — the first
+"add value" mark was a perfectly good wifi symbol.
+
+### Also fixed on the way
+
+`heroPara` animated `transform`, and `.hero-inner` is also `.hero-layer-near`, whose
+whole job is a `transform` carrying the pointer tilt and Z position. An animation on
+`transform` overrides the base value outright, so while that ran — always, it is
+`both` on a scroll timeline — the near layer's depth was being discarded and the
+"hero in depth" effect was only happening behind the copy. It now animates
+`translate` and `scale`, which compose with `transform` instead of replacing it.
 
 ---
 
@@ -204,15 +326,16 @@ you consider it done.
 
 ## Files in this folder
 
-| File | Purpose |
+| Path | Purpose |
 |---|---|
-| `index.html` | The entire website |
-| `README.md` | This file |
-| `serve.js` | Local static server for previewing (not part of the site) |
-| `serve.py` | Older Python preview server on port 3400. Works in a normal terminal; fails inside this workspace's sandbox. Kept, not used. |
-| `photo*.jpg` | Site images, sized for display |
-| `Originals/` | Full-resolution source photos. Not served. |
-| `Enrico Ravenna Resume.pdf` | Linked from the CTA and footer |
+| `app/` | The five routes plus `globals.css`, which is the whole stylesheet |
+| `components/` | Shared UI; `components/globe/` is the career-arc scene |
+| `lib/content.ts` | **Every word on the site.** Copy edits happen here, nowhere else |
+| `lib/arc.ts` | Camera choreography — beats, distances, the approach. Pure maths, no React |
+| `tests/arc.test.mjs` | 18 assertions over `lib/arc.ts`. `node tests/arc.test.mjs` |
+| `public/` | Images, the two hero videos, the earth textures, the resume PDF |
+| `Video Assets/` | Video masters, the build scripts, and the reasoning behind both |
+| `Originals/` | Full-resolution source photos. Not served, not committed. |
 
 ---
 
@@ -220,7 +343,8 @@ you consider it done.
 
 - The three **Insights** cards still point at the LinkedIn profile, not at real post
   permalinks. Marked `⚠️ NEEDS REAL POST URL` in the file.
-- The **Accessibility Statement** link in the footer is still `href="#"`.
+- The **Accessibility Statement** link in the footer is still `href="#"`, though
+  `/accessibility` exists and is written.
 - `og:image` points at `https://enricoravenna.com/photo.jpg`, which resolves, but it is
   the 733×1100 portrait rather than a purpose-built 1200×630 card. Link previews will
   crop it awkwardly. Worth making a real `og-image.jpg`.

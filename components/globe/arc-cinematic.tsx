@@ -2,7 +2,7 @@
 
 import dynamic from "next/dynamic";
 import { useEffect, useRef, useState } from "react";
-import { BEATS, RUNWAY_VH, norm } from "@/lib/arc";
+import { APPROACH_VH, BEATS, RUNWAY_VH, norm } from "@/lib/arc";
 import { useReducedMotion } from "@/lib/use-reduced-motion";
 
 /**
@@ -11,10 +11,18 @@ import { useReducedMotion } from "@/lib/use-reduced-motion";
  * A tall runway holds a pinned viewport-height stage. As you scroll the
  * runway, the camera flies the arc and the copy beats cross-fade over it.
  *
+ * The first viewport of the runway is the *approach*, and it is spent
+ * underneath the hero: the runway is pulled up by `APPROACH_VH` in the
+ * stylesheet, so the stage is pinned and painting the globe while the hero is
+ * still on screen and dissolving. Two progress values come out of one scroll
+ * measurement — `entry` drives the approach and the hero's dissolve, `progress`
+ * drives the five beats and starts at zero the moment the hero is gone.
+ *
  * Three plus four earth textures is roughly 3MB and none of it belongs in
  * the critical path, so the scene is a dynamic import with `ssr: false` and
- * is only mounted once the runway is near the viewport. Everything above it
- * — the hero, the nav, the copy — is readable long before any of that
+ * is mounted on the first idle moment after load rather than on layout
+ * position — see the mount effect for why position stopped working. Everything
+ * above it — the hero, the nav, the copy — is readable long before any of that
  * arrives, and the page is fully functional if it never does.
  */
 const GlobeScene = dynamic(() => import("./scene"), {
@@ -37,6 +45,9 @@ export function ArcCinematic() {
    * inside its own `useFrame`; React never re-renders for scroll at all.
    */
   const progress = useRef(0);
+  /** Approach progress, 0..1 across the overlap with the hero. Same reasoning
+   *  as above: it changes every frame, so it never touches state. */
+  const entry = useRef(0);
 
   const [mounted, setMounted] = useState(false);
   const [compact, setCompact] = useState(false);
@@ -52,23 +63,57 @@ export function ArcCinematic() {
     return () => mq.removeEventListener("change", sync);
   }, []);
 
-  // Mount the scene when the runway is close, not when it is visible: at
-  // 400px of warning the textures are usually decoded by the time the first
-  // beat needs them.
+  /**
+   * When the scene mounts, and why it is no longer an IntersectionObserver.
+   *
+   * It used to be one: observe the runway, mount at 400px of warning. That
+   * worked because the runway began below the fold. It does not work now —
+   * the runway starts at the top of the hero, so it is intersecting on the
+   * first frame, and observing it would put three megabytes of earth texture
+   * and the whole of three.js straight into the critical path of the landing
+   * page.
+   *
+   * So the trigger moves from *position* to *time and intent*. The hero paints
+   * first, unblocked; then the scene mounts on the first idle moment after
+   * load, which is while the visitor is still reading the hero and several
+   * seconds before the approach can possibly begin. A scroll of more than a
+   * tenth of a viewport short-circuits that wait, because someone who starts
+   * scrolling immediately needs the globe sooner than idle might deliver it.
+   */
   useEffect(() => {
-    const node = runway.current;
-    if (!node) return;
-    const io = new IntersectionObserver(
-      ([entry]) => {
-        if (entry.isIntersecting) {
-          setMounted(true);
-          io.disconnect();
-        }
-      },
-      { rootMargin: "400px" },
-    );
-    io.observe(node);
-    return () => io.disconnect();
+    let done = false;
+    const mount = () => {
+      if (done) return;
+      done = true;
+      setMounted(true);
+      window.removeEventListener("scroll", onScroll);
+    };
+    const onScroll = () => {
+      if (window.scrollY > window.innerHeight * 0.1) mount();
+    };
+
+    // requestIdleCallback is still not in Safari's shipping surface on every
+    // version this site sees, hence the timeout fallback rather than a bare
+    // call. Either way the wait is bounded.
+    const idle = () => {
+      const ric = (window as unknown as {
+        requestIdleCallback?: (cb: () => void, o?: { timeout: number }) => number;
+      }).requestIdleCallback;
+      if (ric) ric(mount, { timeout: 2500 });
+      else setTimeout(mount, 1200);
+    };
+
+    if (document.readyState === "complete") idle();
+    else window.addEventListener("load", idle, { once: true });
+
+    window.addEventListener("scroll", onScroll, { passive: true });
+    onScroll();
+
+    return () => {
+      done = true;
+      window.removeEventListener("scroll", onScroll);
+      window.removeEventListener("load", idle);
+    };
   }, []);
 
   useEffect(() => {
@@ -82,7 +127,24 @@ export function ArcCinematic() {
       requestAnimationFrame(() => {
         const rect = node.getBoundingClientRect();
         const travel = rect.height - window.innerHeight;
-        const p = travel > 0 ? norm(-rect.top, 0, travel) : 0;
+        // The approach is the overlap with the hero, and its length is read
+        // back off the stylesheet rather than recomputed here. The negative
+        // margin is what actually creates the overlap; deriving `lead` from
+        // `innerHeight * APPROACH_VH` instead would agree with it on desktop
+        // and disagree on a phone, where `100vh` is the large viewport and
+        // `innerHeight` is whatever the toolbars have left. One number, one
+        // place, no drift.
+        const lead = Math.abs(parseFloat(getComputedStyle(node).marginTop)) || 0;
+        const travelled = -rect.top;
+
+        const e = norm(travelled, 0, lead);
+        entry.current = e;
+        // The hero reads this rather than measuring the scroll a second time.
+        // One measurement, one source of truth, and the dissolve can never
+        // disagree with the camera about how far through the handoff it is.
+        document.documentElement.style.setProperty("--hero-exit", e.toFixed(4));
+
+        const p = travel > lead ? norm(travelled - lead, 0, travel - lead) : 0;
         progress.current = p;
 
         let active = -1;
@@ -104,6 +166,7 @@ export function ArcCinematic() {
     return () => {
       window.removeEventListener("scroll", update);
       window.removeEventListener("resize", update);
+      document.documentElement.style.removeProperty("--hero-exit");
     };
   }, []);
 
@@ -136,14 +199,28 @@ export function ArcCinematic() {
     <section
       ref={runway}
       className="arc-runway"
-      style={{ height: `${RUNWAY_VH}vh` }}
+      // Both numbers come from lib/arc so the choreography and the layout are
+      // the same source. `marginTop` is the overlap with the hero; the scroll
+      // handler reads it back rather than recomputing it.
+      style={{ height: `${RUNWAY_VH}vh`, marginTop: `${-APPROACH_VH}vh` }}
       aria-label="Career arc"
     >
       <div className="arc-stage">
+        {/* The dawn band. The hero's ember horizon and the globe's atmosphere
+            limb are the same colour doing the same job, one flat and one
+            curved, and this is the join between them: a wide warm bar sitting
+            at the screen height the hero's horizon occupies, which cools toward
+            the atmosphere's own blue and contracts as the globe arrives to
+            take the job over. It lives on this side of the handoff rather than
+            in the hero because the hero is fading to nothing, and a child
+            cannot be more opaque than the parent dissolving it. */}
+        <div className="arc-dawn" aria-hidden="true" />
+
         <div className="arc-canvas" aria-hidden="true">
           {mounted ? (
             <GlobeScene
               progress={progress}
+              entry={entry}
               reducedMotion={reducedMotion}
               compact={compact}
             />

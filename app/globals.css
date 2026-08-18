@@ -202,6 +202,49 @@ body::after {
 .glass > * { position: relative; z-index: 2; }
 
 /* ── Section label ──────────────────────────────────────────── */
+/* ── Section marks ────────────────────────────────────────────
+   The emblem above the sections that are only words. Deliberately in
+   the same vocabulary as .area-icon — 24px viewBox, one stroke weight,
+   the accent red — because two stroked-icon languages on one site is
+   one too many.
+
+   The ring carries the same rotating conic "lit edge" as the hero
+   avatar, at a quarter of the opacity and a third of the speed. That
+   rhyme is the point: the mark should read as furniture this site
+   already owns rather than as a new idea introduced six sections in. */
+.section-mark {
+  position:relative; display:grid; place-items:center;
+  width:52px; height:52px; border-radius:50%;
+  margin-bottom:22px;
+  background: radial-gradient(circle at 50% 30%,
+    rgba(224,82,82,0.17) 0%, rgba(224,82,82,0.05) 56%, transparent 74%);
+  box-shadow:
+    inset 0 0 0 1px rgba(224,82,82,0.26),
+    inset 0 1px 0 rgba(255,255,255,0.10),
+    0 12px 30px -16px rgba(224,82,82,0.55);
+}
+.section-mark-ring {
+  position:absolute; inset:-2px; border-radius:50%; pointer-events:none;
+  background: conic-gradient(from var(--ang),
+    transparent 0%, rgba(236,122,114,0.85) 12%,
+    rgba(201,196,190,0.35) 26%, transparent 44%, transparent 100%);
+  /* Mask to a hairline annulus. Without it this is a filled disc that
+     drowns the glyph. */
+  -webkit-mask: radial-gradient(circle, transparent calc(100% - 2.5px), #000 calc(100% - 1.5px), #000 100%);
+          mask: radial-gradient(circle, transparent calc(100% - 2.5px), #000 calc(100% - 1.5px), #000 100%);
+  animation: spin 18s linear infinite;
+  opacity:.65;
+}
+.section-mark svg {
+  position:relative; width:23px; height:23px;
+  fill:none; stroke:var(--accent); stroke-width:1.35;
+  stroke-linecap:round; stroke-linejoin:round;
+}
+@media (max-width: 640px) {
+  .section-mark { width:44px; height:44px; margin-bottom:18px; }
+  .section-mark svg { width:20px; height:20px; }
+}
+
 .label { display:inline-flex; align-items:center; gap:10px; font-family:var(--font-sans); font-size:10.5px; font-weight:600; letter-spacing:0.22em; text-transform:uppercase; color:var(--sa); margin-bottom:22px; }
 .label::before { content:''; width:28px; height:1px; background:linear-gradient(90deg, transparent, var(--sa)); }
 
@@ -422,7 +465,18 @@ body::after {
   width: 100%;
   padding-inline: var(--pad);
 }
-/* Hero parallax, scrubbed off the hero's own view timeline */
+/* Hero parallax, scrubbed off the hero's own view timeline.
+
+   Animated through the independent `translate` and `scale` properties
+   rather than through `transform`, and that is a correctness fix rather
+   than a style preference. .hero-inner is also .hero-layer-near, whose
+   whole job is a `transform` carrying the pointer tilt and the layer's Z
+   position. An animation on `transform` overrides the base value
+   outright, so while this ran — which is always, it is `both` on a
+   scroll timeline — the near layer's depth and tilt were being
+   discarded and the "hero in depth" effect was only happening on the
+   layers behind the copy. translate/scale compose with transform
+   instead of replacing it, so both now apply. */
 @supports (animation-timeline: view()) {
   @media (prefers-reduced-motion: no-preference) {
     .hero-inner {
@@ -431,8 +485,8 @@ body::after {
       animation-range: contain 0% exit 100%;
     }
     @keyframes heroPara {
-      from { transform: translateY(0)    scale(1);    opacity: 1; }
-      to   { transform: translateY(90px) scale(0.965); opacity: 0.15; }
+      from { translate: 0 0;     scale: 1;     opacity: 1; }
+      to   { translate: 0 90px;  scale: 0.965; opacity: 0.15; }
     }
   }
 }
@@ -502,8 +556,11 @@ body::after {
   -webkit-background-clip:text; background-clip:text; color:#F4F1ED;
 }
 @supports (-webkit-background-clip: text) { .hero-name { -webkit-text-fill-color: transparent; } }
-.hero-communal { font-family:var(--font-serif); font-optical-sizing:auto; font-size:clamp(17px,2.8vw,26px); font-weight:600; font-style:italic; color:var(--accent); letter-spacing:0.01em; line-height:1.25; margin-bottom:10px; }
-.hero-title { font-family:var(--font-sans); font-size:clamp(9.5px,1.4vw,11.5px); font-weight:500; letter-spacing:.22em; text-transform:uppercase; color:var(--muted); margin-bottom:44px; }
+/* The 36px is inherited work, not a fresh guess: it used to be 10px here plus
+   a role line plus that line's own 44px. Dropping the line and keeping 54px of
+   air would have left a hole where a sentence used to be, so the gap closes to
+   roughly two thirds and the hero reads tighter than it did before. */
+.hero-communal { font-family:var(--font-serif); font-optical-sizing:auto; font-size:clamp(17px,2.8vw,26px); font-weight:600; font-style:italic; color:var(--accent); letter-spacing:0.01em; line-height:1.25; margin-bottom:36px; }
 
 .hero-quote { max-width:520px; }
 .hero-quote blockquote { font-family:var(--font-serif); font-optical-sizing:auto; font-style:italic; font-weight:300; font-size:clamp(19px,3.5vw,33px); line-height:1.36; }
@@ -522,10 +579,19 @@ body::after {
 @supports (-webkit-background-clip: text) { .hero-quote blockquote .word { -webkit-text-fill-color:transparent; } }
 @keyframes wordIn { from { opacity:0; transform:translateY(14px); } to { opacity:1; transform:translateY(0); } }
 @keyframes wordShimmer { from{background-position:0% center} to{background-position:280% center} }
-.quote-byline { margin-top:16px; font-family:var(--font-sans); font-size:10px; letter-spacing:.2em; text-transform:uppercase; color:var(--muted); }
+/* --muted-light rather than --muted, and the reason is measured. These two
+   are 10px and 9px sitting directly over the plate's ember horizon — the one
+   bright band in the frame — and the sharper 1080p plate carries more contrast
+   of its own than the mushy 720p one did. Against #9C968F the byline measured
+   4.61:1 and the label 4.83:1, both over a 4.5 floor by a margin too thin to
+   survive the next change to anything. Against #C9C4BE they measure 7.79 and
+   8.17. The alternative was deepening the scrim across 55-72% of the plate,
+   which is exactly the band the horizon glow lives in, so it would have paid
+   for legibility by throwing away the picture. */
+.quote-byline { margin-top:16px; font-family:var(--font-sans); font-size:10px; letter-spacing:.2em; text-transform:uppercase; color:var(--muted-light); }
 
 .hero-authority { display:flex; flex-wrap:wrap; align-items:center; margin-top:28px; }
-.hero-authority-label { font-family:var(--font-sans); font-size:9px; font-weight:600; letter-spacing:.2em; text-transform:uppercase; color:var(--muted); margin-right:14px; white-space:nowrap; }
+.hero-authority-label { font-family:var(--font-sans); font-size:9px; font-weight:600; letter-spacing:.2em; text-transform:uppercase; color:var(--muted-light); margin-right:14px; white-space:nowrap; }
 .hero-authority-items { display:flex; flex-wrap:wrap; align-items:center; gap:4px 0; }
 .hero-authority-item { font-family:var(--font-sans); font-size:10px; font-weight:500; letter-spacing:.12em; text-transform:uppercase; color:var(--muted); white-space:nowrap; }
 .hero-authority-sep { font-size:8px; color:var(--muted); opacity:.4; margin:0 9px; user-select:none; }
@@ -775,41 +841,167 @@ body::after {
 .solo-quote-name { font-family:var(--font-sans); font-size:13px; font-weight:700; letter-spacing:.05em; color:var(--text); }
 .solo-quote-title { font-family:var(--font-sans); font-size:11px; color:var(--muted); margin-top:3px; letter-spacing:.04em; }
 
-/* ── Community voices — glass caption over the photo ────────── */
-.cv-cards { display:grid; grid-template-columns:1fr 1fr; gap:clamp(16px,2.5vw,28px); margin-top:clamp(40px,6vh,72px); }
+/* ── Community voices — the rack-focus card ──────────────────
+   Two states, both complete. At rest the photograph is the card and
+   carries only an attribution and one pulled line. Open — hover, focus
+   or tap — a quote rises and the picture pulls back, dims and goes
+   soft behind it.
+
+   The rack focus is the argument, not decoration: a lens cannot hold
+   the foreground and the background at once and neither can a reader,
+   so whichever layer is being read is the layer that is sharp. It also
+   answers the failure this replaced, where a sixty-word quote on a
+   permanent glass panel covered two thirds of a photograph whose whole
+   job was to be evidence. */
+/* Wider than the 900px measure the rest of the page reads at, and
+   deliberately so. Inside the container these were 376px squares whose
+   caption took 57% of the frame at rest — a photo card where the photo
+   is the smaller half is not a photo card. Breaking out to 1180px puts
+   them at 576px, where the caption is a third and the picture is the
+   rest. The measure is for prose; this is not prose.
+
+   The negative margin is computed rather than hard-coded so it stays
+   correct as --pad changes across breakpoints, and max() stops it ever
+   inverting into an inset on a narrow viewport. */
+.cv-cards {
+  --cv-w: max(100%, min(1180px, calc(100vw - 2 * var(--pad))));
+  width: var(--cv-w);
+  margin-inline: calc((var(--cv-w) - 100%) / -2);
+  display:grid; grid-template-columns:1fr 1fr; gap:clamp(16px,2.5vw,28px);
+  margin-top:clamp(28px,4vh,44px);
+}
+.cv-cards-hint { font-family:var(--font-sans); font-size:11px; letter-spacing:.14em; text-transform:uppercase; color:var(--muted); margin-top:clamp(28px,4vh,44px); }
+
 .cv-card {
-  position:relative; aspect-ratio:3/4; border-radius:16px; overflow:hidden; cursor:default;
+  /* Square. The sources are 4:3 group shots, so a square crops 12% off
+     each side and nothing off the top or bottom — both subjects survive
+     in both photographs, which a 3:4 portrait crop did not manage. It
+     also leaves enough height that the longest quote opens inside the
+     frame instead of running out of the bottom of it. */
+  position:relative; aspect-ratio:1/1; border-radius:16px; overflow:hidden;
   box-shadow: 0 2px 4px rgba(0,0,0,.4), 0 30px 70px -26px rgba(0,0,0,.95);
+  transition: transform .6s var(--ease-snap), box-shadow .6s ease;
+}
+.cv-card-open {
+  transform: translateY(-4px);
+  box-shadow:
+    0 2px 4px rgba(0,0,0,.45),
+    0 44px 96px -32px rgba(0,0,0,1),
+    0 0 0 1px rgba(224,82,82,0.20);
 }
 .cv-card::after {
-  content:''; position:absolute; inset:0; border-radius:inherit; pointer-events:none; z-index:4;
+  content:''; position:absolute; inset:0; border-radius:inherit; pointer-events:none; z-index:5;
   box-shadow: inset 0 0 0 1px rgba(255,255,255,0.12), inset 0 1px 0 rgba(255,255,255,0.22);
 }
-.cv-card-photo { position:absolute; inset:0; width:100%; height:100%; object-fit:cover; object-position:center top; transition:transform 1s var(--ease-snap), filter .6s ease; }
-.cv-card:hover .cv-card-photo { transform:scale(1.06); filter:brightness(1.12); }
-.cv-card-overlay { position:absolute; inset:0; background:linear-gradient(to top, rgba(4,5,8,0.72) 0%, rgba(4,5,8,0.28) 55%, rgba(4,5,8,0.04) 100%); transition:background .5s ease; }
-.cv-card:hover .cv-card-overlay { background:linear-gradient(to top, rgba(4,5,8,0.62) 0%, rgba(4,5,8,0.18) 55%, transparent 100%); }
-/* The caption is a glass panel rather than text laid straight onto the
-   photograph. On a busy image, a bottom gradient alone leaves the top
-   of a long quote sitting over highlights at roughly 2:1. The panel
-   holds white text at ~8:1 no matter what is behind it. */
-.cv-card-content {
-  position:absolute; bottom:12px; left:12px; right:12px; z-index:3;
-  padding:clamp(20px,2.6vw,30px);
-  border-radius:12px;
-  background:linear-gradient(180deg, rgba(9,10,13,0.88), rgba(5,6,9,0.93));
-  backdrop-filter: blur(18px) saturate(140%);
-  -webkit-backdrop-filter: blur(18px) saturate(140%);
-  box-shadow:
-    inset 0  1px 0 rgba(255,255,255,0.14),
-    inset 0 -1px 0 rgba(0,0,0,0.55),
-    0 12px 34px -14px rgba(0,0,0,0.85);
-  transition: background .5s ease;
+
+.cv-card-frame { position:absolute; inset:0; overflow:hidden; }
+.cv-card-photo {
+  position:absolute; inset:0; width:100%; height:100%;
+  object-fit:cover; object-position:center 45%;
+  /* The 1.03 at rest is not a zoom, it is headroom: `filter: blur()`
+     samples past the element's own edges, and without a little scale
+     the open state draws a soft transparent border inside the frame. */
+  transform: scale(1.03);
+  transition: transform 1.05s var(--ease-snap), filter .55s ease;
 }
-.cv-card-open { font-family:var(--font-serif); font-size:clamp(34px,3.6vw,46px); color:var(--accent); opacity:.55; line-height:.7; display:block; margin-bottom:12px; }
-.cv-card-quote { font-family:var(--font-serif); font-style:italic; font-weight:300; font-size:clamp(13px,1.4vw,16px); color:rgba(255,255,255,0.94); line-height:1.68; margin-bottom:20px; }
+.cv-card-open .cv-card-photo {
+  transform: scale(1.09);
+  filter: blur(6px) brightness(0.58) saturate(0.82);
+}
+
+/* Two scrims rather than one, cross-faded. The rest scrim only has to
+   hold a name and a single line at the foot of the frame; the open one
+   has to hold a paragraph. Swapping between them means the picture is
+   never darkened by more than whatever is currently sitting on it. */
+.cv-card-scrim, .cv-card-scrim-open {
+  position:absolute; inset:0; z-index:2; pointer-events:none;
+  transition: opacity .5s ease;
+}
+.cv-card-scrim {
+  opacity:1;
+  background: linear-gradient(to top,
+    rgba(4,5,8,0.88) 0%, rgba(4,5,8,0.56) 18%,
+    rgba(4,5,8,0.14) 40%, transparent 62%);
+}
+.cv-card-scrim-open {
+  opacity:0;
+  background: linear-gradient(to top,
+    rgba(4,5,8,0.94) 0%, rgba(4,5,8,0.86) 46%,
+    rgba(4,5,8,0.60) 78%, rgba(4,5,8,0.40) 100%);
+}
+.cv-card-open .cv-card-scrim { opacity:0; }
+.cv-card-open .cv-card-scrim-open { opacity:1; }
+
+.cv-card-panel {
+  position:absolute; left:0; right:0; bottom:0; z-index:3;
+  padding: clamp(16px,2.2vw,24px) clamp(18px,2.4vw,28px) clamp(14px,1.8vw,20px);
+}
+/* A local ramp under the caption, independent of the two scrims above.
+   The photographs are documentary rather than art-directed and their
+   bottom edges are not reliably dark — this guarantees the caption a
+   ground to sit on whatever the next photograph turns out to contain. */
+.cv-card-panel::before {
+  content:''; position:absolute; inset:-56px 0 0 0; z-index:-1; pointer-events:none;
+  background: linear-gradient(to top, rgba(4,5,8,0.92) 0%, rgba(4,5,8,0.70) 52%, transparent 100%);
+}
+
+.cv-card-rule {
+  display:block; width:24px; height:2px; border-radius:2px;
+  background:var(--accent); margin-bottom:12px;
+  transition: width .5s var(--ease-snap);
+}
+.cv-card-open .cv-card-rule { width:58px; }
+
 .cv-card-name { font-family:var(--font-sans); font-size:12px; font-weight:700; letter-spacing:.08em; text-transform:uppercase; color:var(--accent-hover); }
-.cv-card-title { font-family:var(--font-sans); font-size:10.5px; color:rgba(255,255,255,0.55); margin-top:5px; line-height:1.5; }
+.cv-card-title { font-family:var(--font-sans); font-size:10.5px; color:var(--muted-light); margin-top:5px; line-height:1.5; }
+
+/* The swap. Both containers are grids whose single row eases between
+   0fr and 1fr, so each animates to its own content's real height. */
+.cv-card-pull, .cv-card-reveal { display:grid; transition: grid-template-rows .55s var(--ease-snap); }
+.cv-card-pull > *, .cv-card-reveal > * { overflow:hidden; min-height:0; }
+.cv-card-pull   { grid-template-rows:1fr; }
+.cv-card-reveal { grid-template-rows:0fr; }
+.cv-card-open .cv-card-pull   { grid-template-rows:0fr; }
+.cv-card-open .cv-card-reveal { grid-template-rows:1fr; }
+
+.cv-card-pull > p {
+  font-family:var(--font-serif); font-style:italic; font-weight:300;
+  font-size:clamp(14px,1.5vw,17px); line-height:1.5;
+  color:rgba(255,255,255,0.94); padding-top:12px;
+  transition: opacity .3s ease .1s;
+}
+.cv-card-open .cv-card-pull > p { opacity:0; transition-delay:0s; }
+
+.cv-card-quote {
+  font-family:var(--font-serif); font-style:italic; font-weight:300;
+  font-size:clamp(13px,1.35vw,15.5px); line-height:1.62;
+  color:rgba(255,255,255,0.95); padding-top:14px;
+  opacity:0; transform:translateY(10px);
+  transition: opacity .4s ease, transform .5s var(--ease-snap);
+}
+.cv-card-open .cv-card-quote {
+  opacity:1; transform:none;
+  transition-delay:.14s;
+}
+.cv-card-open-glyph {
+  font-family:var(--font-serif); font-size:2.4em; line-height:0; color:var(--accent);
+  display:inline-block; vertical-align:-0.26em; margin-right:.1em;
+  opacity:0; transform:scale(.6) rotate(-9deg);
+  transition: opacity .4s ease, transform .55s var(--ease-spring);
+}
+.cv-card-open .cv-card-open-glyph {
+  opacity:.55; transform:none; transition-delay:.22s;
+}
+
+.cv-card-toggle {
+  margin-top:14px; padding:6px 0;
+  display:inline-flex; align-items:center; gap:7px;
+  font-family:var(--font-sans); font-size:10px; font-weight:700;
+  letter-spacing:.16em; text-transform:uppercase;
+  color:var(--accent-hover); background:none; border:0; cursor:pointer;
+}
+.cv-card-toggle svg { width:13px; height:13px; transition: transform .45s var(--ease-snap); }
+.cv-card-open .cv-card-toggle svg { transform: rotate(180deg); }
 
 /* ═══════════════════════════════════════════════════════════════
    SPOTLIGHTS
@@ -883,6 +1075,9 @@ body::after {
   background: radial-gradient(ellipse 70% 60% at 50% 100%, rgba(224,82,82,0.10), transparent 70%);
 }
 #cta .container { position:relative; z-index:1; }
+/* #cta is text-align:center, but the mark is a grid box rather than an
+   inline, so centring its text does nothing to the box itself. */
+#cta .section-mark { margin-inline:auto; }
 #cta .label { justify-content:center; }
 #cta .label::before { display:none; }
 #cta h2 { font-family:var(--font-serif); font-optical-sizing:auto; font-size:clamp(26px,5vw,46px); font-weight:700; line-height:1.14; letter-spacing:-.02em; margin-bottom:18px; }
@@ -1028,7 +1223,7 @@ footer { padding:64px 0 52px; border-top:1px solid var(--hairline); text-align:c
   .hero-photo-col { order:-1; }
   .hero-text-col { text-align:center; order:0; }
   .avatar-wrap { width:clamp(140px,38vw,196px); height:clamp(140px,38vw,196px); }
-  .hero-title { margin-bottom:26px; }
+  .hero-communal { margin-bottom:22px; }
   .hero-authority { margin-top:22px; }
   .hero-ctas { margin-top:22px; }
   .hero-ctas { justify-content:center; }
@@ -1049,6 +1244,40 @@ footer { padding:64px 0 52px; border-top:1px solid var(--hairline); text-align:c
   .featured-testimonial-photo-glow { display:none; }
   .featured-testimonial-attr { margin-top:0; }
 }
+/* One column, and the number is measured rather than picked.
+   The open panel has to fit inside a square card, and the binding
+   constraint is the longest quote in the set — Dr. Dorsch's, at 55
+   words. Two-up at a 700px viewport gives 306px cards against a 335px
+   open panel and clips the last line; at 820px the cards are 360px and
+   it fits with room. Below this the cards go full width, where a square
+   is large in absolute pixels and the text has real measure to wrap
+   into. If a longer quote is ever added, re-check this number. */
+@media (max-width: 820px) {
+  .cv-cards { grid-template-columns:1fr; }
+}
+/* Below 600px the overlay stops being the right idea and the card
+   stacks: photograph on top at its native 4:3, caption underneath on
+   the card surface. Measured, again — at a 375px viewport a square
+   card is 331px and Dr. Dorsch's open panel is 319px of it, twelve
+   pixels of headroom, which one longer sentence or one larger system
+   font destroys. More to the point, an overlay exists to keep a
+   photograph visible while text sits on it, and at this width there is
+   not enough photograph left for that trade to be worth making.
+
+   The rack focus survives the change: opening still softens and dims
+   the picture, so the card behaves the same way, it is just no longer
+   pretending the caption is floating on the image. */
+@media (max-width: 600px) {
+  .cv-card {
+    aspect-ratio:auto; display:flex; flex-direction:column;
+    background:var(--bg-card);
+  }
+  .cv-card-frame { position:relative; inset:auto; aspect-ratio:4/3; flex:none; }
+  .cv-card-scrim, .cv-card-scrim-open { display:none; }
+  .cv-card-panel { position:static; }
+  .cv-card-panel::before { display:none; }
+  .cv-card-open .cv-card-photo { filter: blur(4px) brightness(0.62) saturate(0.85); }
+}
 @media (max-width: 700px) {
   .spotlight-grid { grid-template-columns:1fr; }
   .spotlight-img-panel { aspect-ratio:16/9; }
@@ -1058,8 +1287,7 @@ footer { padding:64px 0 52px; border-top:1px solid var(--hairline); text-align:c
   .snav-links { display:none; }
   #sticky-nav { width: auto; left:12px; right:12px; transform:translate(0, calc(-100% - 24px)); }
   #sticky-nav.snav-visible { transform:translate(0,0); }
-  .cv-cards { grid-template-columns:1fr; }
-  .cv-card { aspect-ratio:4/5; }
+
   .journey-track { display:none; }
   .journey-body { display:block; }
   .ch-dot { display:none; }
@@ -1091,6 +1319,25 @@ footer { padding:64px 0 52px; border-top:1px solid var(--hairline); text-align:c
     transition-duration: 0.001ms !important;
   }
   .reveal, .reveal.in { opacity:1 !important; transform:none !important; }
+  /* The community cards open and stay open. Their whole interaction is a
+     rack focus, and with motion off there is nothing left of it worth
+     asking someone to hover for — so the quote is simply on, the photo
+     is simply sharp, and the toggle does nothing but say so. */
+  .cv-card, .cv-card-photo, .cv-card-scrim, .cv-card-scrim-open,
+  .cv-card-pull, .cv-card-reveal, .cv-card-quote, .cv-card-open-glyph,
+  .cv-card-rule, .cv-card-toggle svg { transition:none !important; }
+  .cv-card-photo { transform:none !important; filter:none !important; }
+  .cv-card-scrim { opacity:0 !important; }
+  .cv-card-scrim-open { opacity:1 !important; }
+  .cv-card-pull { grid-template-rows:0fr !important; }
+  .cv-card-reveal { grid-template-rows:1fr !important; }
+  .cv-card-quote { opacity:1 !important; transform:none !important; }
+  .cv-card-open-glyph { opacity:.55 !important; transform:none !important; }
+  .cv-card-toggle { display:none; }
+  /* The mark keeps its inset hairline; only the rotating sweep goes. A
+     conic gradient frozen at 0deg is not a still version of the effect,
+     it is a lopsided arc parked at the top of the circle. */
+  .section-mark-ring { display:none; }
   .journey-chapter .ch-photo-wrap, .journey-chapter .ch-text, .ch-photo { opacity:1 !important; transform:none !important; clip-path:none !important; }
   .hero-quote blockquote .word { opacity:1 !important; transform:none !important; -webkit-text-fill-color:var(--accent); background:none; }
   .interlude-kicker, .interlude-pull, .interlude-body { opacity:1 !important; }
@@ -1111,7 +1358,74 @@ footer { padding:64px 0 52px; border-top:1px solid var(--hairline); text-align:c
 /* ═══════════════════════════════════════════════════════════════
    CAREER-ARC CINEMATIC
 ═══════════════════════════════════════════════════════════════ */
-.arc-runway { position: relative; }
+/* ── The hero → globe handoff ──────────────────────────────────
+   The runway is pulled up under the hero by exactly one viewport
+   (lib/arc.ts APPROACH_VH, written as an inline style so the two can
+   never disagree), so the stage is already pinned and rendering the
+   globe's approach while the hero is still on screen. The hero
+   dissolves over it across that overlap; the two shots share a screen
+   instead of being cut together.
+
+   z-index is what makes it read in the right order: hero above,
+   stage below, and the stage's own opaque background stops the rest
+   of the page showing through. */
+.arc-runway { position: relative; z-index: 1; }
+
+/* Scroll-linked dissolve, driven by --hero-exit (0 at the start of the
+   overlap, 1 when the hero has left). Written by the cinematic's scroll
+   handler; the fallback of 0 is what a browser sees before that
+   handler ever runs, and what reduced motion sees for good, since it
+   renders the static arc and no runway at all.
+
+   The curve is a plain clamp rather than an eased one because the eye
+   is already being given a smoothstep by the camera: holding the hero
+   at full strength for the first fifth means the fade only starts once
+   the name has begun leaving the frame on its own. */
+:root { --hero-exit: 0; }
+#hero {
+  z-index: 2;
+  --hero-fade: clamp(0, calc((var(--hero-exit) - 0.18) / 0.62), 1);
+  opacity: calc(1 - var(--hero-fade));
+}
+@media (prefers-reduced-motion: reduce) {
+  #hero { opacity: 1; }
+}
+
+/* The dawn band: the hero's ember horizon handing off to the planet's
+   limb. Sits at 62% of the stage, which is where the plate's horizon
+   lands once its own scale and translate are accounted for, and is
+   deliberately soft-edged so it does not have to hit that mark exactly.
+
+   Two things happen across the overlap and they are the whole point:
+   it cools from the plate's ember toward #3f85f6, the exact colour of
+   the atmosphere shell in earth.tsx, and it contracts as the real limb
+   arrives to replace it. Peak visibility is in the middle — invisible
+   at the start because the hero is still opaque over it, gone by the
+   end because by then there is a genuine atmosphere doing the job. */
+.arc-dawn {
+  position: absolute; inset: 0; z-index: 1; pointer-events: none;
+  /* 6.75·e²(1−e): a cubic that peaks at exactly 1.0 at e = 2/3 rather than a
+     symmetric parabola peaking at the halfway point. The first half of the
+     overlap is spent behind a hero that is still fully opaque, so a symmetric
+     curve spends its brightest moments where nothing can see them; this one
+     is still climbing as the hero passes through 20% opacity and decays as
+     the globe's real limb arrives to replace it. */
+  --dawn: calc(6.75 * var(--hero-exit) * var(--hero-exit) * (1 - var(--hero-exit)));
+  opacity: clamp(0, var(--dawn), 1);
+  background:
+    radial-gradient(
+      ellipse calc(92% - var(--hero-exit) * 44%) calc(13% - var(--hero-exit) * 6%)
+      at 50% 62%,
+      rgba(255, 176, 92, calc(0.30 - var(--hero-exit) * 0.30)) 0%,
+      rgba(224, 82, 82, 0.10) 38%,
+      transparent 74%),
+    radial-gradient(
+      ellipse calc(70% - var(--hero-exit) * 26%) calc(10% - var(--hero-exit) * 4%)
+      at 50% 62%,
+      rgba(63, 133, 246, calc(var(--hero-exit) * 0.34)) 0%,
+      transparent 72%);
+}
+
 .arc-stage {
   position: sticky; top: 0;
   height: 100svh; height: 100vh;
@@ -1264,8 +1578,14 @@ footer { padding:64px 0 52px; border-top:1px solid var(--hairline); text-align:c
   /* The only bright thing in this plate is a narrow ember horizon, and by
      default it lands square behind the quote. Pushing the frame down drops
      that band into the lower third, under the type, where it can be bright
-     without competing. Scale covers the gap the translate opens up. */
-  transform: scale(1.3) translateY(10%);
+     without competing. Scale covers the gap the translate opens up.
+
+     The extra 4% on the way out is the backdrop receding as the hero
+     dissolves into the globe's approach: fading alone reads as a light being
+     switched off, fading while pulling away reads as distance. Applied here
+     rather than on .hero-space, which carries the `perspective` the depth
+     layers are drawn inside. */
+  transform: scale(calc(1.3 * (1 + var(--hero-fade, 0) * 0.04))) translateY(10%);
   transform-origin: 50% 50%;
   opacity: 0.86;
 }
@@ -1393,6 +1713,15 @@ footer { padding:64px 0 52px; border-top:1px solid var(--hairline); text-align:c
 }
 
 /* Skip link. Off-screen until focused, then a real target. */
+/* Visually hidden, still announced. Used for the words that make a
+   control's purpose unambiguous out of context — "Read the quote" is
+   fine on screen, next to a photograph of the person; read aloud on its
+   own it could be anyone's quote. */
+.sr-only {
+  position:absolute; width:1px; height:1px; padding:0; margin:-1px;
+  overflow:hidden; clip-path:inset(50%); white-space:nowrap; border:0;
+}
+
 .skip-link {
   position: fixed; top: 8px; left: 8px; z-index: 2000;
   transform: translateY(-200%);

@@ -188,7 +188,7 @@ export const BEATS: Beat[] = [
 ];
 
 /**
- * Runway length in viewport heights.
+ * Runway length in viewport heights, *excluding* the approach.
  *
  * Five beats need room. Deliberately not shortened for phones, which is the
  * opposite of the obvious call: a runway measured in viewport heights is
@@ -201,7 +201,65 @@ export const BEATS: Beat[] = [
  * The real fix for "this is long on a phone" is a way out of it, which is
  * what the skip link is for.
  */
-export const RUNWAY_VH = 520;
+export const BEATS_VH = 520;
+
+/**
+ * The approach, in viewport heights, and why it exists at all.
+ *
+ * The first build cut straight from the hero to the globe: the hero scrolled
+ * away, the runway's sticky stage arrived already pinned, and beat one was
+ * fully framed on its first painted pixel. Two separate sections, butted
+ * together, with nothing between them — which is exactly what "a bit abrupt"
+ * describes.
+ *
+ * The fix is that the two sections now *overlap by one viewport*. The runway
+ * is pulled up under the hero by `APPROACH_VH`, so the stage is already
+ * pinned and rendering while the hero is still on screen. Across that overlap
+ * the hero dissolves and the globe flies in from `APPROACH` below, so the
+ * handoff is a single continuous move rather than a cut between two shots.
+ *
+ * One viewport is the right length because it is exactly the distance the
+ * hero takes to leave. Shorter and the globe arrives before there is room for
+ * it; longer and the visitor scrolls through dead space with the hero already
+ * gone.
+ */
+export const APPROACH_VH = 100;
+
+/** Total runway height. The pin lasts `BEATS_VH`; the first `APPROACH_VH` of
+ *  it is spent under the departing hero. */
+export const RUNWAY_VH = BEATS_VH + APPROACH_VH;
+
+/**
+ * Where the camera starts before beat one.
+ *
+ * Far enough out that the globe is a marble rather than a planet — at d=9.2
+ * with FOV 40 it spans 12.5% of the frame height, against 82% at beat one —
+ * and rotated ~27° east of Israel so the approach carries a small amount of
+ * spin as well as a large amount of dolly. The tilt down to lat 8 means the
+ * camera climbs as it closes, which is what stops the move reading as a
+ * straight zoom.
+ */
+export const APPROACH: CameraState = { lat: 8, lon: 62, distance: 9.2 };
+
+/**
+ * Camera framing during the approach, 0 (far) to 1 (beat one).
+ *
+ * Eased twice on purpose. `smooth` alone spends the middle of the move at
+ * near-constant speed, which at this dolly range reads as a mechanical zoom;
+ * squaring the eased value back-loads it so the globe hangs small and distant
+ * for most of the hero's exit and then closes fast in the last third, at the
+ * moment the hero has faded out of the way.
+ */
+export function cameraApproach(entry: number): CameraState {
+  const first = BEATS[0];
+  const t = smooth(Math.min(1, Math.max(0, entry)));
+  const k = t * t;
+  return {
+    lat: APPROACH.lat + (first.lat - APPROACH.lat) * k,
+    lon: APPROACH.lon + shortestDelta(APPROACH.lon, first.lon) * k,
+    distance: APPROACH.distance + (first.distance - APPROACH.distance) * k,
+  };
+}
 
 /** Clamped 0..1 position of `v` within [min, max]. */
 export function norm(v: number, min: number, max: number): number {

@@ -2,6 +2,7 @@ import Link from "next/link";
 import { Hero } from "@/components/hero";
 import { ArcCinematic } from "@/components/globe/arc-cinematic";
 import { PageNav } from "@/components/page-nav";
+import { SectionMark } from "@/components/section-mark";
 import { SITE } from "@/lib/content";
 
 export default function Home() {
@@ -13,6 +14,7 @@ export default function Home() {
       {/* Target for the cinematic's skip link. */}
       <section id="after-arc" className="home-outro section-rise">
         <div className="container">
+          <SectionMark name="next" />
           <p className="label reveal">Where to next</p>
           <h2 className="reveal d1">
             Three chapters. <em>One through-line.</em>

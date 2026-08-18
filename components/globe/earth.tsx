@@ -77,6 +77,7 @@ const fragmentShader = /* glsl */ `
   uniform float uSeaLevel;
   uniform float uNightBoost;
   uniform float uIgnite;
+  uniform float uArrive;
   uniform float uRelief;
   uniform vec2 uElevTexel;
 
@@ -151,6 +152,17 @@ const fragmentShader = /* glsl */ `
     float rim = pow(1.0 - max(dot(N, V), 0.0), 3.0);
     col += vec3(0.16, 0.38, 0.88) * rim * 0.55;
 
+    // Arrival. The camera closes on the globe from 9.2 radii while the hero
+    // is still dissolving over it, and a planet at full brightness behind a
+    // half-faded hero is two images fighting. uArrive holds the globe near
+    // black through the first part of the approach and brings it up as the
+    // hero clears, so what the eye sees is one image replacing another rather
+    // than two overlapping. The limb is exempted (added back at 0.35) because
+    // that thin bright edge is the first thing that should be legible — it is
+    // what tells you a body is arriving at all.
+    col *= mix(0.04, 1.0, uArrive);
+    col += vec3(0.16, 0.38, 0.88) * rim * 0.35 * (1.0 - uArrive);
+
     gl_FragColor = vec4(col, 1.0);
     #include <colorspace_fragment>
   }
@@ -173,6 +185,7 @@ const cloudFragment = /* glsl */ `
   uniform sampler2D uClouds;
   uniform vec3 uSunDir;
   uniform float uOpacity;
+  uniform float uArrive;
 
   varying vec2 vUv;
   varying vec3 vNormalW;
@@ -193,7 +206,7 @@ const cloudFragment = /* glsl */ `
     // ends in a hard circle a few pixels outside the planet.
     float edge = smoothstep(0.0, 0.35, dot(N, V));
 
-    gl_FragColor = vec4(col, c * uOpacity * (0.10 + lit * 0.90) * edge);
+    gl_FragColor = vec4(col, c * uOpacity * (0.10 + lit * 0.90) * edge * uArrive);
     #include <colorspace_fragment>
   }
 `;
@@ -212,6 +225,7 @@ const atmosphereVertex = /* glsl */ `
 const atmosphereFragment = /* glsl */ `
   uniform vec3 uColor;
   uniform vec3 uSunDir;
+  uniform float uArrive;
   varying vec3 vNormalW;
   varying vec3 vPosW;
 
@@ -231,7 +245,10 @@ const atmosphereFragment = /* glsl */ `
     // goes gold before it goes blue.
     vec3 tint = mix(uColor, vec3(1.0, 0.72, 0.45), pow(sun, 6.0) * 0.35);
 
-    float a = fres * (0.28 + sun * 0.85);
+    // The halo leads the arrival rather than tracking it: at uArrive 0 it is
+    // already at 45% strength, so the first thing that resolves out of the
+    // dark behind the hero is a rim of atmosphere, not a grey ball.
+    float a = fres * (0.28 + sun * 0.85) * mix(0.45, 1.0, uArrive);
     gl_FragColor = vec4(tint, a);
   }
 `;
@@ -261,11 +278,13 @@ type Props = {
    * second to move a camera is how a smooth scene turns into a slideshow.
    */
   progress: React.RefObject<number>;
+  /** Approach progress, 0..1 across the overlap with the departing hero. */
+  entry: React.RefObject<number>;
   reducedMotion: boolean;
   compact: boolean;
 };
 
-export function GlobeEarth({ progress, reducedMotion, compact }: Props) {
+export function GlobeEarth({ progress, entry, reducedMotion, compact }: Props) {
   const seg = compact ? SEGMENTS.compact : SEGMENTS.wide;
 
   const [dayMap, nightMap, elevMap, cloudMap] = useLoader(THREE.TextureLoader, [
@@ -278,6 +297,8 @@ export function GlobeEarth({ progress, reducedMotion, compact }: Props) {
   const group = useRef<THREE.Group>(null);
   const clouds = useRef<THREE.Mesh>(null);
   const mat = useRef<THREE.ShaderMaterial>(null);
+  const cloudMat = useRef<THREE.ShaderMaterial>(null);
+  const atmoMat = useRef<THREE.ShaderMaterial>(null);
 
   // Accumulated cloud angle.
   const spin = useRef(0);
@@ -314,6 +335,7 @@ export function GlobeEarth({ progress, reducedMotion, compact }: Props) {
       uSunDir: { value: sunDir },
       uNightBoost: { value: 1.35 },
       uIgnite: { value: 0 },
+      uArrive: { value: 0 },
       // Slope gain for the derived normals. Purely aesthetic.
       uRelief: { value: 22.0 },
       uElevTexel: { value: new THREE.Vector2(1 / 2048, 1 / 1024) },
@@ -326,6 +348,7 @@ export function GlobeEarth({ progress, reducedMotion, compact }: Props) {
       uClouds: { value: cloudMap },
       uSunDir: { value: sunDir },
       uOpacity: { value: 0.62 },
+      uArrive: { value: 0 },
     }),
     [cloudMap, sunDir],
   );
@@ -334,6 +357,7 @@ export function GlobeEarth({ progress, reducedMotion, compact }: Props) {
     () => ({
       uColor: { value: new THREE.Color("#3f85f6") },
       uSunDir: { value: sunDir },
+      uArrive: { value: 0 },
     }),
     [sunDir],
   );
@@ -342,12 +366,24 @@ export function GlobeEarth({ progress, reducedMotion, compact }: Props) {
     const p = progress.current ?? 0;
 
     /**
+     * Arrival ramp. Smoothstep across the middle of the approach rather than
+     * a linear fade: the ends are the parts that must not be noticed — one is
+     * behind an opaque hero, the other has to land on full brightness exactly
+     * as the beats begin — and a linear ramp has visible corners at both.
+     */
+    const e = Math.min(1, Math.max(0, ((entry.current ?? 0) - 0.15) / 0.7));
+    const arrive = e * e * (3 - 2 * e);
+
+    /**
      * City lights come up as the sequence starts and stay up. `uIgnite`
      * cross-fades the night texture in over the day one on the unlit side.
      */
     if (mat.current) {
       mat.current.uniforms.uIgnite.value = Math.min(1, Math.max(0, (p - 0.01) / 0.12));
+      mat.current.uniforms.uArrive.value = arrive;
     }
+    if (cloudMat.current) cloudMat.current.uniforms.uArrive.value = arrive;
+    if (atmoMat.current) atmoMat.current.uniforms.uArrive.value = arrive;
     if (!group.current) return;
 
     /**
@@ -388,6 +424,7 @@ export function GlobeEarth({ progress, reducedMotion, compact }: Props) {
       <mesh ref={clouds} scale={1 + ELEVATION_SCALE + 0.008}>
         <sphereGeometry args={[GLOBE_RADIUS, seg.clouds[0], seg.clouds[1]]} />
         <shaderMaterial
+          ref={cloudMat}
           uniforms={cloudUniforms}
           vertexShader={cloudVertex}
           fragmentShader={cloudFragment}
@@ -402,6 +439,7 @@ export function GlobeEarth({ progress, reducedMotion, compact }: Props) {
       <mesh scale={1.075}>
         <sphereGeometry args={[GLOBE_RADIUS, seg.atmosphere[0], seg.atmosphere[1]]} />
         <shaderMaterial
+          ref={atmoMat}
           uniforms={atmoUniforms}
           vertexShader={atmosphereVertex}
           fragmentShader={atmosphereFragment}

@@ -1,5 +1,6 @@
 import type { Metadata } from "next";
 import { PageNav } from "@/components/page-nav";
+import { SectionMark } from "@/components/section-mark";
 import {
   ARC_THESIS,
   CTA,
@@ -67,6 +68,7 @@ export default function VisionPage() {
 
       <section id="insights" className="section-rise">
         <div className="container">
+          <SectionMark name="insight" />
           <p className="label reveal">From LinkedIn</p>
           <h2 className="reveal d1">What I&apos;m thinking about.</h2>
           <div className="insights-grid">
@@ -107,6 +109,7 @@ export default function VisionPage() {
 
       <section id="cta" className="section-rise">
         <div className="container">
+          <SectionMark name="connect" />
           <p className="label reveal">{CTA.label}</p>
           <h2 className="reveal d1">{CTA.headline}</h2>
           <p className="sub reveal d2">{CTA.sub}</p>

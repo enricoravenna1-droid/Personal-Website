@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 import Image from "next/image";
 import { PageNav } from "@/components/page-nav";
 import { AreaIcon } from "@/components/area-icon";
+import { SectionMark } from "@/components/section-mark";
 import { CountUp } from "@/components/count-up";
 import { AREAS, INITIATIVES, NUMBERS, TICKER } from "@/lib/content";
 
@@ -85,6 +86,7 @@ export default function WorkPage() {
 
       <section id="areas" className="section-rise">
         <div className="container">
+          <SectionMark name="value" />
           <p className="label reveal">Areas I Work In</p>
           <h2 className="reveal d1">
             Where I <em>add value.</em>
@@ -116,6 +118,7 @@ export default function WorkPage() {
 
       <section id="people" className="section-rise">
         <div className="container">
+          <SectionMark name="people" />
           <p className="label reveal">Who I&apos;ve Walked With</p>
           <h2 className="reveal d1">People, not just programs.</h2>
           <div className="people-list">

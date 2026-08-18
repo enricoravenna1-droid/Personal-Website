@@ -32,7 +32,12 @@ const mod = await import(
 );
 
 const {
+  APPROACH,
+  APPROACH_VH,
   BEATS,
+  BEATS_VH,
+  RUNWAY_VH,
+  cameraApproach,
   cameraAt,
   shortestDelta,
   latLonToVec3,
@@ -75,6 +80,59 @@ check("the final beat is the widest shot", () => {
   for (const b of BEATS.slice(0, -1)) {
     assert.ok(last.distance > b.distance, `"${b.kicker}" is wider than the pull-back`);
   }
+});
+
+console.log("the approach");
+
+check("the approach ends exactly where beat one begins", () => {
+  // The handover between cameraApproach and cameraAt happens at entry 1, and
+  // the two have to agree there or the globe jumps at the moment the hero
+  // finishes dissolving — the single most visible frame in the whole sequence.
+  // Compared to a tolerance rather than exactly: the approach reaches beat one
+  // by interpolating a 27° longitude delta to t=1, and 62 + (-27.2) lands on
+  // 34.799999999999955 in binary floating point. A sub-microdegree difference
+  // on a sphere of radius 1 is nine decimal places below a pixel.
+  const a = cameraApproach(1);
+  const b = cameraAt(0);
+  for (const k of ["lat", "lon", "distance"]) {
+    assert.ok(Math.abs(a[k] - b[k]) < 1e-9, `${k} differs: ${a[k]} vs ${b[k]}`);
+  }
+});
+
+check("the approach starts far enough out to read as an arrival", () => {
+  // At FOV 40 the globe spans 2*asin(1/d) degrees: 12.5° at the approach's
+  // 9.2 radii against 38.9° at beat one's 3.05. The point of the approach is
+  // that it starts as a marble and lands as a planet, and a third of the frame
+  // is the line between the two — above it there is no arrival left to watch.
+  const span = (d) => (2 * Math.asin(GLOBE_RADIUS / d) * 180) / Math.PI;
+  assert.ok(span(APPROACH.distance) < CAMERA_FOV * 0.35,
+    `starts at ${span(APPROACH.distance).toFixed(1)}° of a ${CAMERA_FOV}° frame`);
+  assert.ok(APPROACH.distance > BEATS[0].distance * 2,
+    "the approach barely moves");
+});
+
+check("the approach is continuous and only ever closes in", () => {
+  let prev = null;
+  let prevDist = Infinity;
+  for (let e = 0; e <= 1.0001; e += 0.01) {
+    const c = cameraApproach(e);
+    assert.ok(c.distance <= prevDist + 1e-9, `dolly reversed at entry ${e.toFixed(2)}`);
+    prevDist = c.distance;
+    const v = latLonToVec3(c.lat, c.lon, GLOBE_RADIUS * c.distance);
+    if (prev) {
+      const d = Math.hypot(v[0] - prev[0], v[1] - prev[1], v[2] - prev[2]);
+      assert.ok(d < 0.35, `camera jumped ${d.toFixed(3)} units at entry ${e.toFixed(2)}`);
+    }
+    prev = v;
+  }
+});
+
+check("the runway is the approach plus the beats, and nothing else", () => {
+  // The stylesheet pulls the runway up by APPROACH_VH and the scroll handler
+  // subtracts the same overlap before computing beat progress. If these stop
+  // adding up, the beats start early and beat one is half gone before the
+  // hero has finished leaving.
+  assert.equal(RUNWAY_VH, BEATS_VH + APPROACH_VH);
 });
 
 console.log("beat windows");

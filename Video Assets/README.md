@@ -10,15 +10,91 @@ Both live in `../public/` and are wired into `components/hero.tsx`.
 |---|---|---|
 | `hero-portrait.mp4` | 47 KB | The studio headshot, animated. 680×680, 2.9s seamless loop. |
 | `hero-portrait-poster.jpg` | 20 KB | First-paint and reduced-motion fallback. |
-| `hero-plate-sunrise.mp4` | 124 KB | Sunrise over the same desert. 1280×720, 13.0s crossfade loop, graded near-black. |
-| `hero-plate-sunrise-poster.jpg` | 14 KB | Same. |
+| `hero-plate-sunrise.mp4` | 836 KB | Sunrise over the same desert. **1920×816, 8.5s crossfade loop, 1.45× speed.** Rebuilt 2026-08-18, see below. |
+| `hero-plate-sunrise-poster.jpg` | 28 KB | Same. |
 
-Total added weight: **212 KB**. For reference, the raw model output was 7.77 MB
-for the portrait alone.
+Total added weight: **911 KB**, of which the plate is 836 KB. The first plate
+was 124 KB and looked it; see "Round two" for what that 712 KB buys and why the
+first number was the wrong thing to be proud of.
 
 The original static pre-dawn plate (`hero-plate-desert.mp4`, 84 KB) is superseded
 and now lives in `Sources/`. It is still a good fallback if the sunrise ever
 reads as too much movement.
+
+## Round two: sharper, faster, and no letterbox (2026-08-18)
+
+Same note AJ 2054 got on its own plate, in the same words: too soft, wanted
+sharp and fast. Three fixes, and only one of them is the one you would guess.
+`build_plate_sharp.py` in this folder rebuilds it end to end.
+
+**Sharp was mostly a bitrate problem, not a resolution problem.** The shipped
+plate encoded at **78 kb/s** — CRF 32 on a frame that is almost entirely a slow
+gradient, which is the single worst case for x264's deadzone. What reached the
+page was banded mush, and no CSS was going to sharpen that. A CRF sweep at
+1080p measured 23 → 2.0 MB, 25 → 1.25 MB, 26 → 1.0 MB, 27 → 807 KB.
+**CRF 26** with `aq-mode=3` and `deblock=-1,-1`.
+
+AJ's fix was to regenerate at Kling `mode: 'pro'` for a real 1920×1080 master.
+That is still the better fix and it is not available here: the only sunrise
+master is the 720p `std` 15s take, and regenerating costs credits. So the
+upscale to 1080p is second-order — it beats the browser's bilinear stretch of a
+720p file across a ~900px hero, and adds no detail that was not there.
+
+**The letterbox was the surprise.** The master is 2.35:1 content inside a 16:9
+frame: 88px of hard black top and bottom, confirmed with `cropdetect` at
+limit 0.10. The old plate never cropped them — `transform: scale(1.3)` in the
+CSS was pushing them off screen. So a third of every encoded frame was spent on
+black bars *and* the visible picture was being blown up ~1.9× to hide them.
+Cropping first gives the same framing from more pixels at fewer bits: the file
+is 836 KB at 1920×816 against 1.0 MB at 1920×1080 for a worse picture.
+
+**Faster is `setpts`, and it has a ceiling.** 1.45×, not 2×. Compress a sunrise
+much past this and weather becomes timelapse, which is the whole reason this was
+shot at 15s on Kling rather than 8s on Veo. Output is capped at `fps=24`; without
+that cap `setpts` leaves the file at 35 fps and spends ~30% more bits on frames
+nobody asked for.
+
+Loop seam re-measured: first and last frames differ by **0.56/255** against
+**5.67** for two genuinely different frames, a ratio of 10× where the old plate
+managed 7×.
+
+| | First plate | Round two |
+|---|---|---|
+| Resolution | 1280×720 letterboxed | **1920×816, bars cropped** |
+| Bitrate | 78 kb/s | **800 kb/s** |
+| Loop | 13.0s | 8.5s |
+| Speed | 1.0× | **1.45×** |
+| Seam Δ/255 vs mid-clip | 0.84 / 5.99 | **0.56 / 5.67** |
+| Size | 124 KB | 836 KB |
+
+### The contrast consequence, and where it landed
+
+A sharper, brighter plate carries more contrast of its own, and the hero type
+sits on top of it. Re-measured with `measure_hero_contrast.py` (also new, also
+in this folder — it rebuilds the browser's composite offline because the
+preview pane throttles rAF and a canvas built from a `<video>` in the page
+never gets a frame to sample):
+
+| Element | px | Needs | Old plate | New plate | After the fix |
+|---|---|---|---|---|---|
+| Name | 58 | 3.0 | 16.10 | 14.35 | 14.35 |
+| Positioning | 26 | 3.0 | 4.55 | 3.89 | 3.89 |
+| Quote | 33 | 3.0 | 12.56 | 11.77 | 11.77 |
+| Quote byline | 10 | 4.5 | 4.99 | **4.61** | **7.79** |
+| BACKGROUND label | 9 | 4.5 | 5.63 | **4.83** | **8.17** |
+| Background list | 16 | 4.5 | 15.73 | 11.52 | 11.52 |
+
+The byline and the label are 10px and 9px sitting directly over the ember
+horizon — the one bright band in the frame — and both landed within a tenth of
+the 4.5 floor. **The fix was not to deepen the scrim.** That band is exactly
+where the horizon glow lives, so darkening it would have paid for legibility by
+throwing away the picture the whole exercise was meant to sharpen. Both moved
+from `--muted` to `--muted-light` instead. Same plate, same scrim, four points
+of headroom.
+
+Note the numbers also moved because the JFAR role line was removed from the
+hero on the same day, so every element below it shifted up into a slightly
+different band of the scrim.
 
 ## The sunrise, and why it loops differently (2026-08-15)
 
@@ -157,4 +233,16 @@ ffmpeg -y -i raw.mp4 -filter_complex "[0:v]trim=0:1.5,setpts=PTS-STARTPTS,scale=
 There is no system ffmpeg on this Mac. Install a contained one with
 `pip install --target=./pylibs imageio-ffmpeg`.
 
-**Last updated: 2026-08-15** (sunrise plate)
+## Rebuilding, round two
+
+```bash
+python3 build_plate_sharp.py          # crop, grade, sharpen, speed, loop, encode
+python3 measure_hero_contrast.py      # re-check the hero type over the result
+```
+
+`measure_hero_contrast.py` carries the hero geometry as constants, measured in
+the browser at 1441×900. **If the hero layout changes, re-measure those boxes
+before trusting its output** — the script has no way to know the page moved.
+
+**Last updated: 2026-08-18** (plate rebuilt sharper and faster; hero contrast
+re-measured and two colours corrected)

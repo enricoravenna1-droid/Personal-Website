@@ -213,11 +213,12 @@ export function Hero() {
           <div className="hero-text-col">
             <h1 className="hero-name">{SITE.name}</h1>
             <p className="hero-communal">{SITE.positioning}</p>
-            {/* EDIT: role line. Dates rather than "Former": the tenure reads
-                as a credential instead of a demotion, and it is unambiguous. */}
-            <p className="hero-title">
-              Executive Director, Jewish Federation of Arkansas · 2025–2026
-            </p>
+            {/* The JFAR role line used to sit here. Removed 2026-08-18: the
+                same tenure is already named twice below the fold — in the
+                BACKGROUND list a few lines down, and again as chapter three of
+                /story — so on the one screen that has to land in two seconds it
+                was clutter arguing for the past. The hero now states who he is;
+                the pages state what he did. */}
 
             <div className="hero-quote">
               <blockquote>

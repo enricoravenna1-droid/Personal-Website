@@ -27,8 +27,11 @@ const BONE = new THREE.Color("#C9C4BE");
 
 export function GlobeMarkers({
   progress,
+  entry,
 }: {
   progress: React.RefObject<number>;
+  /** Approach progress, 0..1. Markers stay at zero scale through it. */
+  entry: React.RefObject<number>;
 }) {
   const mesh = useRef<THREE.InstancedMesh>(null);
   const dummy = useMemo(() => new THREE.Object3D(), []);
@@ -75,9 +78,20 @@ export function GlobeMarkers({
     if (!node) return;
     const p = progress.current ?? 0;
     const t = clock.elapsedTime;
+    /**
+     * Gate on the approach.
+     *
+     * `markerOpacity` gives beat one's markers 0.5 at progress 0, which is
+     * correct once the sequence has started and wrong before it: through the
+     * approach the globe is a distant marble, and a red pin floating on it at
+     * half scale announces the first beat several seconds early. The gate opens
+     * only in the last fifth of the approach, so the pins land with the globe.
+     */
+    const e = entry.current ?? 0;
+    const gate = Math.min(1, Math.max(0, (e - 0.8) / 0.2));
 
     placed.forEach((m, i) => {
-      const shown = markerOpacity(m.beat, p);
+      const shown = markerOpacity(m.beat, p) * gate;
       // A slow breath so the field is never dead, keyed off index so they
       // are not all pulsing in lockstep.
       const pulse = 1 + Math.sin(t * 1.4 + i * 0.7) * 0.09;
