@@ -14,8 +14,11 @@ Originals/
 # are regenerable from the scripts, which ARE committed.
 Video Assets/pylibs/
 Video Assets/_frames/
-Video Assets/hero-plate-sunrise-sharp.mp4
-Video Assets/hero-plate-sunrise-sharp-poster.jpg
+Video Assets/hero-plate-*.mp4
+Video Assets/hero-plate-*-poster.jpg
+Video Assets/candidate-*.mp4
+Video Assets/candidate-*.jpg
+Video Assets/_sweep-*
 
 # Raw Higgsfield renders behind the hero videos. Not served, ~41 MB.
 # The shipped clips live in public/; the method, costs, and the reasons each

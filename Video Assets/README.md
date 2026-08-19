@@ -10,18 +10,140 @@ Both live in `../public/` and are wired into `components/hero.tsx`.
 |---|---|---|
 | `hero-portrait.mp4` | 47 KB | The studio headshot, animated. 680×680, 2.9s seamless loop. |
 | `hero-portrait-poster.jpg` | 20 KB | First-paint and reduced-motion fallback. |
-| `hero-plate-sunrise.mp4` | 836 KB | Sunrise over the same desert. **1920×816, 8.5s crossfade loop, 1.45× speed.** Rebuilt 2026-08-18, see below. |
-| `hero-plate-sunrise-poster.jpg` | 28 KB | Same. |
+| `hero-plate-river.mp4` | 1.18 MB | A state capital at night on a wide river: a truss bridge spanning the frame, a floodlit dome and downtown towers behind it, a lit riverboat crossing under it. **1920×1080, 8.0s crossfade loop, native speed.** Shipped 2026-08-18, see "Round three". |
+| `hero-plate-river-poster.jpg` | 125 KB | First-paint and reduced-motion fallback. |
 
-Total added weight: **911 KB**, of which the plate is 836 KB. The first plate
-was 124 KB and looked it; see "Round two" for what that 712 KB buys and why the
-first number was the wrong thing to be proud of.
+Total added weight: **1.36 MB**, of which the plate is 1.18 MB. A night city is
+genuinely expensive to encode — thousands of small bright points against black
+is the opposite of the smooth gradient the desert plate was — and the CRF sweep
+below is where that number was set rather than guessed.
+
+The sunrise and desert plates are superseded and live in `Sources/`.
 
 The original static pre-dawn plate (`hero-plate-desert.mp4`, 84 KB) is superseded
 and now lives in `Sources/`. It is still a good fallback if the sunrise ever
 reads as too much movement.
 
-## Round two: sharper, faster, and no letterbox (2026-08-18)
+## Round three: the plate finally has an argument (2026-08-18)
+
+Round two made the desert plate sharper and faster, and that is precisely what
+killed it. **Sharpening it is what exposed it.** At 78 kb/s the old plate was
+mush and read as texture; at 800 kb/s it became a recognisable photograph of a
+place, and the place did not mean anything. A canyon at sunrise could sit behind
+any executive coach or any SaaS homepage. It also read as the Colorado Plateau
+rather than the Negev, so it was not doing autobiography either. It was the one
+picture on the site that was not about him.
+
+**Write this down, because it generalises: a hero plate is not decoration, it is
+an argument, and quality only makes a weak argument more legible.** AJ 2054's
+plate works because the night aerial *is* the thesis — isolation before it has
+been scored. The desert had no equivalent.
+
+The replacement is Enrico's own brief: the Arkansas River at night, the bridges,
+downtown, the Capitol dome, a boat under way. It carries three things at once —
+his last post, a city rather than a small town, and **bridges**, which is the
+exact word Pastor Perry's quote on `/voices` uses about him.
+
+### Generation
+
+**Kling 3.0, `mode: 'pro'`, 16:9, 10s, silent. 25 credits a take, three takes,
+75 spent of 882.** Returns a true 1920×1080 with no letterbox, which the
+sunrise master did not.
+
+Prompt rules that mattered, all inherited from earlier rounds and all still
+true:
+
+- Never name a film artefact. No "35mm", no "anamorphic", no "film grain" — the
+  models render them literally. Ask instead for "clean modern digital cinema
+  frame, edge to edge, no film border, no sprocket holes, no lettering".
+- Ban text explicitly. A riverfront full of restaurants is a frame full of
+  signage, and generated lettering is garbled every time. `no text, no
+  lettering, no signage, no logos, no watermark`.
+- Ban people. At the size this renders on the page they are noise, and models
+  render small figures badly.
+- Say "no teal cast". Night city prompts drift blue-green by default and this
+  site's palette is red, black and grey.
+
+One take came back as a **preset recommendation instead of a job** ("IN THE
+DARK"). Resubmit with `declined_preset_id` set to the offered preset or the
+composition gets overridden by someone else's look.
+
+### The three takes
+
+| | What it is | Verdict |
+|---|---|---|
+| `river-a` | Steel arch bridge, floodlit dome on its own hill, blue hour | Closest runner-up. The most elegant single object of the three, but it is dusk rather than night and its reflections run the full width of the lower half — exactly where the quote and the buttons sit. |
+| `river-b` | Wide aerial, three bridges, real tower skyline, riverfront pavilions | The only take with the River Market pavilions. Also the only take that stopped being Arkansas: that skyline reads as a top-ten metro. Busiest frame of the three. |
+| **`river-c`** | **Truss bridge spanning the frame, dome and downtown behind, riverboat crossing** | **Shipped.** Genuinely night. The bridge is a horizontal band that sits behind the name and then gets out of the way, and everything below the waterline is still black river. |
+
+### Encode
+
+CRF sweep at 1920×1080: 26 → 1837 KB, 28 → 1329 KB, 30 → 982 KB, 32 → 736 KB.
+Settled on **CRF 30**, which at native speed and a 2s dissolve gives 1.18 MB.
+
+The banding check that decided it: crop the sky band from CRF 26, 30 and 32,
+push brightness and contrast hard, and compare. **All three were
+indistinguishable.** Unlike the desert's smooth gradient sky, a night sky with
+cloud detail gives x264 something to hold onto, so the CRF that mattered there
+does not matter here.
+
+**Native speed, not sped up.** The desert needed 1.45× because a slow sunrise is
+sluggish. Water and a boat at anything above 1× reads as fast-forward.
+
+Loop seam: endpoints differ by **3.33/255** against **9.65** mid-clip, a ratio of
+2.9×. Tighter than the desert's 10× because a translating camera never returns
+to its own first framing — the same limit AJ 2054 hit at 1.4×. Under the scrim
+the step is about one unit of 255 and is not perceptible. `seam.py` in this
+folder measures it for any clip.
+
+### The page had to change shape around it
+
+A night city is the **inverse composition** of a sunrise: dark sky, a bright
+band of bridge and skyline across the upper middle, still black water under all
+of it. Two things in `app/globals.css` were tuned for the opposite picture and
+both were wrong for this one.
+
+- **The transform.** The sunrise used `scale(1.3) translateY(10%)` to push its
+  ember horizon down into the lower third and out from behind the quote. Applying
+  the same 13% push here would have dragged the brightest thing in the frame
+  straight onto the quote. Now `scale(1.12)` and no translate: the band lands
+  behind the name, which needs 3:1 rather than 4.5:1, and everything below sits
+  on water.
+- **The scrim.** Was heaviest at the top and lifted below. Now the weight follows
+  the light: less over the already-dark sky, most across 32–56%, lifting over the
+  water.
+- **The handoff band** in `.arc-dawn` moved from 62% to 46%, because that is
+  where this plate's brightest line is.
+
+### Contrast, re-measured
+
+Same method, same script, new geometry. **The type reads better on this plate
+than on any before it**, because the composition puts the small text over still
+water instead of over a horizon glow.
+
+| Element | px | Needs | Desert | River |
+|---|---|---|---|---|
+| Name | 58 | 3.0 | 14.35 | 12.23 |
+| Positioning | 26 | 3.0 | 3.89 | 4.01 |
+| Quote | 33 | 3.0 | 11.77 | **14.20** |
+| Quote byline | 10 | 4.5 | 7.79 | **9.35** |
+| BACKGROUND label | 9 | 4.5 | 8.17 | **9.92** |
+| Background list | 16 | 4.5 | 11.52 | **15.21** |
+
+`measure_hero_contrast.py` carries the hero geometry as constants read from the
+browser. **They are now the river plate's.** If the plate transform or the hero
+layout changes again, re-read them before trusting the output; the script cannot
+tell that the page moved underneath it.
+
+### What the frame does not claim
+
+The dome, the towers and the bridge are composed, not surveyed. The real
+Arkansas State Capitol sits about a mile inland from the river and would not
+appear behind the bridges from any real vantage point. Nothing on the page says
+Little Rock, which was the brief: it should read as a state capital at night and
+nothing more.
+
+## Round two: sharper, faster, and no letterbox (2026-08-18, superseded)
 
 Same note AJ 2054 got on its own plate, in the same words: too soft, wanted
 sharp and fast. Three fixes, and only one of them is the one you would guess.
@@ -233,16 +355,30 @@ ffmpeg -y -i raw.mp4 -filter_complex "[0:v]trim=0:1.5,setpts=PTS-STARTPTS,scale=
 There is no system ffmpeg on this Mac. Install a contained one with
 `pip install --target=./pylibs imageio-ffmpeg`.
 
-## Rebuilding, round two
+## Rebuilding
+
+`build_plate.py` is the general pipeline and the one to use. `build_plate_sharp.py`
+is kept because it records the exact numbers behind the sunrise plate, but it is
+hardcoded to that one clip.
 
 ```bash
-python3 build_plate_sharp.py          # crop, grade, sharpen, speed, loop, encode
-python3 measure_hero_contrast.py      # re-check the hero type over the result
+# crop, scale, grade, sharpen, speed, crossfade-loop, encode
+python3 build_plate.py Sources/river-c.mp4 hero-plate-river.mp4 \
+    --speed 1.0 --xfade 2.0 --size 1920x1080 --crf 30 \
+    --grade "eq=brightness=-0.02:saturation=0.74:contrast=1.06,colorbalance=rs=0.05:bs=-0.06:rm=0.03:bm=-0.05"
+
+python3 seam.py hero-plate-river.mp4        # how cleanly the loop closes
+python3 measure_hero_contrast.py            # hero type over the result
 ```
+
+`--detect-crop` finds baked-in letterbox bars at a threshold tuned for
+near-black plates. The sunrise master had 88px bars top and bottom; the Kling
+3.0 `pro` renders have none.
 
 `measure_hero_contrast.py` carries the hero geometry as constants, measured in
 the browser at 1441×900. **If the hero layout changes, re-measure those boxes
 before trusting its output** — the script has no way to know the page moved.
 
-**Last updated: 2026-08-18** (plate rebuilt sharper and faster; hero contrast
-re-measured and two colours corrected)
+**Last updated: 2026-08-18** (round three: the desert is retired and the hero
+carries the river at night; plate pipeline generalised into `build_plate.py`;
+transform, scrim and handoff band recomposed; contrast re-measured)

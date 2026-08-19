@@ -404,6 +404,17 @@ body::after {
   display:flex; flex-direction:column; justify-content:center; align-items:center;
   padding:80px var(--pad) 72px;
   position:relative; overflow:hidden;
+  /* Opaque, and it has to be its own opacity rather than the plate's.
+     The runway is pulled up under this section, so the pinned arc stage
+     is sitting behind the hero from the first frame. Until 2026-08-18
+     the only thing hiding it was the plate, which is a <video> inside a
+     box inset -26% with a scrim that reaches full --bg at its own
+     bottom, not at the hero's — so the stage's "Skip the sequence"
+     control was faintly legible through the foot of the hero, and would
+     have been fully visible the moment anyone changed or removed the
+     plate. Now the section covers the stage on its own and the
+     scroll-linked opacity below is what uncovers it. */
+  background: var(--bg);
   view-timeline-name: --hero;
   view-timeline-axis: block;
 }
@@ -1391,10 +1402,12 @@ footer { padding:64px 0 52px; border-top:1px solid var(--hairline); text-align:c
   #hero { opacity: 1; }
 }
 
-/* The dawn band: the hero's ember horizon handing off to the planet's
-   limb. Sits at 62% of the stage, which is where the plate's horizon
-   lands once its own scale and translate are accounted for, and is
+/* The light band: the hero's brightest line handing off to the planet's
+   limb. Sits at 46% of the stage, which is where the river plate's
+   bridge, skyline and dome land once its scale is accounted for, and is
    deliberately soft-edged so it does not have to hit that mark exactly.
+   It was at 62% for the sunrise plate, whose ember horizon sat low; move
+   it again if the plate is ever recomposed.
 
    Two things happen across the overlap and they are the whole point:
    it cools from the plate's ember toward #3f85f6, the exact colour of
@@ -1415,13 +1428,13 @@ footer { padding:64px 0 52px; border-top:1px solid var(--hairline); text-align:c
   background:
     radial-gradient(
       ellipse calc(92% - var(--hero-exit) * 44%) calc(13% - var(--hero-exit) * 6%)
-      at 50% 62%,
+      at 50% 46%,
       rgba(255, 176, 92, calc(0.30 - var(--hero-exit) * 0.30)) 0%,
       rgba(224, 82, 82, 0.10) 38%,
       transparent 74%),
     radial-gradient(
       ellipse calc(70% - var(--hero-exit) * 26%) calc(10% - var(--hero-exit) * 4%)
-      at 50% 62%,
+      at 50% 46%,
       rgba(63, 133, 246, calc(var(--hero-exit) * 0.34)) 0%,
       transparent 72%);
 }
@@ -1485,8 +1498,20 @@ footer { padding:64px 0 52px; border-top:1px solid var(--hairline); text-align:c
   border: 1px solid var(--border-interactive);
   background: rgba(8,9,12,0.6);
   backdrop-filter: blur(10px); -webkit-backdrop-filter: blur(10px);
-  transition: color .2s ease, border-color .2s ease;
+  transition: color .2s ease, border-color .2s ease, opacity .3s ease;
+  /* Hidden until the sequence actually exists. This is a control for a
+     ride that has not started, sitting behind a hero that is still on
+     screen; offering to skip something the visitor cannot yet see is
+     worse than not offering at all.
+
+     Gated by a class rather than by arithmetic on --hero-exit, because
+     `visibility` does not interpolate. Opacity alone would leave a
+     focusable, invisible control in the tab order, which is the exact
+     shape of a keyboard trap nobody can see. */
+  opacity: 0;
+  visibility: hidden;
 }
+.arc-armed .arc-skip { opacity: 1; visibility: visible; }
 .arc-skip:hover { color: var(--text); border-color: var(--accent); }
 
 /* Reduced-motion variant: the same five claims, delivered flat. */
@@ -1575,41 +1600,59 @@ footer { padding:64px 0 52px; border-top:1px solid var(--hairline); text-align:c
   position: absolute; inset: 0;
   width: 100%; height: 100%;
   object-fit: cover;
-  /* The only bright thing in this plate is a narrow ember horizon, and by
-     default it lands square behind the quote. Pushing the frame down drops
-     that band into the lower third, under the type, where it can be bright
-     without competing. Scale covers the gap the translate opens up.
+  /* No translate, and only enough scale to cover the perspective shortfall.
+     The sunrise plate needed `scale(1.3) translateY(10%)` because its one
+     bright feature was a narrow ember horizon that otherwise landed square
+     behind the quote, so the frame was pushed down to drop it into the lower
+     third. This plate is composed the other way round: its bright band is the
+     bridge, the skyline and the dome, all of which sit high, and everything
+     below the waterline is still dark river. Pushing this frame down by the
+     same 13% would drag the brightest thing in it straight onto the quote.
+     Left alone, the band lands behind the name — which needs 3:1, not 4.5 —
+     and the whole lower half of the type sits on black water.
 
      The extra 4% on the way out is the backdrop receding as the hero
      dissolves into the globe's approach: fading alone reads as a light being
      switched off, fading while pulling away reads as distance. Applied here
      rather than on .hero-space, which carries the `perspective` the depth
      layers are drawn inside. */
-  transform: scale(calc(1.3 * (1 + var(--hero-fade, 0) * 0.04))) translateY(10%);
+  transform: scale(calc(1.12 * (1 + var(--hero-fade, 0) * 0.04)));
   transform-origin: 50% 50%;
   opacity: 0.86;
 }
-/* Scrim is now a vertical ramp rather than a radial pool: heaviest across
-   the band where the name and quote sit, lifting below them so the horizon
-   and ridgeline actually read. */
+/* A vertical ramp, and its shape is inverted from the one the sunrise
+   plate wanted. That plate was dark at the top with a bright ember band
+   low, so the scrim was heaviest at the top and lifted below. This one is
+   the opposite picture: a dark sky, a bright band of bridge and skyline
+   and dome across the upper middle, and still black water under all of it.
+
+   So the weight moves to where the light actually is. The sky gets less
+   than it used to, because scrimming an already-dark sky only costs the
+   clouds; the city band gets the most; and the water below gets least,
+   because there is nothing there to suppress and the quote reads on it
+   unaided. Figures re-measured with Video Assets/measure_hero_contrast.py
+   and recorded in that folder's README. */
 .hero-plate::after {
   content: ''; position: absolute; inset: 0;
   background:
     linear-gradient(180deg,
-      rgba(8,9,12,0.92) 0%,
-      rgba(8,9,12,0.78) 26%,
-      rgba(8,9,12,0.72) 48%,
-      /* Deliberate bump. The quote byline lands at 61-63% of this box and is
-         10px muted gray; without this it measures 3.66:1 against the plate,
-         under the 4.5:1 floor for small text. The band sits above the horizon
-         glow, so it costs nothing visually. */
-      rgba(8,9,12,0.78) 63%,
-      rgba(8,9,12,0.58) 72%,
-      rgba(8,9,12,0.48) 82%,
-      rgba(8,9,12,0.62) 94%,
+      rgba(8,9,12,0.74) 0%,
+      rgba(8,9,12,0.66) 20%,
+      /* The band. Bridge deck, lamps, lit windows and the floodlit dome all
+         fall between here and 52%, and the name sits across it. */
+      rgba(8,9,12,0.80) 32%,
+      rgba(8,9,12,0.84) 46%,
+      rgba(8,9,12,0.74) 56%,
+      /* The quote byline and the BACKGROUND label are 10px and 9px and land
+         at 63-70%. They are over water rather than over the city, but the
+         water carries the reflections of everything above it, so this does
+         not relax as far as the picture alone would allow. */
+      rgba(8,9,12,0.68) 68%,
+      rgba(8,9,12,0.60) 80%,
+      rgba(8,9,12,0.66) 92%,
       var(--bg) 100%),
     radial-gradient(ellipse 62% 44% at 50% 40%,
-      rgba(8,9,12,0.42) 0%, transparent 100%);
+      rgba(8,9,12,0.38) 0%, transparent 100%);
 }
 
 /* The aurora is already positioned by its own rule; inside the depth

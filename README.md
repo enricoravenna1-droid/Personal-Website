@@ -100,21 +100,38 @@ point `og:image` at it. LinkedIn caches previews, so afterwards run the URL thro
 
 ## What changed on 2026-08-18
 
-Five changes, all from the same note: make the front door look like the work of
+Six changes, all from the same note: make the front door look like the work of
 someone who is about to run a large-city Federation.
 
-### 1. The hero plate is sharper and faster
+### 1. The hero plate is a river at night, not a desert
 
-Rebuilt from the 15s Kling master: letterbox cropped, upscaled, sharpened, sped
-1.45×, re-encoded at ten times the bitrate. 124 KB → 836 KB, 1280×720 → 1920×816,
-13.0s → 8.5s. Full reasoning and the CRF sweep in `Video Assets/README.md`; the
-script is `Video Assets/build_plate_sharp.py`.
+The desert plate went through two rounds in one day. It was rebuilt sharper and
+faster first — letterbox cropped, 1080p, 1.45×, ten times the bitrate — and that
+is exactly what killed it. **Sharpening it is what exposed it.** At 78 kb/s it
+was mush and read as texture; at 800 kb/s it was a recognisable photograph of a
+place, and the place meant nothing.
 
-Two hero text colours moved from `--muted` to `--muted-light` as a consequence. A
-sharper plate carries more contrast of its own, and the 10px byline and 9px
-BACKGROUND label sit directly over the ember horizon; they measured 4.61 and 4.83
-against a 4.5 floor. Deepening the scrim would have fixed that by throwing away the
-picture. Numbers in `Video Assets/README.md`, re-runnable with
+The replacement is a state capital at night on a wide river: a truss bridge
+spanning the frame, a floodlit dome and downtown towers behind it, a lit
+riverboat crossing under it. It is his last post, it is a city rather than a
+small town, and **bridges** is the exact word Pastor Perry's quote on `/voices`
+uses about him. 1920×1080, 8.0s crossfade loop, native speed, 1.18 MB.
+
+The lesson worth keeping: **a hero plate is an argument, not decoration, and
+quality only makes a weak argument more legible.**
+
+Two things in `globals.css` had to change shape with it, because a night city is
+the inverse composition of a sunrise. The plate transform dropped from
+`scale(1.3) translateY(10%)` to `scale(1.12)` with no push, and the scrim's
+weight moved from the top of the frame to the band where the bridge and skyline
+sit. Details, the CRF sweep, the generation prompts and the two takes that lost
+are all in `Video Assets/README.md`.
+
+Two hero text colours moved from `--muted` to `--muted-light` on the way through,
+back when the sharpened desert pushed the 10px byline to 4.61:1 against a 4.5
+floor. The river plate does not need the help — the byline measures 9.35:1 on it,
+because the small text sits over still water rather than over a horizon glow —
+but the colours are better anyway and they stay. Re-runnable with
 `python3 "Video Assets/measure_hero_contrast.py"`.
 
 ### 2. The JFAR role line is gone from the hero
@@ -189,6 +206,14 @@ Deliberately not organisational marks. The standing rule on this account is that
 documents are unbranded and the name is the brand; these are furniture, not a logo.
 `components/section-mark.tsx` records which glyphs were rejected and why — the first
 "add value" mark was a perfectly good wifi symbol.
+
+### 6. The arc stage stopped showing through the hero
+
+The runway is pulled up under the hero, so the pinned stage sits behind it from
+the first frame. Until this pass the only thing hiding it was the plate, by
+accident, and the stage's "Skip the sequence" control was faintly legible through
+the foot of the hero. `#hero` now carries its own opaque background, and the skip
+control is hidden and out of the tab order until the approach is nearly over.
 
 ### Also fixed on the way
 

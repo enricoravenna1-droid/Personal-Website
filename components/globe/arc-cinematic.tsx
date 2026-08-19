@@ -54,6 +54,10 @@ export function ArcCinematic() {
   /** Beat index for the copy layer. This one *is* state — it changes five
    *  times over the whole sequence, not sixty times a second. */
   const [beat, setBeat] = useState(-1);
+  /** True once the approach is nearly over. Gates the skip control, which
+   *  must not be focusable while the hero still covers the stage. Flips
+   *  once per visit, so state is the right home for it. */
+  const [armed, setArmed] = useState(false);
 
   useEffect(() => {
     const mq = window.matchMedia(`(max-width: ${COMPACT_MAX_WIDTH}px)`);
@@ -144,6 +148,11 @@ export function ArcCinematic() {
         // disagree with the camera about how far through the handoff it is.
         document.documentElement.style.setProperty("--hero-exit", e.toFixed(4));
 
+        setArmed((prev) => {
+          const next = e > 0.75;
+          return prev === next ? prev : next;
+        });
+
         const p = travel > lead ? norm(travelled - lead, 0, travel - lead) : 0;
         progress.current = p;
 
@@ -198,7 +207,7 @@ export function ArcCinematic() {
   return (
     <section
       ref={runway}
-      className="arc-runway"
+      className={`arc-runway${armed ? " arc-armed" : ""}`}
       // Both numbers come from lib/arc so the choreography and the layout are
       // the same source. `marginTop` is the overlap with the hero; the scroll
       // handler reads it back rather than recomputing it.

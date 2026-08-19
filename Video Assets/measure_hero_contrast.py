@@ -25,9 +25,18 @@ SD = os.path.dirname(os.path.abspath(__file__))
 FF = os.path.join(SD, "pylibs/imageio_ffmpeg/binaries/ffmpeg-macos-aarch64-v7.1")
 
 # ── Geometry, measured in the browser at 1441x900 ──────────────────────────
-# The video's painted box after `transform: scale(1.3) translateY(10%)` on the
-# .hero-layer-deep box, in viewport coordinates.
-VID_BOX = (-334.09, -41.20, 2109.19, 1317.33)   # x, y, w, h
+# The video's painted box after its transform on the .hero-layer-deep box, in
+# viewport coordinates. Re-read these from the page whenever the plate's
+# transform or the hero layout changes; the script cannot tell that the page
+# moved underneath it. In the browser console:
+#
+#   const v = document.querySelector('.hero-plate video');
+#   [v.getBoundingClientRect(), document.querySelector('.hero-plate')
+#      .getBoundingClientRect(), document.querySelector('#hero')
+#      .getBoundingClientRect()]
+#
+# Current values are for the river plate at `transform: scale(1.12)`.
+VID_BOX = (-188.07, -81.73, 1817.15, 1134.93)   # x, y, w, h
 # .hero-plate's own box: the one the ::after gradient percentages resolve
 # against. Not the same box as the video, which is why they are both here.
 PLATE_BOX = (-90.73, -20.93, 1622.45, 1013.33)
@@ -48,10 +57,10 @@ ELEMENTS = [
 
 # ── The scrim, transcribed from globals.css ───────────────────────────────
 # .hero-plate::after, layer 2 (painted under layer 1): the vertical ramp.
-RAMP = [(0.00, 0.92), (0.26, 0.78), (0.48, 0.72), (0.63, 0.78),
-        (0.72, 0.58), (0.82, 0.48), (0.94, 0.62), (1.00, 1.00)]
-# .hero-plate::after, layer 1: radial ellipse 62% 44% at 50% 40%, 0.42 -> 0.
-RADIAL = (0.50, 0.40, 0.62, 0.44, 0.42)
+RAMP = [(0.00, 0.74), (0.20, 0.66), (0.32, 0.80), (0.46, 0.84),
+        (0.56, 0.74), (0.68, 0.68), (0.80, 0.60), (0.92, 0.66), (1.00, 1.00)]
+# .hero-plate::after, layer 1: radial ellipse 62% 44% at 50% 40%, 0.38 -> 0.
+RADIAL = (0.50, 0.40, 0.62, 0.44, 0.38)
 # #hero::after: ellipse 105% 95% at 50% 45%, transparent 42% -> 0.42 at 82%
 # -> --bg at 100%.
 VIGNETTE = (0.50, 0.45, 1.05, 0.95)
@@ -152,7 +161,7 @@ def composite(px, w, h, sx, sy):
 
 def main():
     src = sys.argv[1] if len(sys.argv) > 1 else os.path.join(
-        SD, "..", "public", "hero-plate-sunrise.mp4")
+        SD, "..", "public", "hero-plate-river.mp4")
     src = os.path.abspath(src)
     out = os.path.join(SD, "_frames")
     os.makedirs(out, exist_ok=True)

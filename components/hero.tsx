@@ -128,26 +128,41 @@ export function Hero() {
   return (
     <section id="hero">
       <div className="hero-space" ref={stage}>
-        {/* Depth layer 0: the plate. A 13s sunrise over the same desert, graded
-            near-black. It sits deepest in Z and is scrimmed by its own ::after,
-            because the hero type has to stay readable over it at every frame —
-            the plate is atmosphere, not content.
+        {/* Depth layer 0: the plate. A state capital at night on a wide river,
+            a truss bridge spanning the frame, the dome and the downtown towers
+            behind it, and a lit riverboat crossing under it. It sits deepest in
+            Z and is scrimmed by its own ::after, because the hero type has to
+            stay readable over it at every frame — the plate is atmosphere, not
+            content.
 
-            Looped by crossfade, not by ping-pong. Ping-pong is free and seamless
-            but it plays the clip backwards, which on a sunrise means the sun
-            un-rises. Here the tail dissolves into the head over 2s so the light
-            only ever moves forward. Measured endpoint difference is 0.84/255,
-            against 5.99 for two genuinely different frames.
+            The subject is the argument, which is what the two plates before it
+            were missing. This is his last post, and the bridges are the thing
+            Pastor Perry's quote on /voices actually calls him: a bridge
+            builder. A desert canyon at sunrise was a beautiful photograph of
+            nowhere in particular.
+
+            Composed so the bright band sits high. Everything from the quote
+            down lands on still dark water, which is why this plate wants the
+            opposite scrim shape from the sunrise it replaced — see
+            .hero-plate::after.
+
+            Looped by crossfade rather than ping-pong: the camera pushes
+            forward and the boat travels, so reversing it would sail the boat
+            backwards. Endpoints differ by 3.33/255 against 9.65 for two
+            genuinely different frames. That ratio is tighter than the
+            sunrise's because a translating camera never returns to its own
+            first framing; under the scrim the step is about a unit of 255 and
+            is not perceptible.
 
             Reduced motion gets the poster frame and no <video> at all, so the
             file is never even fetched. */}
         <div className="hero-plate hero-layer hero-layer-deep" aria-hidden="true">
           {reduced ? (
-            <img src="/hero-plate-sunrise-poster.jpg" alt="" />
+            <img src="/hero-plate-river-poster.jpg" alt="" />
           ) : (
             <video
-              src="/hero-plate-sunrise.mp4"
-              poster="/hero-plate-sunrise-poster.jpg"
+              src="/hero-plate-river.mp4"
+              poster="/hero-plate-river-poster.jpg"
               autoPlay
               muted
               loop
