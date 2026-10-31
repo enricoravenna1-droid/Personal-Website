@@ -374,3 +374,62 @@ you consider it done.
   the 733×1100 portrait rather than a purpose-built 1200×630 card. Link previews will
   crop it awkwardly. Worth making a real `og-image.jpg`.
 - The Dave Elswick spotlight has no link, by design, until there is a real show URL.
+
+---
+
+## The film rebuild (branch `film`, started 2026-10-31)
+
+Enrico chose Plan A, "The Film", on 2026-10-31, with a product-breakdown
+twist: one object in the centre of the screen that comes apart as you scroll,
+every piece labelled, like the coffee and fragrance product sites. The object
+he picked is **glass plates**: four flat tiles of black glass on a red thread,
+one tile per chapter, oldest at the bottom.
+
+**Status: prototype.** It lives at `/proto` (not linked, `noindex`) and is the
+first build step: he sees the object moving before any copy is locked or any
+page is rebuilt. Nothing on `main` has changed; production is untouched.
+
+### Files
+
+| Path | What |
+|---|---|
+| `lib/film.ts` | The choreography. Pure maths: `filmAt(p)` returns every plate, the camera, the thread and the copy layers for a scroll progress `p` in 0..1. Phases: hero, fracture, chapters (four beats), reassemble, core. |
+| `components/film/scene.tsx` | The React Three Fiber scene: the plates, the photos sealed inside them, the thread, the studio environment, bloom, and the callout projection that pins the HTML labels to the lit tile's edge. |
+| `components/film/film.tsx` | The runway and the DOM layers (hero copy, callouts, leader lines, the values over the core). Exposes `window.__film.seek(p)`. |
+| `components/film/film.css` | Prototype styles, all under `.film-*`. |
+| `app/proto/page.tsx` | The throwaway route. |
+| `scripts/shoot_frames.mjs` | Headless Chrome over raw CDP. Renders any `p` on demand. Copied from the AJ 2054 project. |
+| `Film Frames/` | Every round's frames, `r1` to `r9`, plus `seq/` for the stitched scroll-through. Previous rounds are kept on purpose. |
+
+### How it is checked
+
+The preview pane cannot judge WebGL motion (it throttles rAF and screenshots
+come back black), so every frame is rendered headless at real viewport sizes
+with `window.__film.seek(p)`, desktop 1440×900 and phone 390×844:
+
+```bash
+node scripts/shoot_frames.mjs "Film Frames/r9/jobs.json"
+```
+
+Nine rounds on 2026-10-31. What each one caught, so it is not re-learned:
+
+1. A `:has()` rule meant to hide the site chrome on `/proto` hid `main` itself. Everything black.
+2. The stack rotated continuously through the chapters, so plate three was seen edge-on and invisible. The stack now holds a fixed shallow angle; the lit tile turns itself.
+3. Plates were standing panels overlapping each other. They are flat tiles now, stacked along Y, and the lit one lifts, slides forward and tilts 70° to face the camera.
+4. The tile above the lit one cut across its photo. Neighbours above now lift out of the way; neighbours below settle.
+5. The camera jumped at the start of the chapters and lagged the plates closing. The arrival now interpolates from the fracture framing; the reassemble camera finishes in the first 60% of the phase.
+6. `RoomEnvironment` made the glass read as chrome. The environment is now a procedural dark studio: one big soft key panel, one thin rim strip, a faint fill. **That is what made it black glass.**
+7. The red point light at the stack centre left a specular dot on the closed plates. Moving it moved the dot. It is gone; the thread's emissive plus bloom is the glow.
+8. On phones the callout overlapped the lower tiles. The camera backs off on portrait aspect and the object sits higher while the tiles are apart.
+
+### Known gaps in the prototype
+
+- Copy is placeholder, taken from `lib/content.ts`. The positioning line, the Reut
+  description and the Arkansas ending are Enrico's to supply.
+- No vision act yet; the prototype runs hero → chapters → core.
+- Lenis smoothing is live on the real scroll but the camera easing has not been
+  judged by eye in a real browser, only by seeked frames.
+- No reduced-motion or no-WebGL fallback yet. Plan: render the fallback video
+  from this same scene with `shoot_frames.mjs`.
+- The photos are the existing site images; `photo.jpg` stands in for the Reut
+  chapter until there is a New York picture.

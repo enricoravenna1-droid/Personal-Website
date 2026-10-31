@@ -42,3 +42,4 @@ tsconfig.tsbuildinfo
 
 # Scratch dir for tools/build_og_card.py (inlined fonts + 2x render, ~1 MB)
 /tools/.build/
+Film Frames/
