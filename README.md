@@ -428,5 +428,6 @@ AI-upscaled through the Higgsfield connector before going full bleed.
 departure sentence, hero footage if he wants a video loop, and the Writing and
 Speaking pages (no material yet; the nav keeps Story, Voices, Work, Vision).
 
-**Production is untouched.** Any push to `main` deploys to enricoravenna.com,
-so all of this stays on `film` until he says ship.
+**Shipped 2026-10-31.** Enrico said "Ship it"; `film` was merged into `main`
+(merge commit 3f0d026) and Vercel deployed it to enricoravenna.com within a
+minute. Live frames are in `Film Frames/live`. Branch `film` stays for the next round.
