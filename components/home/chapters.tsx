@@ -41,7 +41,7 @@ export function Chapters() {
         const r = refs.current[i];
         if (!r.layer) continue;
         // Wipe in across the last 28% of the previous beat; chapter 0 is up from the start.
-        const wipe = i === 0 ? 1 : easeInOut(norm(u, i - 0.26, i));
+        const wipe = i === 0 ? 1 : easeInOut(norm(u, i - 0.18, i));
         // Covered by the next chapter's wipe: stays put underneath, nothing to do.
         const gone = i < N - 1 && u >= i + 1;
         r.layer.style.clipPath = `inset(${(1 - wipe) * 100}% 0 0 0)`;
@@ -49,7 +49,7 @@ export function Chapters() {
         if (wipe <= 0 || gone) continue;
 
         // Zoom: 1.14 -> 1.0 over the chapter's whole life on screen.
-        const life = norm(u, i - 0.26, i + 1);
+        const life = norm(u, i - 0.18, i + 1);
         const z = 1.14 - 0.14 * easeOut(life);
         // A touch of counter-parallax so the photo lags the wipe.
         const lag = (1 - wipe) * -6;
@@ -57,7 +57,7 @@ export function Chapters() {
 
         // Copy: in over the first 18%, out over the last 15%.
         const inn = smooth(norm(u, i + 0.02, i + 0.2));
-        const out = smooth(norm(u, i + 0.62, i + 0.74));
+        const out = smooth(norm(u, i + 0.7, i + 0.82));
         const op = i === N - 1 ? inn : Math.min(inn, 1 - out);
         const ty = (1 - inn) * 40 - out * 30;
         if (r.copy) {
