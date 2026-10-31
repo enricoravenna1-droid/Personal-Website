@@ -77,12 +77,10 @@ export function SiteNav() {
 
         <div className="snav-right">
           <a
-            href={SITE.linkedin}
-            target="_blank"
-            rel="noopener noreferrer"
+            href={`mailto:${SITE.email}`}
             className="snav-cta"
           >
-            Connect
+            Let's talk
           </a>
         </div>
       </div>

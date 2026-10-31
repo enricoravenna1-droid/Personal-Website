@@ -83,7 +83,7 @@ export const CHAPTERS: Chapter[] = [
     headline: "The",
     headlineAccent: "Soldier.",
     body: [
-      "I was born in Israel. I served in the IDF and was honorably discharged as a First Sergeant. That service is where I learned what accountability looks like when the stakes are real.",
+      "I was born in Israel. I served in the IDF as a First Sergeant. That service is where I learned what accountability looks like when the stakes are real.",
       "Everything I have built since starts there.",
     ],
     photo: "/photo-idf.jpg",
@@ -517,4 +517,91 @@ export const A11Y = {
       body: "The animated globe requires a browser with WebGL enabled. Turning on reduced motion loads the static version, which needs no WebGL at all.",
     },
   ],
+} as const;
+
+/* ─────────────────────────────────────────────────────────────────
+   HOME FILM (rebuilt 2026-10-31)
+   The home page is one scroll-told film: hero, four chapters, three
+   values, the vision, and the ask. Every word of it lives here.
+   ───────────────────────────────────────────────────────────────── */
+
+export const FILM = {
+  hero: {
+    kicker: "Enrico Omri Ravenna",
+    /** Three lines. The third carries the accent colour. */
+    title: ["Jewish", "Communal", "Leader."],
+    sub: "Soldier, builder, leader, operator. One through-line across four chapters: the community is the asset, and together is the only way forward.",
+    primary: { label: "Read the story", href: "#chapters" },
+    secondary: { label: "Work with me", href: "#contact" },
+  },
+  chapters: [
+    {
+      id: "soldier",
+      n: "01",
+      word: "Soldier",
+      line: "Born in Israel. Served in the IDF.",
+      stat: "First Sergeant",
+      photo: "/photo-idf.jpg",
+      alt: "Enrico Omri Ravenna serving in the IDF, Negev desert",
+      /** Hand-set focal points. Never crops above the eyebrows. */
+      pos: "50% 30%",
+      posMobile: "42% 30%",
+    },
+    {
+      id: "builder",
+      n: "02",
+      word: "Builder",
+      line: "Israeli American Council across the Southeast. Then Maccabee Task Force, campus by campus across the Midwest.",
+      stat: "Two regions",
+      photo: "/photo-mtf.jpg",
+      alt: "Enrico leading students on an Israel trip",
+      pos: "50% 45%",
+      posMobile: "62% 45%",
+    },
+    {
+      id: "leader",
+      n: "03",
+      word: "Leader",
+      line: "Executive Director, Jewish Federation of Arkansas. Tripled programming. Rebuilt a dormant donor base.",
+      stat: "3× programming",
+      photo: "/photo-leader.jpg",
+      alt: "Enrico Omri Ravenna on stage, arm raised",
+      pos: "50% 25%",
+      posMobile: "40% 25%",
+    },
+    {
+      id: "operator",
+      n: "04",
+      word: "Operator",
+      line: "Now: Vice President of Operations, Reut USA. New York, from November 2026.",
+      stat: "Today",
+      photo: "/hero-cutout.png",
+      alt: "Enrico Omri Ravenna",
+      pos: "100% 100%",
+      posMobile: "50% 100%",
+      cutout: true,
+    },
+  ],
+  values: {
+    kicker: "What I stand on",
+    items: [
+      { word: "People.", line: "Relationship over transaction. Every time." },
+      { word: "Security.", line: "Without losing the joy." },
+      { word: "Next.", line: "The next generation leads now, not later." },
+    ],
+  },
+  vision: {
+    kicker: "The through-line",
+    statement: "Together is the only way forward.",
+    beats: [
+      { title: "Small places, national stakes", body: "The future of American Jewry runs through communities like Arkansas, not only the major metros." },
+      { title: "Bridges, not walls", body: "Pastors, legislators, neighbors. The table is bigger than the synagogue." },
+      { title: "Build the pipeline", body: "Invest in the people who will run Jewish communities a decade from now. Do not wait for them to find you." },
+    ],
+  },
+  contact: {
+    kicker: "Let's talk",
+    headline: "Building something serious in the Jewish world?",
+    sub: "I want to hear about it.",
+  },
 } as const;

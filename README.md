@@ -374,3 +374,59 @@ you consider it done.
   the 733×1100 portrait rather than a purpose-built 1200×630 card. Link previews will
   crop it awkwardly. Worth making a real `og-image.jpg`.
 - The Dave Elswick spotlight has no link, by design, until there is a real show URL.
+
+---
+
+## The film rebuild (branch `film`, started 2026-10-31)
+
+The home page is being rebuilt as one scroll-told film. Two rounds so far.
+
+**Round one, rejected the same day.** Four tiles of black glass on a red thread
+(three.js, R3F). Enrico's verdict: he could not tell what the object was, the
+black and the red were out, the fonts were out, and the last tile cropped his
+head. The code was removed from the branch (it lives in commit e577749 if it
+is ever wanted); the frames are kept in `Film Frames/r1` to `r9`.
+
+**Round two, building now: the man is the product.** No 3D. A cutout of the
+studio portrait fills the hero; the breakdown is four full-screen photo
+chapters that wipe through while the screen is pinned; then three values on
+cream; then the vision and the ask. He chose this from three hero boards
+(`Film Frames/Hero Boards - Palette and Type - 2026-10-31.png`): board B.
+
+| Decision | Value |
+|---|---|
+| Palette | Deep teal `#0F2E33`, copper `#D9915B`, cream `#F2EDE4`, sage `#8FB3A8`. Tokens in `app/globals.css`; every page inherits them. Red, black and navy are gone. |
+| Type | Syne (display, 800) and DM Sans (body), self-hosted through next/font in `app/layout.tsx`. |
+| Brand line | "Jewish Communal Leader." Reut USA is a line inside chapter 04 and the bio, never the nav, the header or a logo. |
+| Chrome | Nav and footer only. The rotating banner, the reading-progress bar and the WhatsApp button were removed. "Cleaner the better." |
+| Copy | `FILM` in `lib/content.ts`. IDF line reads "First Sergeant", never "discharged". |
+
+| File | What it is |
+|---|---|
+| `lib/scroll-engine.ts` | One rAF loop; subscribers get scroll position each frame it changes. No second lerp on top of Lenis. `window.__home.seek(name, p)` pins a section for headless frame checks. |
+| `components/home/hero.tsx` | Cutout, arch, three-speed parallax, line-by-line entrance. |
+| `components/home/chapters.tsx` | The pinned breakdown. Everything is a function of chapter-time `u` (0..4): wipe in over the last 26% of the previous beat, slow zoom for the chapter's whole life, copy in early and out before the next wipe. Chapter 04 is the cutout again, contained, never cropped. |
+| `components/home/values.tsx` | Three sticky cream cards; the covered card settles back and dims. |
+| `components/home/vision.tsx` | Static vision and contact sections. |
+| `components/home/home.css` | All of the above, plus the phone and reduced-motion rules. Under reduced motion the film becomes a plain page. |
+| `scripts/home_jobs.mjs` | Builds the jobs file that walks the film for `scripts/shoot_frames.mjs`. |
+| `public/hero-cutout.png` | Studio portrait with the background removed by macOS Vision (`VNGenerateForegroundInstanceMaskRequest`). |
+
+**How it is checked.** `node scripts/home_jobs.mjs "Film Frames/fN" > jobs.json`
+then `node scripts/shoot_frames.mjs jobs.json` renders 16 desktop and 16 phone
+frames at real viewport sizes; the preview pane cannot judge motion. Rounds
+are kept in `Film Frames/f1`, `f2`, `f3`... Never overwrite the previous best.
+
+**Lessons from rounds f1 to f3.** Syne 800 is roughly 10.4 em wide for
+"Communal": headline lines use `width: max-content` with their own overflow
+clip, and every big word was sized to the longest one ("Operator", "Security.").
+A transform set from JS wipes out a CSS `translateX` used for centring: centre
+with `left`/`margin-left` instead. The only IDF photo is 712 px, so it was
+AI-upscaled through the Higgsfield connector before going full bleed.
+
+**Still owed by Enrico.** The public Reut description wording, the Arkansas
+departure sentence, hero footage if he wants a video loop, and the Writing and
+Speaking pages (no material yet; the nav keeps Story, Voices, Work, Vision).
+
+**Production is untouched.** Any push to `main` deploys to enricoravenna.com,
+so all of this stays on `film` until he says ship.
