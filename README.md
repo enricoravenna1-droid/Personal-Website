@@ -379,57 +379,54 @@ you consider it done.
 
 ## The film rebuild (branch `film`, started 2026-10-31)
 
-Enrico chose Plan A, "The Film", on 2026-10-31, with a product-breakdown
-twist: one object in the centre of the screen that comes apart as you scroll,
-every piece labelled, like the coffee and fragrance product sites. The object
-he picked is **glass plates**: four flat tiles of black glass on a red thread,
-one tile per chapter, oldest at the bottom.
+The home page is being rebuilt as one scroll-told film. Two rounds so far.
 
-**Status: prototype.** It lives at `/proto` (not linked, `noindex`) and is the
-first build step: he sees the object moving before any copy is locked or any
-page is rebuilt. Nothing on `main` has changed; production is untouched.
+**Round one, rejected the same day.** Four tiles of black glass on a red thread
+(three.js, R3F). Enrico's verdict: he could not tell what the object was, the
+black and the red were out, the fonts were out, and the last tile cropped his
+head. The code was removed from the branch (it lives in commit e577749 if it
+is ever wanted); the frames are kept in `Film Frames/r1` to `r9`.
 
-### Files
+**Round two, building now: the man is the product.** No 3D. A cutout of the
+studio portrait fills the hero; the breakdown is four full-screen photo
+chapters that wipe through while the screen is pinned; then three values on
+cream; then the vision and the ask. He chose this from three hero boards
+(`Film Frames/Hero Boards - Palette and Type - 2026-10-31.png`): board B.
 
-| Path | What |
+| Decision | Value |
 |---|---|
-| `lib/film.ts` | The choreography. Pure maths: `filmAt(p)` returns every plate, the camera, the thread and the copy layers for a scroll progress `p` in 0..1. Phases: hero, fracture, chapters (four beats), reassemble, core. |
-| `components/film/scene.tsx` | The React Three Fiber scene: the plates, the photos sealed inside them, the thread, the studio environment, bloom, and the callout projection that pins the HTML labels to the lit tile's edge. |
-| `components/film/film.tsx` | The runway and the DOM layers (hero copy, callouts, leader lines, the values over the core). Exposes `window.__film.seek(p)`. |
-| `components/film/film.css` | Prototype styles, all under `.film-*`. |
-| `app/proto/page.tsx` | The throwaway route. |
-| `scripts/shoot_frames.mjs` | Headless Chrome over raw CDP. Renders any `p` on demand. Copied from the AJ 2054 project. |
-| `Film Frames/` | Every round's frames, `r1` to `r9`, plus `seq/` for the stitched scroll-through. Previous rounds are kept on purpose. |
+| Palette | Deep teal `#0F2E33`, copper `#D9915B`, cream `#F2EDE4`, sage `#8FB3A8`. Tokens in `app/globals.css`; every page inherits them. Red, black and navy are gone. |
+| Type | Syne (display, 800) and DM Sans (body), self-hosted through next/font in `app/layout.tsx`. |
+| Brand line | "Jewish Communal Leader." Reut USA is a line inside chapter 04 and the bio, never the nav, the header or a logo. |
+| Chrome | Nav and footer only. The rotating banner, the reading-progress bar and the WhatsApp button were removed. "Cleaner the better." |
+| Copy | `FILM` in `lib/content.ts`. IDF line reads "First Sergeant", never "discharged". |
 
-### How it is checked
+| File | What it is |
+|---|---|
+| `lib/scroll-engine.ts` | One rAF loop; subscribers get scroll position each frame it changes. No second lerp on top of Lenis. `window.__home.seek(name, p)` pins a section for headless frame checks. |
+| `components/home/hero.tsx` | Cutout, arch, three-speed parallax, line-by-line entrance. |
+| `components/home/chapters.tsx` | The pinned breakdown. Everything is a function of chapter-time `u` (0..4): wipe in over the last 26% of the previous beat, slow zoom for the chapter's whole life, copy in early and out before the next wipe. Chapter 04 is the cutout again, contained, never cropped. |
+| `components/home/values.tsx` | Three sticky cream cards; the covered card settles back and dims. |
+| `components/home/vision.tsx` | Static vision and contact sections. |
+| `components/home/home.css` | All of the above, plus the phone and reduced-motion rules. Under reduced motion the film becomes a plain page. |
+| `scripts/home_jobs.mjs` | Builds the jobs file that walks the film for `scripts/shoot_frames.mjs`. |
+| `public/hero-cutout.png` | Studio portrait with the background removed by macOS Vision (`VNGenerateForegroundInstanceMaskRequest`). |
 
-The preview pane cannot judge WebGL motion (it throttles rAF and screenshots
-come back black), so every frame is rendered headless at real viewport sizes
-with `window.__film.seek(p)`, desktop 1440×900 and phone 390×844:
+**How it is checked.** `node scripts/home_jobs.mjs "Film Frames/fN" > jobs.json`
+then `node scripts/shoot_frames.mjs jobs.json` renders 16 desktop and 16 phone
+frames at real viewport sizes; the preview pane cannot judge motion. Rounds
+are kept in `Film Frames/f1`, `f2`, `f3`... Never overwrite the previous best.
 
-```bash
-node scripts/shoot_frames.mjs "Film Frames/r9/jobs.json"
-```
+**Lessons from rounds f1 to f3.** Syne 800 is roughly 10.4 em wide for
+"Communal": headline lines use `width: max-content` with their own overflow
+clip, and every big word was sized to the longest one ("Operator", "Security.").
+A transform set from JS wipes out a CSS `translateX` used for centring: centre
+with `left`/`margin-left` instead. The only IDF photo is 712 px, so it was
+AI-upscaled through the Higgsfield connector before going full bleed.
 
-Nine rounds on 2026-10-31. What each one caught, so it is not re-learned:
+**Still owed by Enrico.** The public Reut description wording, the Arkansas
+departure sentence, hero footage if he wants a video loop, and the Writing and
+Speaking pages (no material yet; the nav keeps Story, Voices, Work, Vision).
 
-1. A `:has()` rule meant to hide the site chrome on `/proto` hid `main` itself. Everything black.
-2. The stack rotated continuously through the chapters, so plate three was seen edge-on and invisible. The stack now holds a fixed shallow angle; the lit tile turns itself.
-3. Plates were standing panels overlapping each other. They are flat tiles now, stacked along Y, and the lit one lifts, slides forward and tilts 70° to face the camera.
-4. The tile above the lit one cut across its photo. Neighbours above now lift out of the way; neighbours below settle.
-5. The camera jumped at the start of the chapters and lagged the plates closing. The arrival now interpolates from the fracture framing; the reassemble camera finishes in the first 60% of the phase.
-6. `RoomEnvironment` made the glass read as chrome. The environment is now a procedural dark studio: one big soft key panel, one thin rim strip, a faint fill. **That is what made it black glass.**
-7. The red point light at the stack centre left a specular dot on the closed plates. Moving it moved the dot. It is gone; the thread's emissive plus bloom is the glow.
-8. On phones the callout overlapped the lower tiles. The camera backs off on portrait aspect and the object sits higher while the tiles are apart.
-
-### Known gaps in the prototype
-
-- Copy is placeholder, taken from `lib/content.ts`. The positioning line, the Reut
-  description and the Arkansas ending are Enrico's to supply.
-- No vision act yet; the prototype runs hero → chapters → core.
-- Lenis smoothing is live on the real scroll but the camera easing has not been
-  judged by eye in a real browser, only by seeked frames.
-- No reduced-motion or no-WebGL fallback yet. Plan: render the fallback video
-  from this same scene with `shoot_frames.mjs`.
-- The photos are the existing site images; `photo.jpg` stands in for the Reut
-  chapter until there is a New York picture.
+**Production is untouched.** Any push to `main` deploys to enricoravenna.com,
+so all of this stays on `film` until he says ship.

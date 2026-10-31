@@ -1,0 +1,267 @@
+/* ═══════════════════════════════════════════════════════════════════
+   Home film. Deep teal, copper, cream. Syne for display, DM Sans for
+   body. Every motion here is a transform or an opacity: nothing lays
+   out on scroll.
+   ═══════════════════════════════════════════════════════════════════ */
+
+:root {
+  --cream: #F2EDE4;
+  --teal-ink: #0F2E33;
+  --teal-mid: #4E6660;
+  --home-pad: clamp(22px, 5vw, 64px);
+}
+
+/* ── Hero ───────────────────────────────────────────────────── */
+.hh {
+  position: relative;
+  min-height: 100svh;
+  overflow: hidden;
+  background: var(--bg);
+  isolation: isolate;
+}
+.hh-arch {
+  position: absolute;
+  right: 3.5vw;
+  bottom: 12vh;
+  width: min(44vw, 660px);
+  height: 74vh;
+  border-radius: 999px 999px 0 0;
+  background: var(--bg-card);
+  transform-origin: 50% 100%;
+  will-change: transform;
+  -webkit-mask-image: linear-gradient(to bottom, #000 82%, transparent 100%);
+          mask-image: linear-gradient(to bottom, #000 82%, transparent 100%);
+  animation: hh-arch 1.4s var(--ease-snap) both;
+}
+.hh-arch::after {
+  content: "";
+  position: absolute; inset: 0; border-radius: inherit;
+  background: radial-gradient(60% 50% at 50% 100%, var(--accent) 0%, transparent 70%);
+  opacity: .5;
+}
+.hh-photo {
+  position: absolute;
+  right: 5vw;
+  bottom: 12vh;
+  height: 76vh;
+  will-change: transform;
+  -webkit-mask-image: linear-gradient(to bottom, #000 80%, transparent 99%);
+          mask-image: linear-gradient(to bottom, #000 80%, transparent 99%);
+  animation: hh-photo 1.3s var(--ease-snap) .1s both;
+}
+.hh-photo img { height: 100%; width: auto; max-width: none; }
+
+.hh-copy {
+  position: absolute;
+  left: var(--home-pad);
+  top: 21vh;
+  width: min(56vw, 780px);
+  will-change: transform, opacity;
+  z-index: 2;
+}
+.hh-kicker, .hc-kicker, .hv-kicker, .hs-kicker {
+  display: flex; align-items: center; gap: 14px;
+  font-size: 12px; font-weight: 600; letter-spacing: .22em; text-transform: uppercase;
+  color: var(--accent);
+}
+.hh-kicker::before, .hc-kicker::before, .hv-kicker::before, .hs-kicker::before {
+  content: ""; width: 28px; height: 2px; background: var(--accent);
+}
+.hh-kicker { margin-bottom: 28px; animation: hh-fade .9s var(--ease-enter) .05s both; }
+.hh-title {
+  font-family: var(--font-serif);
+  font-weight: 800;
+  font-size: clamp(52px, 6.2vw, 92px);
+  line-height: .95;
+  letter-spacing: -.03em;
+  color: var(--text);
+}
+.hh-line { display: block; width: max-content; max-width: 92vw; overflow: hidden; padding-bottom: .04em; margin-bottom: -.04em; }
+.hh-line > span { display: block; transform: translateY(112%); animation: hh-rise 1s var(--ease-snap) both; animation-delay: inherit; }
+.hh-accent { color: var(--accent); }
+.hh-sub {
+  margin-top: 28px;
+  font-size: clamp(17px, 1.4vw, 21px);
+  line-height: 1.5;
+  color: var(--muted);
+  max-width: 520px;
+  animation: hh-fade 1s var(--ease-enter) .55s both;
+}
+.hh-btns { display: flex; gap: 14px; margin-top: 36px; animation: hh-fade 1s var(--ease-enter) .7s both; }
+.hh-btn {
+  display: inline-flex; align-items: center;
+  padding: 15px 26px; border-radius: 999px;
+  font-size: 14.5px; font-weight: 600; letter-spacing: .01em;
+  transition: transform .35s var(--ease-snap), background-color .25s ease, color .25s ease, border-color .25s ease;
+}
+.hh-btn:hover { transform: translateY(-2px); }
+.hh-btn-p { background: var(--accent); color: var(--teal-ink); }
+.hh-btn-p:hover { background: var(--accent-hover); }
+.hh-btn-s { border: 1.5px solid var(--text); color: var(--text); }
+.hh-btn-s:hover { border-color: var(--accent); color: var(--accent); }
+
+.hh-index {
+  position: absolute;
+  left: var(--home-pad); right: var(--home-pad); bottom: 4vh;
+  display: grid; grid-template-columns: repeat(4, 1fr); gap: 24px;
+  padding-top: 20px;
+  border-top: 1px solid var(--hairline);
+  z-index: 2;
+  animation: hh-fade 1s var(--ease-enter) .9s both;
+}
+.hh-ix { display: flex; align-items: baseline; gap: 10px; font-family: var(--font-serif); font-weight: 700; font-size: 16px; color: var(--text); transition: color .25s ease; }
+.hh-ix:hover { color: var(--accent); }
+.hh-ix-n { color: var(--accent); font-size: 13px; letter-spacing: .08em; }
+
+.hh-scroll {
+  position: absolute; left: 50%; bottom: 4vh; transform: translateX(-50%);
+  width: 1px; height: 44px; overflow: hidden; opacity: .5;
+  animation: hh-fade 1s var(--ease-enter) 1.2s both;
+}
+.hh-scroll span { display: block; width: 100%; height: 100%; background: var(--text); animation: hh-scroll 1.8s cubic-bezier(.65,0,.35,1) infinite; }
+
+@keyframes hh-rise { from { transform: translateY(112%); } to { transform: translateY(0); } }
+@keyframes hh-fade { from { opacity: 0; transform: translateY(14px); } to { opacity: 1; transform: translateY(0); } }
+@keyframes hh-photo { from { opacity: 0; transform: translateY(40px); } to { opacity: 1; transform: translateY(0); } }
+@keyframes hh-arch { from { opacity: 0; transform: scaleY(.9); } to { opacity: 1; transform: scaleY(1); } }
+@keyframes hh-scroll { 0% { transform: translateY(-100%); } 50% { transform: translateY(0); } 100% { transform: translateY(100%); } }
+
+/* ── Chapters: the breakdown ────────────────────────────────── */
+.hc-runway { position: relative; }
+.hc-stage { position: sticky; top: 0; height: 100svh; overflow: hidden; background: var(--bg); }
+.hc-layer { position: absolute; inset: 0; will-change: clip-path; }
+.hc-img { position: absolute; inset: 0; transform-origin: 50% 50%; will-change: transform; }
+.hc-photo { object-fit: cover; object-position: var(--pos); }
+.hc-veil {
+  position: absolute; inset: 0;
+  background:
+    linear-gradient(to top, rgba(15,46,51,.96) 0%, rgba(15,46,51,.6) 36%, rgba(15,46,51,.14) 68%, rgba(15,46,51,.28) 100%),
+    linear-gradient(to right, rgba(15,46,51,.6) 0%, rgba(15,46,51,0) 58%);
+}
+.hc-ghost {
+  position: absolute; right: 7vw; top: 5vh;
+  font-family: var(--font-serif); font-weight: 800;
+  font-size: 26vh; line-height: 1; letter-spacing: -.04em;
+  color: var(--accent); opacity: 0;
+  will-change: transform, opacity;
+}
+.hc-copy {
+  position: absolute; left: var(--home-pad); bottom: 10vh;
+  max-width: 680px; opacity: 0;
+  will-change: transform, opacity;
+}
+.hc-kicker { margin-bottom: 18px; }
+.hc-word {
+  font-family: var(--font-serif); font-weight: 800;
+  font-size: clamp(60px, 8.8vw, 128px); line-height: .9; letter-spacing: -.035em;
+  color: var(--text);
+}
+.hc-line { margin-top: 22px; font-size: clamp(17px, 1.4vw, 21px); line-height: 1.45; color: #DCE5E1; max-width: 540px; }
+.hc-stat {
+  display: inline-block; margin-top: 26px; padding: 10px 16px;
+  border: 1px solid var(--accent); border-radius: 999px;
+  color: var(--accent); font-size: 12.5px; font-weight: 600; letter-spacing: .12em; text-transform: uppercase;
+}
+.hc-rail {
+  position: absolute; right: clamp(22px, 4vw, 56px); top: 50%; transform: translateY(-50%);
+  height: 34vh; display: flex; gap: 14px; z-index: 20;
+}
+.hc-rail-track { position: relative; width: 1px; background: rgba(242,237,228,.18); }
+.hc-rail-fill { position: absolute; inset: 0; background: var(--accent); transform-origin: top; transform: scaleY(0); }
+.hc-rail-ns { display: flex; flex-direction: column; justify-content: space-between; font-size: 12px; letter-spacing: .12em; color: var(--muted); }
+.hc-rail-n { transition: color .3s ease; }
+.hc-rail-n[data-active="1"] { color: var(--accent); }
+
+/* ── Values: cream ──────────────────────────────────────────── */
+.hv-runway { position: relative; background: var(--cream); color: var(--teal-ink); }
+.hv-card {
+  position: sticky; top: 0; height: 100svh;
+  display: grid; place-items: center;
+  background: var(--cream);
+  box-shadow: 0 -24px 60px rgba(15,46,51,.10);
+}
+.hv-inner { text-align: center; max-width: 960px; padding: 0 24px; will-change: transform, opacity; }
+.hv-kicker { justify-content: center; margin-bottom: 26px; }
+.hv-word {
+  font-family: var(--font-serif); font-weight: 800;
+  font-size: clamp(56px, 9vw, 140px); line-height: .9; letter-spacing: -.04em;
+  color: var(--teal-ink);
+}
+.hv-line { margin-top: 26px; font-size: clamp(18px, 1.6vw, 24px); color: var(--teal-mid); }
+
+/* ── Vision and the ask ─────────────────────────────────────── */
+.hs { position: relative; padding: 18vh 0; background: var(--bg); }
+.hs-wrap { max-width: 1120px; margin: 0 auto; padding: 0 var(--home-pad); }
+.hs-kicker { margin-bottom: 26px; }
+.hs-statement {
+  font-family: var(--font-serif); font-weight: 800;
+  font-size: clamp(44px, 6.4vw, 96px); line-height: .98; letter-spacing: -.03em;
+  max-width: 14ch; color: var(--text);
+}
+.hs-beats { display: grid; grid-template-columns: repeat(3, 1fr); gap: 40px; margin-top: 72px; }
+.hs-beat h3 { font-family: var(--font-serif); font-weight: 700; font-size: 22px; letter-spacing: -.01em; margin-bottom: 12px; color: var(--text); }
+.hs-beat p { font-size: 16.5px; line-height: 1.6; color: var(--muted); }
+.hs-contact { border-top: 1px solid var(--hairline); }
+.hs-ask {
+  font-family: var(--font-serif); font-weight: 800;
+  font-size: clamp(36px, 5vw, 72px); line-height: 1; letter-spacing: -.03em; max-width: 16ch; color: var(--text);
+}
+.hs-sub { margin-top: 18px; font-size: 20px; color: var(--muted); }
+.hs-links { display: flex; gap: 14px; margin-top: 36px; }
+
+/* ── Phone ──────────────────────────────────────────────────── */
+@media (max-width: 760px) {
+  .hh { min-height: 100svh; }
+  .hh-arch { right: auto; left: 50%; margin-left: -39vw; width: 78vw; height: 48svh; bottom: auto; top: 6svh; }
+  .hh-photo { right: 0; left: 0; height: 50svh; bottom: auto; top: 5svh; display: flex; justify-content: center; }
+  .hh-copy { top: auto; bottom: 7svh; width: auto; right: var(--home-pad); }
+  .hh-title { font-size: clamp(30px, 8.6vw, 44px); }
+  .hh-copy { left: 18px; right: 18px; }
+  .hh-sub { font-size: 16px; margin-top: 18px; }
+  .hh-btns { margin-top: 22px; }
+  .hh-btn { padding: 13px 20px; font-size: 14px; }
+  .hh-index, .hh-scroll { display: none; }
+
+  .hc-photo { object-position: var(--pos-m); }
+  .hc-copy { bottom: 8svh; right: var(--home-pad); }
+  .hc-word { font-size: clamp(36px, 10.5vw, 56px); }
+  .hc-line { font-size: 16px; }
+  .hc-ghost { font-size: 16vh; top: 4vh; right: 5vw; }
+  .hc-rail { right: 16px; height: 22vh; top: 26vh; transform: none; }
+  .hc-veil { background: linear-gradient(to top, rgba(15,46,51,.97) 0%, rgba(15,46,51,.7) 40%, rgba(15,46,51,.2) 72%, rgba(15,46,51,.3) 100%); }
+
+  .hv-word { font-size: clamp(40px, 12vw, 64px); }
+  .hv-line { font-size: 17px; }
+  .hs { padding: 14vh 0; }
+  .hs-beats { grid-template-columns: 1fr; gap: 28px; margin-top: 48px; }
+  .hs-links, .hh-btns { flex-wrap: wrap; }
+}
+
+/* Portrait phones: the arch and the photo need the taller frame. */
+@media (max-width: 760px) and (max-height: 700px) {
+  .hh-photo { height: 44svh; }
+  .hh-arch { height: 42svh; }
+}
+
+/* ── Reduced motion: the film becomes a page ────────────────── */
+@media (prefers-reduced-motion: reduce) {
+  .hh-arch, .hh-photo, .hh-kicker, .hh-sub, .hh-btns, .hh-index, .hh-scroll { animation: none; }
+  .hh-line > span { animation: none; transform: none; }
+  .hc-runway { height: auto !important; }
+  .hc-stage { position: static; height: auto; }
+  .hc-layer { position: relative; height: 100svh; clip-path: none !important; visibility: visible !important; }
+  .hc-copy, .hc-ghost { opacity: 1 !important; transform: none !important; }
+  .hc-ghost { opacity: .16 !important; }
+  .hc-rail { display: none; }
+  .hv-runway { height: auto !important; }
+  .hv-card { position: relative; }
+  .hv-inner { transform: none !important; opacity: 1 !important; }
+}
+
+/* Chapter 04 is the man himself: the hero cutout on a lit surface, a
+   callback to the first frame. Contained, never cropped. */
+.hc-cutout { background: radial-gradient(70% 60% at 78% 100%, rgba(217,145,91,.42) 0%, rgba(23,64,71,.9) 45%, var(--bg) 100%); }
+.hc-cutout .hc-photo { object-fit: contain; }
+.hc-layer:has(.hc-cutout) .hc-veil { background: linear-gradient(to top, rgba(15,46,51,.9) 0%, rgba(15,46,51,.2) 40%, transparent 70%); }
+.hc-cutout { left: auto; width: 48vw; top: 7vh; }
+@media (max-width: 760px) { .hc-cutout { left: 0; width: auto; top: 10svh; } }
