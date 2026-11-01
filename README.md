@@ -431,3 +431,40 @@ Speaking pages (no material yet; the nav keeps Story, Voices, Work, Vision).
 **Shipped 2026-10-31.** Enrico said "Ship it"; `film` was merged into `main`
 (merge commit 3f0d026) and Vercel deployed it to enricoravenna.com within a
 minute. Live frames are in `Film Frames/live`. Branch `film` stays for the next round.
+
+## Round three (built 2026-11-01 on `film`, not pushed)
+
+Enrico picked **B, One Frame** and the word **Succession**. Plan:
+`Round Three Plan - Four Approaches - 2026-11-01.pdf`; boards in `Film Frames/boards-2026-11-01/`.
+
+| Change | Where |
+|---|---|
+| Chapter 04 is **Visionary** (id `visionary`); hero sub says "visionary"; value three is **Succession.** | `lib/content.ts` |
+| `NAV` carries the dropdown lists; every entry is a real section id | `lib/content.ts` |
+| Dropdowns: glass panel, hover with a grace period, first tap opens on touch, ArrowDown/Up/Home/End, Escape returns focus, Left/Right walk the row. Disclosure pattern, not `role="menu"`. Phone: menu button and an accordion sheet. Panels are siblings of the pill, not children, so their blur sees the page. | `components/site-nav.tsx`, nav block in `app/globals.css` |
+| Scroll engine: subscribers get `dt` and can ask for more frames; `damper()` (critically damped, 90% in 120 ms) on pinned progress, bypassed for touch and seeks; `velocity()` for the speed zoom-out; `__home.frame(y)` runs one fixed 1/60 s step for video. | `lib/scroll-engine.ts` |
+| Home chapters: no clip-path. Each chapter is a panel that slides up with its photo counter-moving 84% inside it; the leaving chapter drifts up and darkens. 100 vh per chapter, captions overlap the handover. Kicker moves faster than the copy. | `components/home/chapters.tsx`, `home.css` |
+| Pointer tilt removed. | `components/enhancements.tsx` |
+| One Frame: pinned photo right, words left, cross-dissolve per beat, photo drifts slower than the page, kickers run ahead, zoom-out at speed, next chapter's word faint at the foot, voices index over the faded edge. Phone: frame on top. Reduced motion: plain page with each photo inline. | `components/one-frame.tsx`, `one-frame.css` |
+| Story, Voices, Work, Vision rebuilt in that grammar. Copy unchanged, all from `lib/content.ts`. | `app/*/page.tsx` |
+
+**A bug this fixed site-wide.** The CSS build (Lightning CSS) was collapsing
+`backdrop-filter` plus `-webkit-backdrop-filter` into the prefixed one only, which
+Chrome ignores, so no glass on the site had ever blurred in Chrome. Write only the
+standard property; the build adds the prefix. Also: never animate `opacity` on an
+element with `backdrop-filter`, or on its ancestor, or the blur switches off.
+
+**How it is checked.** `node scripts/page_jobs.mjs "Film Frames/pN" > jobs.json` and
+`node scripts/shoot_frames.mjs jobs.json` walk the home film and the four pages by
+`window.__home.seek`, at 1440x900 and 390x844, plus real-hover and real-key nav
+frames, the phone sheet, and reduced-motion full pages. `node scripts/video_jobs.mjs
+<dir> story voices` renders 60 fps frames for ffmpeg. `scripts/contact_sheet.mjs`
+tiles frames. Rounds `p1`, `p2`, `p3` (`p3b` is the last fix); best is `p3`. Deliverables:
+`Film Frames/Round Three - Contact Sheet - 2026-11-01.png`, `... Phone Sheet ...`,
+and the two `Round Three - ... Scroll 60fps - 2026-11-01.mp4` videos.
+
+**Known imperfections.** Jessie's photo is 594 px and soft at full frame. Mid-dissolve
+is a double exposure, by nature. Erin and Wendy have no portraits, so their frame is
+the JFAR stage. `/accessibility` still describes the old globe and "five beats",
+which the film removed on 2026-10-31; it needs his wording before it is true again.
+Not yet tested with a real wheel in his Chrome.

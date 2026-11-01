@@ -37,12 +37,57 @@ export const BANNER_MESSAGES = [
   "Seeking the next large-city Federation CEO role",
 ] as const;
 
-export const NAV = [
-  { href: "/story", label: "Story" },
-  { href: "/voices", label: "Voices" },
-  { href: "/work", label: "Work" },
-  { href: "/vision", label: "Vision" },
-] as const;
+/**
+ * The nav and its dropdowns. Every `href` lands on a real section id on its
+ * page, so each entry is a jump, not a guess. `n` and `meta` are optional:
+ * Story numbers its chapters, the other menus are plain lists.
+ */
+export type NavEntry = { href: string; label: string; n?: string; meta?: string };
+export type NavItem = { href: string; label: string; items: NavEntry[]; all?: NavEntry };
+
+export const NAV: NavItem[] = [
+  {
+    href: "/story",
+    label: "Story",
+    items: [
+      { href: "/story#soldier", n: "01", label: "Soldier", meta: "IDF" },
+      { href: "/story#builder", n: "02", label: "Builder", meta: "IAC · MTF" },
+      { href: "/story#leader", n: "03", label: "Leader", meta: "JFAR" },
+      { href: "/story#visionary", n: "04", label: "Visionary", meta: "Reut USA" },
+    ],
+    all: { href: "/story", label: "The whole story" },
+  },
+  {
+    href: "/voices",
+    label: "Voices",
+    items: [
+      { href: "/voices#from-israel", label: "From Israel" },
+      { href: "/voices#peers", label: "Federation peers" },
+      { href: "/voices#team", label: "My team" },
+      { href: "/voices#community", label: "The community" },
+    ],
+  },
+  {
+    href: "/work",
+    label: "Work",
+    items: [
+      { href: "/work#aj-2054", label: "AJ 2054" },
+      { href: "/work#campus", label: "Campus" },
+      { href: "/work#on-air", label: "On air" },
+      { href: "/work#add-value", label: "Where I add value" },
+      { href: "/work#numbers", label: "The numbers" },
+    ],
+  },
+  {
+    href: "/vision",
+    label: "Vision",
+    items: [
+      { href: "/vision#beats", label: "Three beats" },
+      { href: "/vision#writing", label: "Writing" },
+      { href: "/vision#talk", label: "Let's talk" },
+    ],
+  },
+];
 
 /**
  * Reading order, used by the prev/next control at the foot of each page.
@@ -530,7 +575,7 @@ export const FILM = {
     kicker: "Enrico Omri Ravenna",
     /** Three lines. The third carries the accent colour. */
     title: ["Jewish", "Communal", "Leader."],
-    sub: "Soldier, builder, leader, operator. One through-line across four chapters: the community is the asset, and together is the only way forward.",
+    sub: "Soldier, builder, leader, visionary. One through-line across four chapters: the community is the asset, and together is the only way forward.",
     primary: { label: "Read the story", href: "#chapters" },
     secondary: { label: "Work with me", href: "#contact" },
   },
@@ -570,9 +615,9 @@ export const FILM = {
       posMobile: "40% 25%",
     },
     {
-      id: "operator",
+      id: "visionary",
       n: "04",
-      word: "Operator",
+      word: "Visionary",
       line: "Now: Vice President of Operations, Reut USA. New York, from November 2026.",
       stat: "Today",
       photo: "/hero-cutout.png",
@@ -587,7 +632,7 @@ export const FILM = {
     items: [
       { word: "People.", line: "Relationship over transaction. Every time." },
       { word: "Security.", line: "Without losing the joy." },
-      { word: "Next.", line: "The next generation leads now, not later." },
+      { word: "Succession.", line: "The next generation leads now, not later." },
     ],
   },
   vision: {

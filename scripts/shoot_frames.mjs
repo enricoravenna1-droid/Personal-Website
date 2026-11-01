@@ -6,6 +6,10 @@
 //
 // Usage: node scripts/shoot_frames.mjs jobs.json
 // jobs.json: { "gl": "swiftshader"|"default", "shots": [ { url, out, w, h, mobile, dpr, waitMs, eval, evalAfterLoad, clip:[x,y,w,h], scroll } ] }
+// A frame may also carry `mouse: [x, y]` (a real pointer move, for hover)
+// and `keys: ["ArrowDown", ...]` (real key presses to the focused element).
+// A shot with `video: { ys: [...], dir }` runs window.__home.frame(y) once per
+// entry, a fixed 1/60 s step, and saves dir/000001.jpg... for ffmpeg.
 import { spawn } from "node:child_process";
 import { readFileSync, writeFileSync, mkdtempSync } from "node:fs";
 import { tmpdir } from "node:os";
@@ -74,10 +78,39 @@ for (const s of jobs.shots) {
     evalResult = r.result?.value ?? r.exceptionDetails?.exception?.description;
     await sleep(s.waitAfterEvalMs ?? 300);
   }
+  if (s.video) {
+    const { mkdirSync } = await import("node:fs");
+    mkdirSync(s.video.dir, { recursive: true });
+    let n = 0;
+    const ys = s.video.ys ?? (await S("Runtime.evaluate", { expression: s.video.ysExpr, returnByValue: true })).result.value;
+    for (const y of ys) {
+      await S("Runtime.evaluate", { expression: `window.__home.frame(${y})`, returnByValue: true });
+      const shot = await S("Page.captureScreenshot", { format: "jpeg", quality: 88 });
+      writeFileSync(`${s.video.dir}/${String(++n).padStart(6, "0")}.jpg`, Buffer.from(shot.data, "base64"));
+    }
+    results.push({ url: s.url, video: s.video.dir, frames: n, logs: logs.slice(0, 30) });
+    await send("Target.closeTarget", { targetId });
+    continue;
+  }
+  if (s.full) {
+    const r = await S("Runtime.evaluate", { expression: "document.documentElement.scrollHeight", returnByValue: true });
+    await S("Emulation.setDeviceMetricsOverride", { width: w, height: Math.min(r.result.value, 16000), deviceScaleFactor: s.dpr ?? 1, mobile: !!s.mobile });
+    await sleep(1500);
+  }
   const frames = s.frames ?? [{ out: s.out, eval: null }];
   const outs = [];
   for (const f of frames) {
-    if (f.eval) { const r = await S("Runtime.evaluate", { expression: f.eval, awaitPromise: true, returnByValue: true }); if (r.exceptionDetails) logs.push("frame eval EXC " + (r.exceptionDetails.exception?.description ?? "")); await sleep(f.waitMs ?? 120); }
+    if (f.eval) { const r = await S("Runtime.evaluate", { expression: f.eval, awaitPromise: true, returnByValue: true }); if (r.exceptionDetails) logs.push("frame eval EXC " + (r.exceptionDetails.exception?.description ?? "")); else if (f.log) logs.push(`${f.out}: ${JSON.stringify(r.result?.value)}`); await sleep(f.waitMs ?? 120); }
+    const at = f.mouseExpr ? (await S("Runtime.evaluate", { expression: f.mouseExpr, returnByValue: true })).result.value : f.mouse;
+    if (at) { await S("Input.dispatchMouseEvent", { type: "mouseMoved", x: at[0], y: at[1], pointerType: "mouse" }); await sleep(f.mouseWaitMs ?? 450); }
+    if (f.click) { await S("Input.dispatchMouseEvent", { type: "mousePressed", x: at[0], y: at[1], button: "left", clickCount: 1, pointerType: "mouse" }); await S("Input.dispatchMouseEvent", { type: "mouseReleased", x: at[0], y: at[1], button: "left", clickCount: 1, pointerType: "mouse" }); await sleep(f.clickWaitMs ?? 500); }
+    for (const k of f.keys ?? []) {
+      const code = { ArrowDown: 40, ArrowUp: 38, ArrowLeft: 37, ArrowRight: 39, Escape: 27, Tab: 9, Enter: 13 }[k] ?? 0;
+      await S("Input.dispatchKeyEvent", { type: "rawKeyDown", key: k, code: k, windowsVirtualKeyCode: code });
+      await S("Input.dispatchKeyEvent", { type: "keyUp", key: k, code: k, windowsVirtualKeyCode: code });
+      await sleep(160);
+    }
+    if (f.keys) await sleep(f.keysWaitMs ?? 300);
     const p = { format: "png", captureBeyondViewport: false };
     if (f.clip ?? s.clip) { const [x, y, cw, ch] = f.clip ?? s.clip; p.clip = { x, y, width: cw, height: ch, scale: 1 }; }
     const shot = await S("Page.captureScreenshot", p);

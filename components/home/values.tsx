@@ -2,7 +2,7 @@
 
 import { useEffect, useRef } from "react";
 import { FILM } from "@/lib/content";
-import { easeOut, forcedProgress, norm, runwayProgress, subscribe } from "@/lib/scroll-engine";
+import { easeOut, norm, pinnedTracker, subscribe } from "@/lib/scroll-engine";
 import { useReducedMotion } from "@/lib/use-reduced-motion";
 
 const N = FILM.values.items.length;
@@ -19,10 +19,11 @@ export function Values() {
 
   useEffect(() => {
     if (reduced) return;
-    return subscribe((_, vh) => {
+    const track = pinnedTracker("values");
+    return subscribe((_, vh, dt) => {
       const el = runway.current;
       if (!el) return;
-      const p = forcedProgress("values") ?? runwayProgress(el, vh);
+      const [p, moving] = track(el, vh, dt);
       const u = p * (N - 1); // 0..N-1
       for (let i = 0; i < N; i++) {
         const c = cards.current[i];
@@ -35,6 +36,7 @@ export function Values() {
           inner.style.opacity = String(1 - covered * 0.6);
         }
       }
+      return moving;
     });
   }, [reduced]);
 

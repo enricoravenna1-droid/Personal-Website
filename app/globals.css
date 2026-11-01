@@ -155,7 +155,6 @@ body::after {
       rgba(255,255,255,0.004) 100%),
     var(--glass-tint);
   backdrop-filter: blur(var(--glass-blur)) saturate(165%);
-  -webkit-backdrop-filter: blur(var(--glass-blur)) saturate(165%);
   box-shadow:
     inset 0  1px 0 rgba(255,255,255,0.14),
     inset 0 -1px 0 rgba(0,0,0,0.50),
@@ -363,10 +362,9 @@ body::after {
   transform: translate(-50%, calc(-100% - 28px));
   opacity: 0;
   transition: transform .5s var(--ease-snap), opacity .35s ease;
-  border-radius: 100px;
-  --glass-blur: 26px;
 }
 #sticky-nav.snav-visible { transform: translate(-50%, 0); opacity: 1; }
+.snav-pill { border-radius: 100px; --glass-blur: 26px; }
 .snav-inner { padding: 0 10px 0 12px; height:58px; display:flex; align-items:center; position:relative; }
 .snav-identity { display:flex; align-items:center; gap:12px; flex-shrink:0; z-index:2; }
 .snav-avatar {
@@ -377,16 +375,25 @@ body::after {
   transition: opacity .45s var(--ease-snap) .1s, transform .45s var(--ease-spring) .1s;
 }
 #sticky-nav.snav-visible .snav-avatar { opacity:1; transform:scale(1); }
-.snav-name { font-family:var(--font-serif); font-size:16px; font-weight:700; color:var(--text); white-space:nowrap; }
-.snav-links { position:absolute; left:50%; transform:translateX(-50%); display:flex; gap:4px; white-space:nowrap; z-index:2; }
-.snav-right { margin-left:auto; flex-shrink:0; display:flex; justify-content:flex-end; align-items:center; z-index:2; }
-.snav-links a {
-  font-family:var(--font-sans); font-size:11.5px; font-weight:600; letter-spacing:.1em;
+.snav-links { position:absolute; left:50%; transform:translateX(-50%); display:flex; gap:6px; white-space:nowrap; z-index:2; }
+.snav-right { margin-left:auto; flex-shrink:0; display:flex; justify-content:flex-end; align-items:center; gap:8px; z-index:2; }
+.snav-item { display:flex; align-items:center; border-radius:100px; transition: background .25s ease; }
+.snav-item:hover, .snav-item[data-open] { background: rgba(255,255,255,0.07); }
+.snav-label {
+  font-family:var(--font-sans); font-size:11.5px; font-weight:600; letter-spacing:.14em;
   text-transform:uppercase; color:var(--muted); white-space:nowrap;
-  padding: 8px 13px; border-radius: 100px;
-  transition: color .25s ease, background .25s ease;
+  padding: 10px 2px 10px 14px; border-radius: 100px;
+  transition: color .25s ease;
 }
-.snav-links a:hover { color:var(--text); background: rgba(255,255,255,0.07); }
+.snav-item:hover .snav-label, .snav-item[data-open] .snav-label { color:var(--text); }
+.snav-label[aria-current="page"] { color:var(--accent) !important; }
+.snav-chev {
+  display:grid; place-items:center; width:26px; height:34px; margin-right:4px;
+  background:none; border:0; color:var(--muted); cursor:pointer; border-radius:100px;
+}
+.snav-chev svg { width:9px; height:9px; transition: transform .3s var(--ease-snap); }
+.snav-item[data-open] .snav-chev svg { transform: rotate(180deg); }
+.snav-item[data-open] .snav-chev, .snav-item:hover .snav-chev { color:var(--text); }
 .snav-cta {
   font-family:var(--font-sans); font-size:12px; font-weight:600; letter-spacing:.08em;
   text-transform:uppercase; padding:10px 20px; border-radius:100px;
@@ -395,6 +402,64 @@ body::after {
   white-space:nowrap; flex-shrink:0; transition: filter .2s ease, box-shadow .3s ease;
 }
 .snav-cta:hover { filter: brightness(1.14); box-shadow: inset 0 1px 0 rgba(255,255,255,.34), 0 10px 26px -6px var(--accent-glow); }
+
+/* The dropdown. The wrapper's top padding is the hover bridge: the
+   pointer crosses it on the way from the label without leaving either. */
+.snav-dd {
+  position: absolute; top: 58px; width: 300px; margin-left: -150px;
+  padding-top: 12px; z-index: 3;
+}
+.snav-dd-glass, .snav-sheet-glass {
+  border-radius: 18px;
+  background: rgba(15,46,51,.86);
+  border: 1px solid rgba(255,255,255,.13);
+  /* The entrance animates this element, never a parent: an ancestor with a
+     running opacity animation becomes the backdrop root and the blur dies. */
+  animation: snav-dd-in .32s var(--ease-snap) both;
+  backdrop-filter: blur(18px) saturate(1.4);
+  box-shadow: inset 0 1px 0 rgba(255,255,255,.16), 0 24px 50px -20px rgba(0,0,0,.6);
+  padding: 10px;
+}
+.snav-dd ul, .snav-sheet ul { list-style:none; }
+.snav-dd-a {
+  display:flex; align-items:center; gap:16px; padding:11px 14px; border-radius:12px;
+  font-family:var(--font-serif); font-weight:700; font-size:17px; letter-spacing:-.005em; color:var(--text);
+  transition: background .2s ease, color .2s ease;
+}
+.snav-dd-a:hover, .snav-dd-a:focus-visible { background: rgba(242,237,228,.08); }
+.snav-dd-a:focus-visible { outline-offset: -2px; border-radius: 12px; }
+.snav-dd-n { font-family:var(--font-sans); font-size:11px; font-weight:600; letter-spacing:.12em; color:var(--accent); width:20px; flex-shrink:0; }
+.snav-dd-meta { margin-left:auto; font-family:var(--font-sans); font-size:11.5px; font-weight:400; color:var(--muted); }
+.snav-dd hr { border:0; border-top:1px solid rgba(242,237,228,.1); margin:8px 6px; }
+.snav-dd-all {
+  font-family:var(--font-sans); font-size:12px; font-weight:600; letter-spacing:.14em;
+  text-transform:uppercase; color:var(--muted-light); gap:8px;
+}
+@keyframes snav-dd-in { from { transform: translateY(-8px) scale(.985); } to { transform: none; } }
+
+/* Phone: a menu button and a sheet with the four groups as an accordion. */
+.snav-burger {
+  display:none; width:44px; height:44px; border-radius:50%; border:0; cursor:pointer;
+  background: rgba(242,237,228,.08); color: var(--text);
+  flex-direction:column; align-items:center; justify-content:center; gap:5px;
+}
+.snav-burger span { display:block; width:16px; height:1.5px; background:currentColor; border-radius:2px; transition: transform .3s var(--ease-snap); }
+.snav-burger[aria-expanded="true"] span:first-child { transform: translateY(3.25px) rotate(45deg); }
+.snav-burger[aria-expanded="true"] span:last-child { transform: translateY(-3.25px) rotate(-45deg); }
+.snav-sheet { position:absolute; left:0; right:0; top:58px; padding-top:10px; z-index:3; }
+.snav-sheet-glass { padding: 6px 8px; }
+.snav-sg + .snav-sg { border-top: 1px solid rgba(242,237,228,.08); }
+.snav-sg-head { display:flex; align-items:center; }
+.snav-sg-label {
+  flex:1; padding: 14px 12px; min-height:48px; display:flex; align-items:center;
+  font-family:var(--font-sans); font-size:12.5px; font-weight:600; letter-spacing:.16em; text-transform:uppercase; color:var(--muted-light);
+}
+.snav-sg-label[aria-current="page"] { color: var(--accent); }
+.snav-sg-chev { width:48px; height:48px; display:grid; place-items:center; background:none; border:0; color:var(--muted-light); cursor:pointer; border-radius:12px; }
+.snav-sg-chev svg { width:11px; height:11px; transition: transform .3s var(--ease-snap); }
+.snav-sg[data-open] .snav-sg-chev svg { transform: rotate(180deg); }
+.snav-sg ul { padding: 0 0 8px; }
+.snav-sg .snav-dd-a { font-size:16px; padding: 10px 12px; min-height: 44px; }
 
 /* ═══════════════════════════════════════════════════════════════
    HERO
@@ -649,7 +714,6 @@ body::after {
   color:var(--text); font-weight:500;
   background: linear-gradient(180deg, rgba(255,255,255,0.055), rgba(255,255,255,0.012));
   backdrop-filter: blur(14px) saturate(150%);
-  -webkit-backdrop-filter: blur(14px) saturate(150%);
   border:1px solid var(--border-interactive);
   box-shadow: inset 0 1px 0 rgba(255,255,255,.10);
 }
@@ -1223,7 +1287,8 @@ footer { padding:64px 0 52px; border-top:1px solid var(--hairline); text-align:c
 @media (max-width: 900px) {
   #sticky-nav { width: calc(100vw - 24px); top:10px; }
   .snav-links { gap:0; }
-  .snav-links a { padding:8px 9px; font-size:10.5px; }
+  .snav-label { padding:8px 0 8px 10px; font-size:10.5px; letter-spacing:.1em; }
+  .snav-chev { width:22px; margin-right:2px; }
 }
 @media (max-width: 800px) {
   /* Portrait leads on a phone. Previously the text column was ordered
@@ -1295,7 +1360,9 @@ footer { padding:64px 0 52px; border-top:1px solid var(--hairline); text-align:c
   .insights-grid { grid-template-columns:1fr; }
 }
 @media (max-width: 640px) {
-  .snav-links { display:none; }
+  .snav-links, .snav-dd { display:none; }
+  .snav-burger { display:flex; }
+  .snav-cta { padding:10px 16px; }
   #sticky-nav { width: auto; left:12px; right:12px; transform:translate(0, calc(-100% - 24px)); }
   #sticky-nav.snav-visible { transform:translate(0,0); }
 
@@ -1497,7 +1564,7 @@ footer { padding:64px 0 52px; border-top:1px solid var(--hairline); text-align:c
   padding: 9px 16px; border-radius: 100px;
   border: 1px solid var(--border-interactive);
   background: rgba(8,9,12,0.6);
-  backdrop-filter: blur(10px); -webkit-backdrop-filter: blur(10px);
+  backdrop-filter: blur(10px);
   transition: color .2s ease, border-color .2s ease, opacity .3s ease;
   /* Hidden until the sequence actually exists. This is a control for a
      ride that has not started, sitting behind a hero that is still on

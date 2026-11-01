@@ -1,10 +1,7 @@
 import type { Metadata } from "next";
-import Image from "next/image";
 import { PageNav } from "@/components/page-nav";
-import { AreaIcon } from "@/components/area-icon";
-import { SectionMark } from "@/components/section-mark";
-import { CountUp } from "@/components/count-up";
-import { AREAS, INITIATIVES, NUMBERS, TICKER } from "@/lib/content";
+import { Beat, OneFrame, type Frame } from "@/components/one-frame";
+import { AREAS, INITIATIVES, NUMBERS } from "@/lib/content";
 
 export const metadata: Metadata = {
   title: "The Work",
@@ -12,130 +9,70 @@ export const metadata: Metadata = {
     "Active initiatives, the areas Enrico Omri Ravenna works in, and the numbers behind a Federation turnaround: 700+ engagements, 18 programs, four security partnerships.",
 };
 
+/**
+ * The frame holds each initiative's photograph; the areas and the numbers
+ * scroll past as two ledgers over the Federation stage. No cards, no glass,
+ * no icons: a numeral, a title, a line, a hairline.
+ */
+const IDS = ["aj-2054", "campus", "on-air"] as const;
+const POS: Record<string, [string, string]> = {
+  "reut-spotlight": ["82% 40%", "80% 40%"],
+  spotlight: ["44% 38%", "44% 36%"],
+  "elswick-spotlight": ["46% 40%", "46% 36%"],
+};
+
+const FRAMES: Frame[] = [
+  ...INITIATIVES.map((it) => ({ src: it.photo, alt: it.alt, pos: POS[it.id]?.[0], posM: POS[it.id]?.[1] })),
+  { src: "/photo-leader.jpg", alt: "Enrico Omri Ravenna on stage at a Jewish Federation of Arkansas event", pos: "30% 40%", posM: "34% 36%" },
+];
+
 export default function WorkPage() {
   return (
     <>
-      <header className="page-head">
-        <div className="container">
-          <p className="label reveal">The Work</p>
-          <h1 className="reveal d1">
-            <em>In motion.</em>
-          </h1>
-          <p className="page-sub reveal d2">
-            What is running right now, what I am relied on for, and the numbers
-            underneath it.
-          </p>
-        </div>
-      </header>
+      <h1 className="sr-only">The Work</h1>
+      <OneFrame name="work" frames={FRAMES}>
+        {INITIATIVES.map((it, i) => (
+          <Beat key={it.id} id={IDS[i]} frame={i} labelledBy={`${IDS[i]}-h`}>
+            <p className="of-kicker" data-depth>{it.kicker}</p>
+            <h2 className="of-h" id={`${IDS[i]}-h`}>
+              {it.headline} <em>{it.headlineAccent}</em>
+            </h2>
+            <div className="of-body"><p>{it.body}</p></div>
+            {it.cta ? (
+              <a href={it.cta.href} target="_blank" rel="noopener noreferrer" className="of-link">
+                {it.cta.label} <span aria-hidden="true">→</span>
+              </a>
+            ) : null}
+          </Beat>
+        ))}
 
-      {INITIATIVES.map((item) => (
-        <section
-          key={item.id}
-          id={item.id}
-          className="section-rise"
-          data-accent={item.accent}
-        >
-          <div className="container">
-            <div className="spotlight-grid">
-              <div className="reveal">
-                <span className="spotlight-kicker">{item.kicker}</span>
-                <h2 className="spotlight-h">
-                  {item.headline} <em>{item.headlineAccent}</em>
-                </h2>
-                <p className="spotlight-body">{item.body}</p>
-                {item.cta ? (
-                  <a
-                    href={item.cta.href}
-                    target="_blank"
-                    rel="noopener noreferrer"
-                    className="btn-primary"
-                  >
-                    {item.cta.label}
-                    <svg
-                      width="16"
-                      height="16"
-                      viewBox="0 0 24 24"
-                      fill="none"
-                      stroke="currentColor"
-                      strokeWidth="2"
-                      aria-hidden="true"
-                    >
-                      <path
-                        strokeLinecap="round"
-                        strokeLinejoin="round"
-                        d="M13.5 4.5 21 12m0 0-7.5 7.5M21 12H3"
-                      />
-                    </svg>
-                  </a>
-                ) : null}
-              </div>
-              <div className="spotlight-img-panel reveal d2" data-fit={item.fit}>
-                <Image
-                  src={item.photo}
-                  alt={item.alt}
-                  className="spotlight-img"
-                  width={1200}
-                  height={900}
-                  sizes="(max-width: 700px) 92vw, 44vw"
-                />
-              </div>
-            </div>
-          </div>
-        </section>
-      ))}
-
-      <section id="areas" className="section-rise">
-        <div className="container">
-          <SectionMark name="value" />
-          <p className="label reveal">Areas I Work In</p>
-          <h2 className="reveal d1">
-            Where I <em>add value.</em>
-          </h2>
-          <div className="areas-grid">
+        <Beat id="add-value" frame={3} labelledBy="add-value-h">
+          <p className="of-kicker" data-depth>Areas I work in</p>
+          <h2 className="of-h" id="add-value-h">Where I <em>add value.</em></h2>
+          <ol className="of-ledger">
             {AREAS.map((a, i) => (
-              <article key={a.title} className={`area-card glass reveal d${(i % 6) + 1}`}>
-                <AreaIcon name={a.icon} />
-                <h3 className="area-title">{a.title}</h3>
-                <p className="area-desc">{a.desc}</p>
-              </article>
+              <li key={a.title}>
+                <span className="n">{String(i + 1).padStart(2, "0")}</span>
+                <h3>{a.title}</h3>
+                <p>{a.desc}</p>
+              </li>
             ))}
-          </div>
-        </div>
-      </section>
+          </ol>
+        </Beat>
 
-      <div className="ticker-wrap" aria-hidden="true">
-        <div className="ticker-track">
-          {/* Doubled: the -50% keyframe assumes exactly two copies, so the
-              loop point lands where the first copy ends. */}
-          {[...TICKER, ...TICKER].map((t, i) => (
-            <span key={i} className="ticker-item">
-              {t}
-              <span className="ticker-dot" />
-            </span>
-          ))}
-        </div>
-      </div>
-
-      <section id="people" className="section-rise">
-        <div className="container">
-          <SectionMark name="people" />
-          <p className="label reveal">Who I&apos;ve Walked With</p>
-          <h2 className="reveal d1">People, not just programs.</h2>
-          <div className="people-list">
-            {NUMBERS.map((n, i) => (
-              <div key={n.display} className={`people-item reveal d${(i % 5) + 1}`}>
-                <CountUp
-                  value={n.value}
-                  suffix={"suffix" in n ? (n.suffix as string) : ""}
-                  display={n.display}
-                />
-                <p className="people-text">{n.text}</p>
-              </div>
+        <Beat id="numbers" frame={3} labelledBy="numbers-h">
+          <p className="of-kicker" data-depth>The numbers</p>
+          <h2 className="of-h" id="numbers-h">People, not just <em>programs.</em></h2>
+          <ul className="of-ledger of-nums">
+            {NUMBERS.map((n) => (
+              <li key={n.display}>
+                <span className="num">{n.display}</span>
+                <p>{n.text}</p>
+              </li>
             ))}
-          </div>
-        </div>
-      </section>
-
+          </ul>
+        </Beat>
+      </OneFrame>
       <PageNav current="/work" />
     </>
   );

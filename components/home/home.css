@@ -129,7 +129,8 @@
 /* ── Chapters: the breakdown ────────────────────────────────── */
 .hc-runway { position: relative; }
 .hc-stage { position: sticky; top: 0; height: 100svh; overflow: hidden; background: var(--bg); }
-.hc-layer { position: absolute; inset: 0; will-change: clip-path; }
+.hc-layer { position: absolute; inset: 0; overflow: hidden; background: var(--bg); will-change: transform; }
+.hc-shade { position: absolute; inset: 0; background: #071a1d; opacity: 0; pointer-events: none; will-change: opacity; }
 .hc-img { position: absolute; inset: 0; transform-origin: 50% 50%; will-change: transform; }
 .hc-photo { object-fit: cover; object-position: var(--pos); }
 .hc-veil {
@@ -150,7 +151,7 @@
   max-width: 680px; opacity: 0;
   will-change: transform, opacity;
 }
-.hc-kicker { margin-bottom: 18px; }
+.hc-kicker { margin-bottom: 18px; will-change: transform; }
 .hc-word {
   font-family: var(--font-serif); font-weight: 800;
   font-size: clamp(60px, 8.8vw, 128px); line-height: .9; letter-spacing: -.035em;
@@ -184,7 +185,8 @@
 .hv-kicker { justify-content: center; margin-bottom: 26px; }
 .hv-word {
   font-family: var(--font-serif); font-weight: 800;
-  font-size: clamp(56px, 9vw, 140px); line-height: .9; letter-spacing: -.04em;
+  /* Sized to the longest value, "Succession.", about 9 em wide in Syne 800. */
+  font-size: clamp(40px, 7.2vw, 112px); line-height: .9; letter-spacing: -.04em;
   color: var(--teal-ink);
 }
 .hv-line { margin-top: 26px; font-size: clamp(18px, 1.6vw, 24px); color: var(--teal-mid); }
@@ -230,7 +232,7 @@
   .hc-rail { right: 16px; height: 22vh; top: 26vh; transform: none; }
   .hc-veil { background: linear-gradient(to top, rgba(15,46,51,.97) 0%, rgba(15,46,51,.7) 40%, rgba(15,46,51,.2) 72%, rgba(15,46,51,.3) 100%); }
 
-  .hv-word { font-size: clamp(40px, 12vw, 64px); }
+  .hv-word { font-size: clamp(30px, 9.4vw, 52px); }
   .hv-line { font-size: 17px; }
   .hs { padding: 14vh 0; }
   .hs-beats { grid-template-columns: 1fr; gap: 28px; margin-top: 48px; }
@@ -249,7 +251,9 @@
   .hh-line > span { animation: none; transform: none; }
   .hc-runway { height: auto !important; }
   .hc-stage { position: static; height: auto; }
-  .hc-layer { position: relative; height: 100svh; clip-path: none !important; visibility: visible !important; }
+  .hc-layer { position: relative; height: 100svh; transform: none !important; visibility: visible !important; }
+  .hc-img, .hc-kicker { transform: none !important; }
+  .hc-shade { display: none; }
   .hc-copy, .hc-ghost { opacity: 1 !important; transform: none !important; }
   .hc-ghost { opacity: .16 !important; }
   .hc-rail { display: none; }

@@ -9,12 +9,11 @@ import { useEffect } from "react";
  * Everything here is optional: the page is complete and readable without a
  * line of it. Two groups:
  *
- *  1. Class-triggered entrances, for the handful of effects CSS scroll
- *     timelines cannot express (a clip-path wipe that must not replay, a
- *     three-stage staggered fade). Skipped entirely where the browser drives
- *     entrances from scroll natively.
- *  2. Pointer effects: the glass specular, magnetic buttons, photo tilt.
- *     These have no scroll-driven equivalent at all.
+ *  1. The `.reveal` entrance fallback, for browsers that cannot drive it
+ *     from scroll natively.
+ *  2. Pointer effects: the glass specular and magnetic buttons. The photo
+ *     tilt was removed in round three (2026-11-01): photographs now move
+ *     only with the scroll, at one speed rule, on every page.
  *
  * Re-runs on route change, because App Router keeps the layout mounted and
  * swaps the page under it: without the pathname dependency, only the first
@@ -60,17 +59,10 @@ export function Enhancements() {
       cleanups.push(() => io.disconnect());
     };
 
-    // Entrances CSS cannot own.
-    observe(".journey-chapter", "ch-in");
-    observe("#ch-interlude", "interlude-in", { threshold: 0.15 });
-    observe(".arc-thesis", "arc-in", { threshold: 0.2 });
-    observe(".spotlight-img-panel", "curtain-in", { threshold: 0.25 });
-
     // Fallback path only. Where the CSS is driving these off the scroll,
     // adding classes would be redundant work fighting a live animation.
     if (!scrollDriven) {
       observe(".reveal", "in", { threshold: 0.08, rootMargin: "0px 0px -24px 0px" });
-      observe(".vb-1,.vb-2,.vb-3", "vb-in");
       const settle = window.setTimeout(() => {
         $(".reveal").forEach((el) => {
           if (el.getBoundingClientRect().top < window.innerHeight * 0.96) {
@@ -108,31 +100,6 @@ export function Enhancements() {
         const onLeave = () => {
           node.style.setProperty("--tx", "0px");
           node.style.setProperty("--ty", "0px");
-        };
-        node.addEventListener("pointermove", onMove, { passive: true });
-        node.addEventListener("pointerleave", onLeave);
-        cleanups.push(() => {
-          node.removeEventListener("pointermove", onMove);
-          node.removeEventListener("pointerleave", onLeave);
-        });
-      });
-
-      // Chapter photo tilt. Applied to the frame, not the image: the image
-      // carries the scroll-driven parallax on its own transform.
-      $("[data-tilt]").forEach((el) => {
-        const node = el as HTMLElement;
-        const max = parseFloat(node.dataset.tiltMax ?? "6");
-        const onMove = (e: Event) => {
-          const ev = e as PointerEvent;
-          const r = node.getBoundingClientRect();
-          const rx = ((ev.clientY - r.top) / r.height - 0.5) * -max * 2;
-          const ry = ((ev.clientX - r.left) / r.width - 0.5) * max * 2;
-          node.style.transition = "transform .12s linear";
-          node.style.transform = `perspective(900px) rotateX(${rx.toFixed(2)}deg) rotateY(${ry.toFixed(2)}deg)`;
-        };
-        const onLeave = () => {
-          node.style.transition = "transform .6s cubic-bezier(0.16,1,0.3,1)";
-          node.style.transform = "";
         };
         node.addEventListener("pointermove", onMove, { passive: true });
         node.addEventListener("pointerleave", onLeave);

@@ -1,6 +1,6 @@
 import type { Metadata } from "next";
 import { PageNav } from "@/components/page-nav";
-import { SectionMark } from "@/components/section-mark";
+import { Beat, BeatGroup, OneFrame, type Frame } from "@/components/one-frame";
 import {
   ARC_THESIS,
   CTA,
@@ -16,12 +16,16 @@ export const metadata: Metadata = {
     "Relationship over transaction. Security without losing joy. The next generation leads now. What Enrico Omri Ravenna is building toward.",
 };
 
+/** One still of him, held for the whole page; the beats and the ask scroll past. */
+const FRAMES: Frame[] = [
+  { src: "/photo-now.jpg", alt: "Enrico Omri Ravenna, studio portrait", pos: "50% 22%", posM: "50% 18%" },
+];
+
 /** ARC_THESIS marks its emphasis with |pipes| so the copy stays plain text. */
 function Thesis({ text }: { text: string }) {
-  const parts = text.split("|");
   return (
-    <p className="arc-thesis">
-      {parts.map((part, i) =>
+    <p className="of-thesis">
+      {text.split("|").map((part, i) =>
         i % 2 === 1 ? <em key={i}>{part}</em> : <span key={i}>{part}</span>,
       )}
     </p>
@@ -31,107 +35,65 @@ function Thesis({ text }: { text: string }) {
 export default function VisionPage() {
   return (
     <>
-      <header className="page-head">
-        <div className="container">
-          <p className="label reveal">My Vision</p>
-          <h1 className="reveal d1">This is what I&apos;m building toward.</h1>
-        </div>
-      </header>
-
-      <section id="vision" className="section-rise">
-        <div className="container">
+      <OneFrame name="vision" frames={FRAMES}>
+        <Beat id="building" frame={0}>
+          <p className="of-kicker" data-depth>My vision</p>
+          <h1 className="of-h">This is what I&apos;m building toward.</h1>
           <Thesis text={ARC_THESIS} />
-
-          <blockquote className="vision-pull-quote reveal">
-            <q>{VISION_PULL.quote}</q>
-            <cite>— {VISION_PULL.cite}</cite>
+          <blockquote className="of-body">
+            <p>&ldquo;{VISION_PULL.quote}&rdquo;</p>
+            <cite className="of-cite">{VISION_PULL.cite}</cite>
           </blockquote>
+        </Beat>
 
-          <div className="vision-beats">
-            {VISION_BEATS.map((b, i) => (
-              <article key={b.statement} className={`vision-beat vb-${i + 1}`}>
-                <h2 className="vb-statement">{b.statement}</h2>
-                <p className="vb-body">{b.body}</p>
-              </article>
+        <BeatGroup id="beats">
+          {VISION_BEATS.map((b, i) => (
+            <Beat key={b.statement} frame={0} labelledBy={`beat-${i + 1}`}>
+              <p className="of-kicker" data-depth>Beat {String(i + 1).padStart(2, "0")} · of 03</p>
+              <h2 className="of-h" id={`beat-${i + 1}`}>{b.statement}</h2>
+              <div className="of-body"><p>{b.body}</p></div>
+            </Beat>
+          ))}
+        </BeatGroup>
+
+        <Beat frame={0}>
+          <blockquote className="of-pull">
+            &ldquo;Where there is a possibility, there&apos;s a responsibility.&rdquo;
+          </blockquote>
+          <cite className="of-cite">{SITE.name}</cite>
+        </Beat>
+
+        <Beat id="writing" frame={0} labelledBy="writing-h">
+          <p className="of-kicker" data-depth>From LinkedIn</p>
+          <h2 className="of-h" id="writing-h">What I&apos;m thinking about.</h2>
+          <ul className="of-ledger of-writing">
+            {INSIGHTS.map((post) => (
+              <li key={post.title}>
+                <span className="of-tag">{post.tag}</span>
+                <h3>
+                  <a href={post.href} target="_blank" rel="noopener noreferrer">
+                    {post.title} <span className="of-arrow" aria-hidden="true">↗</span>
+                    <span className="sr-only"> (LinkedIn, opens in a new tab)</span>
+                  </a>
+                </h3>
+              </li>
             ))}
-          </div>
+          </ul>
+        </Beat>
 
-          <div className="vision-quote-bridge reveal">
-            <blockquote>
-              &ldquo;Where there is a possibility, there&apos;s a
-              responsibility.&rdquo;
-            </blockquote>
-            <cite>— {SITE.name}</cite>
-          </div>
-        </div>
-      </section>
-
-      <section id="insights" className="section-rise">
-        <div className="container">
-          <SectionMark name="insight" />
-          <p className="label reveal">From LinkedIn</p>
-          <h2 className="reveal d1">What I&apos;m thinking about.</h2>
-          <div className="insights-grid">
-            {INSIGHTS.map((post, i) => (
-              <article
-                key={post.title}
-                className={`insight-card glass insight-card-${i + 1} reveal d${i + 1}`}
-              >
-                <span className="insight-edge" aria-hidden="true" />
-                <p className="insight-tag">{post.tag}</p>
-                <h3 className="insight-title">{post.title}</h3>
-                <a
-                  href={post.href}
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  className="insight-link"
-                >
-                  Read on LinkedIn
-                  <svg
-                    viewBox="0 0 24 24"
-                    fill="none"
-                    stroke="currentColor"
-                    strokeWidth="2.5"
-                    aria-hidden="true"
-                  >
-                    <path
-                      strokeLinecap="round"
-                      strokeLinejoin="round"
-                      d="M13.5 4.5 21 12m0 0-7.5 7.5M21 12H3"
-                    />
-                  </svg>
-                </a>
-              </article>
-            ))}
-          </div>
-        </div>
-      </section>
-
-      <section id="cta" className="section-rise">
-        <div className="container">
-          <SectionMark name="connect" />
-          <p className="label reveal">{CTA.label}</p>
-          <h2 className="reveal d1">{CTA.headline}</h2>
-          <p className="sub reveal d2">{CTA.sub}</p>
-          <div className="cta-row reveal d3">
-            <a
-              href={SITE.linkedin}
-              target="_blank"
-              rel="noopener noreferrer"
-              className="btn-primary"
-            >
+        <Beat id="talk" frame={0} labelledBy="talk-h">
+          <p className="of-kicker" data-depth>{CTA.label}</p>
+          <h2 className="of-h" id="talk-h">{CTA.headline}</h2>
+          <div className="of-body"><p>{CTA.sub}</p></div>
+          <div className="of-btns">
+            <a href={SITE.linkedin} target="_blank" rel="noopener noreferrer" className="of-btn of-btn-p">
               Connect on LinkedIn
             </a>
-            <a href={`mailto:${SITE.email}`} className="btn-secondary">
-              Email Me
-            </a>
-            <a href={SITE.resume} download className="btn-secondary">
-              Download Resume
-            </a>
+            <a href={`mailto:${SITE.email}`} className="of-btn">Email me</a>
+            <a href={SITE.resume} download className="of-btn">Download resume</a>
           </div>
-        </div>
-      </section>
-
+        </Beat>
+      </OneFrame>
       <PageNav current="/vision" />
     </>
   );

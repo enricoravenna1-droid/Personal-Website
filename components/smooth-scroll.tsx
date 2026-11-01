@@ -12,6 +12,9 @@ import { useReducedMotion } from "@/lib/use-reduced-motion";
  *     scroll is a genuine accessibility problem, not a taste question.
  *  2. The duration is 1.05s, not the 1.6s people copy from demos. Long
  *     smoothing feels laggy rather than premium.
+ *
+ * Pinned sections add their own ~120 ms soft stop on top of this, in
+ * lib/scroll-engine.ts. That one is on progress, not on the page.
  */
 export function SmoothScroll({ children }: { children: React.ReactNode }) {
   const reduced = useReducedMotion();
@@ -27,6 +30,8 @@ export function SmoothScroll({ children }: { children: React.ReactNode }) {
       // overriding it is the single most common way to make a site feel broken.
       syncTouch: false,
     });
+    // The nav's same-page jumps ride the same smoothing as the wheel.
+    window.__lenis = lenis;
 
     let frame = 0;
     const raf = (time: number) => {
@@ -37,6 +42,7 @@ export function SmoothScroll({ children }: { children: React.ReactNode }) {
 
     return () => {
       cancelAnimationFrame(frame);
+      if (window.__lenis === lenis) window.__lenis = undefined;
       lenis.destroy();
     };
   }, [reduced]);
