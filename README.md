@@ -432,7 +432,7 @@ Speaking pages (no material yet; the nav keeps Story, Voices, Work, Vision).
 (merge commit 3f0d026) and Vercel deployed it to enricoravenna.com within a
 minute. Live frames are in `Film Frames/live`. Branch `film` stays for the next round.
 
-## Round three (built 2026-11-01 on `film`, not pushed)
+## Round three (shipped 2026-11-01)
 
 Enrico picked **B, One Frame** and the word **Succession**. Plan:
 `Round Three Plan - Four Approaches - 2026-11-01.pdf`; boards in `Film Frames/boards-2026-11-01/`.
@@ -468,3 +468,8 @@ is a double exposure, by nature. Erin and Wendy have no portraits, so their fram
 the JFAR stage. `/accessibility` still describes the old globe and "five beats",
 which the film removed on 2026-10-31; it needs his wording before it is true again.
 Not yet tested with a real wheel in his Chrome.
+
+**Shipped 2026-11-01.** Enrico said "Ship it"; `film` fast-forwarded `main` to 5eda7cf
+and Vercel deployed it within a minute. All six routes return 200 on
+enricoravenna.com, the live CSS carries the standard `backdrop-filter`, and live
+frames of Story, Voices and the nav (desktop and phone) are in `Film Frames/live-r3`.
